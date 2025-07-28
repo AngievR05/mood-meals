@@ -1,0 +1,62 @@
+.home-container {
+  font-family: 'Segoe UI', sans-serif;
+  padding: 2rem;
+  background-color: #f9f9f9;
+  min-height: 100vh;
+}
+
+.home-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.home-header h1 {
+  font-size: 2.5rem;
+  color: #333;
+}
+
+.home-header p {
+  color: #777;
+  font-size: 1.2rem;
+}
+
+.mood-section h2 {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  color: #444;
+}
+
+.mood-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.mood-card {
+  border: none;
+  border-radius: 20px;
+  padding: 1.5rem 1rem;
+  color: #fff;
+  font-weight: bold;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.mood-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.mood-icon {
+  font-size: 2.2rem;
+  display: block;
+}
+
+.mood-label {
+  font-size: 1rem;
+  margin-top: 0.5rem;
+  display: block;
+}
