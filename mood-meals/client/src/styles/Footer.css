@@ -1,0 +1,37 @@
+.footer-marquee-wrapper {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+  background-color: #222;
+  color: white;
+  padding: 0.75rem 0;
+  z-index: 1000;
+}
+
+.footer-marquee {
+  display: flex;
+  width: max-content;
+  animation: scroll-left 60s linear infinite;
+}
+
+.footer-marquee-wrapper:hover .footer-marquee {
+  animation-play-state: paused;
+}
+
+.footer-marquee span {
+  white-space: nowrap;
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding-right: 4rem;
+}
+
+@keyframes scroll-left {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}

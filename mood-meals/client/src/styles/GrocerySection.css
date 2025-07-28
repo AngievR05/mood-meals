@@ -1,0 +1,60 @@
+.grocery-section {
+  margin: 2rem 0;
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+
+.grocery-section h2 {
+  font-size: 1.6rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.grocery-input {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.grocery-input input {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  transition: border-color 0.2s ease;
+}
+
+.grocery-input input:focus {
+  border-color: #55DDE0;
+}
+
+.grocery-input button {
+  padding: 0.6rem 1rem;
+  background: #81C784;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.grocery-input button:hover {
+  background: #66bb6a;
+}
+
+.grocery-list {
+  list-style: none;
+  padding-left: 0;
+}
+
+.grocery-list li {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px dashed #ccc;
+  font-size: 1rem;
+  color: #555;
+}

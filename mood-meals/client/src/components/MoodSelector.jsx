@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import '../styles/Home.css';
 
 const moods = [
@@ -12,14 +12,22 @@ const moods = [
   { name: 'Grateful', color: '#81C784' },
 ];
 
-const MoodSelector = () => {
+const MoodSelector = ({ onSelect }) => {
+  const [selectedMood, setSelectedMood] = useState(null);
+
+  const handleMoodClick = (mood) => {
+    setSelectedMood(mood.name);
+    onSelect(mood.name);
+  };
+
   return (
     <div className="mood-grid">
       {moods.map((mood) => (
         <button
           key={mood.name}
-          className="mood-card"
+          className={`mood-card ${selectedMood === mood.name ? 'selected' : ''}`}
           style={{ backgroundColor: mood.color }}
+          onClick={() => handleMoodClick(mood)}
         >
           <span className="mood-icon">{mood.name.charAt(0)}</span>
           <span className="mood-label">{mood.name}</span>

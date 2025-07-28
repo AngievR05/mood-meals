@@ -20,6 +20,12 @@
   font-size: 1.2rem;
 }
 
+.mood-section,
+.grocery-section,
+.meals-section {
+  margin-bottom: 3rem;
+}
+
 .mood-section h2 {
   font-size: 1.8rem;
   margin-bottom: 1rem;
@@ -41,22 +47,31 @@
   font-weight: bold;
   text-align: center;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+  position: relative;
+  overflow: hidden;
 }
 
 .mood-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  transform: translateY(-5px) scale(1.03);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
 }
 
 .mood-icon {
-  font-size: 2.2rem;
+  font-size: 2.4rem;
   display: block;
+  opacity: 0.9;
 }
 
 .mood-label {
-  font-size: 1rem;
-  margin-top: 0.5rem;
-  display: block;
+  font-size: 1.05rem;
+  margin-top: 0.4rem;
 }
+
+.mood-card.selected {
+  outline: 3px solid white;
+  box-shadow: 0 0 0 4px white, 0 0 0 8px rgba(85, 221, 224, 0.4);
+  transform: scale(1.05);
+}
+
