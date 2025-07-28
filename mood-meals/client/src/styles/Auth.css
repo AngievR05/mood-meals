@@ -1,0 +1,197 @@
+.auth-container {
+  min-height: 100vh;
+  /* Remove any background or overlay styles here */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  font-family: 'Segoe UI', sans-serif;
+  position: relative; /* keep this for positioning overlay div */
+}
+
+.auth-card,
+.auth-form {
+  position: relative; /* form is positioned above overlay inline now */
+  z-index: 1;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(14px);
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  width: 100%;
+  max-width: 420px;
+  color: #fff;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  animation: fadeInUp 0.6s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ... rest of your CSS unchanged ... */
+
+
+/* .auth-container {
+  min-height: 100vh;
+  background-image: url('/assets/images/background.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: #5d9cec; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  font-family: 'Segoe UI', sans-serif;
+  position: relative;
+}
+
+.auth-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4); 
+  z-index: 0;
+}
+
+.auth-card,
+.auth-form {
+  position: relative;
+  z-index: 1;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(14px);
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  width: 100%;
+  max-width: 420px;
+  color: #fff;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  animation: fadeInUp 0.6s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+} */
+
+.auth-card h2,
+.auth-form h2 {
+  text-align: center;
+  font-size: 1.9rem;
+  margin-bottom: 1.8rem;
+  color: #ffffff;
+}
+
+.auth-card input,
+.auth-form input {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1.5px solid transparent;
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  margin-bottom: 1.2rem;
+  color: #fff;
+  font-size: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+  transition: 0.3s ease;
+  outline: none;
+}
+
+.auth-card input::placeholder,
+.auth-form input::placeholder {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.auth-card input:focus,
+.auth-form input:focus {
+  border-color: #fff;
+  background-color: rgba(255, 255, 255, 0.25);
+}
+
+.auth-button,
+.auth-form button {
+  background: #4a89dc;
+  color: #fff;
+  padding: 0.9rem 1rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.auth-button:hover,
+.auth-form button:hover {
+  background: #3573c2;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(93, 156, 236, 0.4);
+}
+
+.auth-link,
+.auth-form p {
+  margin-top: 1rem;
+  text-align: center;
+  font-size: 0.95rem;
+  color: #fff;
+}
+
+.auth-link span,
+.auth-form p span {
+  color: #fff;
+  font-weight: bold;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.auth-error {
+  color: #fdd;
+  background: rgba(255, 0, 0, 0.2);
+  padding: 0.6rem;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+  text-align: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.auth-success {
+  color: #d2ffd2;
+  background: rgba(0, 255, 100, 0.15);
+  padding: 0.6rem;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+  text-align: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Mobile adjustments */
+@media (max-width: 500px) {
+  .auth-card,
+  .auth-form {
+    padding: 2rem 1.5rem;
+  }
+
+  .auth-card h2,
+  .auth-form h2 {
+    font-size: 1.5rem;
+  }
+
+  .auth-button,
+  .auth-form button {
+    font-size: 0.95rem;
+    padding: 0.75rem 1rem;
+  }
+}

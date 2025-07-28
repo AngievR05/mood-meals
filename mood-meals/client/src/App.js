@@ -2,21 +2,45 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
+
 import Home from './pages/Home';
 import MealSuggestions from './components/MealSuggestions';
-import RecipePage from './components/RecipePage'; 
-import Footer from './components/Footer';
+import RecipePage from './components/RecipePage';
+
+import Login from './pages/Login';
+import Register from './pages/Register';
 
 function App() {
   return (
     <Router>
-      <Navbar />
+      {/* Show Navbar only on authenticated pages, not login/register */}
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/suggestions" element={<MealSuggestions />} />
-        <Route path="/recipes/:mealName" element={<RecipePage />} />
+        <Route
+          path="/"
+          element={<Login />}
+        />
+        <Route
+          path="/register"
+          element={<Register />}
+        />
+
+        {/* Wrap authenticated routes with Navbar and Footer */}
+        <Route
+          path="/*"
+          element={
+            <>
+              <Navbar />
+              <Routes>
+                <Route path="home" element={<Home />} />
+                <Route path="suggestions" element={<MealSuggestions />} />
+                <Route path="recipes/:mealName" element={<RecipePage />} />
+              </Routes>
+              <Footer />
+            </>
+          }
+        />
       </Routes>
-      <Footer />
     </Router>
   );
 }
