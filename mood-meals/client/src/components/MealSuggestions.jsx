@@ -4,6 +4,10 @@ import '../styles/MealSuggestions.css';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+
 const mealMap = {
   Happy: [
     { name: 'Fruit Salad', image: '/images/meals/fruit-salad.jpg' },
@@ -103,8 +107,9 @@ const mealMap = {
   ],
 };
 
-
 const MealSuggestions = ({ currentMood }) => {
+  const [selectedMeal, setSelectedMeal] = useState(null);
+  const navigate = useNavigate();
   const meals = mealMap[currentMood] || [];
 
   const settings = {
@@ -115,19 +120,14 @@ const MealSuggestions = ({ currentMood }) => {
     slidesToScroll: 1,
     arrows: true,
     responsive: [
-      {
-        breakpoint: 1024, // tablet
-        settings: {
-          slidesToShow: 2,
-        },
-      },
-      {
-        breakpoint: 640, // mobile
-        settings: {
-          slidesToShow: 1,
-        },
-      },
+      { breakpoint: 1024, settings: { slidesToShow: 2 } },
+      { breakpoint: 640, settings: { slidesToShow: 1 } },
     ],
+  };
+
+  const openRecipe = (meal) => {
+    setSelectedMeal(meal); // Set modal if you need it
+    navigate(`/recipes/${encodeURIComponent(meal.name)}`);
   };
 
   if (!currentMood) {
@@ -135,15 +135,6 @@ const MealSuggestions = ({ currentMood }) => {
       <div className="meal-suggestions">
         <h2>🍽️ Meals for Mood</h2>
         <p>Select a mood to get meal ideas!</p>
-      </div>
-    );
-  }
-
-  if (meals.length === 0) {
-    return (
-      <div className="meal-suggestions">
-        <h2>🍽️ Meals for "{currentMood}" Mood</h2>
-        <p>No meal suggestions found for this mood.</p>
       </div>
     );
   }
@@ -161,7 +152,12 @@ const MealSuggestions = ({ currentMood }) => {
               loading="lazy"
             />
             <p className="meal-name">{name}</p>
-            <button className="recipe-button">View Recipe</button>
+            <button
+              className="view-recipe-btn"
+              onClick={() => openRecipe({ name, image })}
+            >
+              🍴 View Recipe
+            </button>
           </div>
         ))}
       </Slider>
