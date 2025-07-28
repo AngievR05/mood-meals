@@ -3,11 +3,11 @@ import '../styles/Footer.css';
 
 const Footer = () => {
   const message = `
-    Mood Meals: Your journey to mindful eating. &nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;
-    Quick Links: Home &nbsp;|&nbsp; About &nbsp;|&nbsp; Contact &nbsp;|&nbsp; FAQ &nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;
-    Follow us on: Facebook &nbsp;|&nbsp; Instagram &nbsp;|&nbsp; Twitter &nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;
-    Contact Us: support@moodmeals.co.za &nbsp;|&nbsp; +27 66 261 9841 &nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;
-    Privacy Policy &nbsp;|&nbsp; Terms of Service&nbsp;&nbsp;&nbsp;&nbsp;
+    Mood Meals: Your journey to mindful eating. |&nbsp;&nbsp;&nbsp;&nbsp;
+    Quick Links: Home | About | Contact | FAQ |&nbsp;&nbsp;&nbsp;&nbsp;
+    Follow us on: Facebook | Instagram | Twitter |&nbsp;&nbsp;&nbsp;&nbsp;
+    Contact Us: support@moodmeals.co.za | +27 66 261 9841 |&nbsp;&nbsp;&nbsp;&nbsp;
+    Privacy Policy | Terms of Service&nbsp;&nbsp;&nbsp;&nbsp;
   `;
 
   return (

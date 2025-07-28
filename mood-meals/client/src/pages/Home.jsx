@@ -17,7 +17,7 @@ const Home = () => {
     <div className="home-container">
       <header className="home-header">
         <h1>Mood Meals</h1>
-        <p>Hi Angie 👋 — How are you feeling today?</p>
+        <p>Hi Angie 👋 <br /> How are you feeling today?</p>
       </header>
 
       <section className="mood-section">
@@ -36,7 +36,6 @@ const Home = () => {
         <MealSuggestions currentMood={currentMood} />
       </section>
 
-      <Footer />
     </div>
   );
 };
