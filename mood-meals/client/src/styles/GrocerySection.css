@@ -1,50 +1,70 @@
 .grocery-section {
-  margin: 2rem 0;
-  background: #fff;
-  padding: 1.5rem;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  margin: 0rem 0;
+  background: #fdfdfd;
+  padding: 1rem;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.07);
+  font-family: 'Segoe UI', sans-serif;
 }
 
 .grocery-section h2 {
-  font-size: 1.6rem;
-  color: #333;
-  margin-bottom: 1rem;
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  color: #1c1c1c;
 }
 
 .grocery-input {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
+  gap: 1rem;
+  margin-bottom: 2rem;
 }
 
 .grocery-input input {
   flex: 1;
-  padding: 0.6rem 1rem;
-  border-radius: 10px;
-  border: 1px solid #ccc;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  border: 2px solid #e4d9fe8d;
   font-size: 1rem;
-  transition: border-color 0.2s ease;
+  transition: all 0.3s ease;
 }
 
 .grocery-input input:focus {
-  border-color: #55DDE0;
+  border-color: #967adc;
+  outline: none;
+  box-shadow: 0 0 0 2px #b655e044;
 }
 
 .grocery-input button {
-  padding: 0.6rem 1rem;
-  background: #81C784;
-  color: white;
+  padding: 0.75rem 1.2rem;
+  background: #967adc;
+  color: #fff;
   border: none;
-  border-radius: 10px;
-  font-weight: bold;
+  border-radius: 12px;
+  font-weight: 600;
   cursor: pointer;
   transition: background 0.3s ease;
 }
 
 .grocery-input button:hover {
-  background: #66bb6a;
+  background: #ac92ec;
+}
+
+.grocery-lists {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.grocery-column {
+  flex: 1;
+  min-width: 220px;
+}
+
+.grocery-column h3 {
+  font-size: 1.4rem;
+  margin-bottom: 0.75rem;
+  color: #222;
 }
 
 .grocery-list {
@@ -53,8 +73,33 @@
 }
 
 .grocery-list li {
-  padding: 0.5rem 0.75rem;
-  border-bottom: 1px dashed #ccc;
+  background: #f2f2f2;
+  margin-bottom: 0.6rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   font-size: 1rem;
-  color: #555;
+  transition: background 0.2s ease, transform 0.2s ease;
+  cursor: pointer;
+}
+
+.grocery-list li:hover {
+  background: #e0f7fa;
+  transform: scale(1.02);
+}
+
+.grocery-list li.checked {
+  background: #c8e6c9;
+  text-decoration: line-through;
+  color: #8cc152;
+  font-weight: 600;
+  cursor: default;
+}
+
+.check-icon {
+  font-size: 1.1rem;
+  color: #a0d468;
+  margin-left: 0.5rem;
 }

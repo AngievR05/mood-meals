@@ -1,6 +1,6 @@
 .meal-suggestions {
   margin-top: 2rem;
-  background: linear-gradient(135deg, #e0f7fa, #f0fdfc);
+  background: linear-gradient(135deg, #5d9cec, #4a89dc);
   padding: 2rem 2.5rem;
   border-radius: 24px;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
@@ -15,7 +15,7 @@
 
 .meal-suggestions h2 {
   font-size: 2rem;
-  color: #1f2937;
+  color: #ffffff;
   margin-bottom: 2rem;
   font-weight: 700;
   text-align: center;
@@ -46,9 +46,9 @@
 
 /* Meal Card Styles */
 .meal-card {
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.879);
   border-radius: 20px;
-  box-shadow: 0 6px 24px rgba(0, 191, 165, 0.08);
+  box-shadow: 0 6px 24px rgba(0, 65, 195, 0.074);
   overflow: hidden;
   transition: transform 0.35s ease, box-shadow 0.35s ease;
   text-align: center;
@@ -90,7 +90,7 @@
   font-size: 0.95rem;
   font-weight: 600;
   color: #fff;
-  background: linear-gradient(to right, #00bfa5, #1de9b6);
+  background: linear-gradient(to right, #4fc1e9, #3bafda);
   border: none;
   border-radius: 999px;
   cursor: pointer;
@@ -102,7 +102,7 @@
 }
 
 .view-recipe-btn:hover {
-  background: linear-gradient(to right, #1de9b6, #00bfa5);
+  background: linear-gradient(to right, #ac92ec, #967adc);
   transform: translateY(-2px);
 }
 

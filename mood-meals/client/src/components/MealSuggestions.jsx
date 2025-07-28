@@ -156,7 +156,7 @@ const MealSuggestions = ({ currentMood }) => {
               className="view-recipe-btn"
               onClick={() => openRecipe({ name, image })}
             >
-              🍴 View Recipe
+              View Recipe
             </button>
           </div>
         ))}
