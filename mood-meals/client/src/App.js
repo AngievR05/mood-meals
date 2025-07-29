@@ -10,28 +10,29 @@ import RecipePage from './components/RecipePage';
 
 import Login from './pages/Login';
 import Register from './pages/Register';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
     <Router>
       <Routes>
-        {/* Public Routes */}
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        {/* Protected/App Routes */}
         <Route
           path="/*"
           element={
-            <>
-              <Navbar />
-              <Routes>
-                <Route path="home" element={<Home />} />
-                <Route path="suggestions" element={<MealSuggestions />} />
-                <Route path="recipes/:mealName" element={<RecipePage />} />
-              </Routes>
-              <Footer />
-            </>
+            <ProtectedRoute>
+              <>
+                <Navbar />
+                <Routes>
+                  <Route path="home" element={<Home />} />
+                  <Route path="suggestions" element={<MealSuggestions />} />
+                  <Route path="recipes/:mealName" element={<RecipePage />} />
+                </Routes>
+                <Footer />
+              </>
+            </ProtectedRoute>
           }
         />
       </Routes>
