@@ -22,10 +22,35 @@ const Register = () => {
     }));
   };
 
+  const validateForm = () => {
+    const { username, email, password } = formData;
+
+    if (username.trim().length < 3) {
+      return 'Username must be at least 3 characters';
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return 'Enter a valid email address';
+    }
+
+    if (password.length < 6) {
+      return 'Password must be at least 6 characters';
+    }
+
+    return null;
+  };
+
   const handleRegister = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
+
+    const validationError = validateForm();
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
 
     try {
       const res = await fetch('http://localhost:5000/api/auth/register', {
@@ -43,7 +68,7 @@ const Register = () => {
       }
 
       setSuccess('🎉 Registered successfully! Redirecting...');
-      setTimeout(() => navigate('/'), 2000); // Navigate to login page '/'
+      setTimeout(() => navigate('/'), 2000);
     } catch (err) {
       setError(err.message);
     }
@@ -61,7 +86,6 @@ const Register = () => {
         minHeight: '100vh',
       }}
     >
-      {/* Overlay div */}
       <div
         style={{
           position: 'absolute',
@@ -71,7 +95,6 @@ const Register = () => {
         }}
       ></div>
 
-      {/* Form */}
       <form
         className="auth-card"
         onSubmit={handleRegister}
@@ -83,7 +106,6 @@ const Register = () => {
           type="text"
           name="username"
           placeholder="Username"
-          required
           value={formData.username}
           onChange={handleChange}
         />
@@ -92,7 +114,6 @@ const Register = () => {
           type="email"
           name="email"
           placeholder="Email"
-          required
           value={formData.email}
           onChange={handleChange}
         />
@@ -101,7 +122,6 @@ const Register = () => {
           type="password"
           name="password"
           placeholder="Password"
-          required
           value={formData.password}
           onChange={handleChange}
         />

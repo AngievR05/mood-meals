@@ -14,18 +14,12 @@ import Register from './pages/Register';
 function App() {
   return (
     <Router>
-      {/* Show Navbar only on authenticated pages, not login/register */}
       <Routes>
-        <Route
-          path="/"
-          element={<Login />}
-        />
-        <Route
-          path="/register"
-          element={<Register />}
-        />
+        {/* Public Routes */}
+        <Route path="/" element={<Login />} />
+        <Route path="/register" element={<Register />} />
 
-        {/* Wrap authenticated routes with Navbar and Footer */}
+        {/* Protected/App Routes */}
         <Route
           path="/*"
           element={
