@@ -35,9 +35,16 @@ const moodImages = {
 const Home = () => {
   const [moodNote, setMoodNote] = useState('');
   const [currentMood, setCurrentMood] = useState('');
+  const [username, setUsername] = useState('');
 
   useEffect(() => {
     AOS.init({ duration: 1000, once: true });
+
+    // Pull username from localStorage to greet user
+    const storedUsername = localStorage.getItem('username');
+    if (storedUsername) {
+      setUsername(storedUsername);
+    }
   }, []);
 
   return (
@@ -45,12 +52,18 @@ const Home = () => {
       <header className="home-header">
         <div className="header-left">
           <h1>Mood Meals</h1>
-          <p>Hi Angie 👋 <br /> How are you feeling today?</p>
+          <p>
+            {username ? (
+              <>Hi {username} 👋 <br /> How are you feeling today?</>
+            ) : (
+              <>How are you feeling today?</>
+            )}
+          </p>
         </div>
         {currentMood && (
           <div className="header-right">
             <img
-              key={currentMood}              // triggers React to re-render img and restart animation
+              key={currentMood}
               src={moodImages[currentMood]}
               alt={currentMood}
               className="header-mood-image pulse"
@@ -61,8 +74,8 @@ const Home = () => {
 
       <section className="mood-section" data-aos="fade-up">
         <h2>Select Your Mood</h2>
-        <MoodSelector onSelect={(mood) => setCurrentMood(mood)} />
-        <MoodNoteModal onSave={(note) => setMoodNote(note)} />
+        <MoodSelector onSelect={setCurrentMood} />
+        <MoodNoteModal onSave={setMoodNote} />
         <div className="mood-status-wrapper">
           <MoodIndicator mood={currentMood} />
           <StreakTracker streak={3} />

@@ -7,7 +7,7 @@ import spinner from '../assets/images/Group2.png'; // your spinner image
 const Login = () => {
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [formData, setFormData] = useState({ identifier: '', password: '' });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
@@ -17,9 +17,8 @@ const Login = () => {
   };
 
   const validateForm = () => {
-    const { email, password } = formData;
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) return 'Enter a valid email address';
+    const { identifier, password } = formData;
+    if (!identifier.trim()) return 'Username or Email is required';
     if (password.length < 6) return 'Password must be at least 6 characters';
     return null;
   };
@@ -41,7 +40,10 @@ const Login = () => {
       const res = await fetch('http://localhost:5000/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          identifier: formData.identifier,
+          password: formData.password,
+        }),
       });
 
       const data = await res.json();
@@ -49,6 +51,8 @@ const Login = () => {
       if (!res.ok) throw new Error(data.message || 'Login failed');
 
       localStorage.setItem('token', data.token);
+      localStorage.setItem('username', data.username);
+      localStorage.setItem('email', data.email);
 
       setSuccess('✅ Logged in successfully! Redirecting...');
       setTimeout(() => navigate('/home'), 1500);
@@ -88,12 +92,13 @@ const Login = () => {
         <h2>Welcome Back to Mood Meals</h2>
 
         <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={formData.email}
+          type="text"
+          name="identifier"
+          placeholder="Username or Email"
+          value={formData.identifier}
           onChange={handleChange}
           disabled={loading}
+          autoComplete="username email"
         />
 
         <input
@@ -103,6 +108,7 @@ const Login = () => {
           value={formData.password}
           onChange={handleChange}
           disabled={loading}
+          autoComplete="current-password"
         />
 
         {error && <p className="auth-error">{error}</p>}
