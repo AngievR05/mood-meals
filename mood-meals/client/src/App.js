@@ -7,6 +7,7 @@ import Footer from './components/Footer';
 import Home from './pages/Home';
 import MealSuggestions from './components/MealSuggestions';
 import RecipePage from './components/RecipePage';
+import MoodTracker from './pages/MoodTracker';
 
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -29,6 +30,7 @@ function App() {
                   <Route path="home" element={<Home />} />
                   <Route path="suggestions" element={<MealSuggestions />} />
                   <Route path="recipes/:mealName" element={<RecipePage />} />
+                  <Route path="mood-tracker" element={<MoodTracker />} />
                 </Routes>
                 <Footer />
               </>
