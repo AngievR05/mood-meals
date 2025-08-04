@@ -6,6 +6,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
+import '../styles/MoodRadialChart.css';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -18,20 +19,6 @@ const moodColors = {
   Energised: '#FFCE54',
   Confused: '#FC6E51',
   Grateful: '#AC92EC',
-};
-
-const centerTextPlugin = {
-  id: 'centerText',
-  beforeDraw(chart) {
-    const { ctx, width, height } = chart;
-    ctx.save();
-    ctx.font = 'bold 22px Segoe UI, sans-serif';
-    ctx.fillStyle = '#4a89dc';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('Mood Breakdown', width / 2, height / 2);
-    ctx.restore();
-  },
 };
 
 const MoodRadialChart = ({ data }) => {
@@ -67,18 +54,15 @@ const MoodRadialChart = ({ data }) => {
         position: 'right',
         align: 'center',
         labels: {
-          boxWidth: 20,
-          boxHeight: 20,
-          padding: 20,
+          boxWidth: 18,
+          padding: 16,
           font: {
-            size: 16,
-            weight: '600',
+            size: 15,
+            weight: '500',
           },
           color: '#333',
           usePointStyle: true,
-          pointStyle: 'rectRounded',
-          pointStyleWidth: 18,
-          pointStyleHeight: 18,
+          pointStyle: 'circle',
         },
       },
       tooltip: {
@@ -102,31 +86,9 @@ const MoodRadialChart = ({ data }) => {
   };
 
   return (
-    <div
-      style={{
-        width: '100%',
-        maxWidth: '900px',
-        height: '450px',
-        margin: '20px auto',
-        padding: '30px 40px',
-        backgroundColor: '#f9f9f9',
-        borderRadius: '12px',
-        boxShadow: '0 2px 15px rgba(0,0,0,0.1)',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        overflow: 'visible', // important for hover shadows
-      }}
-    >
-      <div
-        style={{
-          flex: '1 1 60%',
-          height: '100%',
-          position: 'relative',
-          overflow: 'visible',
-        }}
-      >
-        <Doughnut data={chartData} options={options} plugins={[centerTextPlugin]} />
+    <div className="mood-chart-container">
+      <div className="mood-chart">
+        <Doughnut data={chartData} options={options} />
       </div>
     </div>
   );

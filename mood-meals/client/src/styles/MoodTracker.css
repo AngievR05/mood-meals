@@ -5,6 +5,8 @@
   min-height: 100vh;
   font-family: 'Segoe UI', sans-serif;
   color: #333;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Header */
@@ -17,11 +19,15 @@
   font-size: 2.8rem;
   color: #4a89dc;
   margin-bottom: 0.5rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
 }
 
 .tracker-header p {
   font-size: 1.1rem;
   color: #666;
+  font-weight: 500;
+  opacity: 0.8;
 }
 
 /* Section Headings */
@@ -31,138 +37,164 @@
   font-size: 1.8rem;
   color: #444;
   margin-bottom: 1rem;
+  font-weight: 600;
+  border-bottom: 2px solid #4a89dc;
+  padding-bottom: 0.3rem;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* Mood Grid (matching Home page) */
 .mood-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-  gap: 1.2rem;
-  margin-bottom: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 1.3rem;
+  margin-bottom: 2.5rem;
+  padding: 0 0.5rem;
 }
 
 /* Mood Card UI (copied from Home) */
 .mood-card {
   border: none;
   border-radius: 16px;
-  height: 130px;
-  padding: 0.75rem;
-  background: transparent;
+  height: 140px;
+  padding: 1rem;
+  background: linear-gradient(135deg, #5d9cec, #4a89dc);
   color: #fff;
-  font-weight: bold;
+  font-weight: 700;
   text-align: center;
   cursor: pointer;
-  transition: all 0.3s ease-in-out;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.14);
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  user-select: none;
 }
 
-.mood-card:hover {
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.2);
-  filter: brightness(1.05);
+.mood-card:hover,
+.mood-card:focus {
+  transform: translateY(-6px) scale(1.05);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+  filter: brightness(1.1);
+  outline: none;
 }
 
 /* Icon background */
 .mood-icon {
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 255, 255, 0.22);
   border-radius: 50%;
-  width: 70px;
-  height: 70px;
+  width: 75px;
+  height: 75px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 0.4rem;
-  transition: background-color 0.3s;
+  margin-bottom: 0.5rem;
+  transition: background-color 0.3s ease;
+  box-shadow: 0 4px 8px rgba(255 255 255 / 0.3);
 }
 
 .mood-icon img {
-  width: 68px;
-  height: 68px;
+  width: 70px;
+  height: 70px;
   object-fit: contain;
   transition: transform 0.3s ease;
+  will-change: transform;
 }
 
 .mood-card:hover .mood-icon img {
-  transform: scale(1.1);
+  transform: scale(1.15);
 }
 
 /* Mood label text */
 .mood-label {
-  font-size: 0.9rem;
-  font-weight: 600;
+  font-size: 1rem;
+  font-weight: 700;
   color: #fff;
+  text-shadow: 0 0 6px rgba(0,0,0,0.15);
+  user-select: none;
 }
 
 /* Selected state styling */
 .mood-card.selected {
-  outline: 3px solid white;
-  box-shadow: 0 0 0 3px white, 0 0 0 7px rgba(85, 221, 224, 0.4);
-  transform: scale(1.04);
+  outline: 3px solid #fff;
+  box-shadow:
+    0 0 0 3px #fff,
+    0 0 10px 6px rgba(85, 221, 224, 0.6),
+    0 10px 22px rgba(0, 0, 0, 0.3);
+  transform: scale(1.07);
+  filter: brightness(1.15);
 }
 
 /* Textarea Note */
 textarea {
   width: 98%;
-  padding: 1rem;
-  border-radius: 12px;
-  border: 1px solid #ccd6dd;
-  margin-top: 1rem;
+  padding: 1rem 1.2rem;
+  border-radius: 14px;
+  border: 1.5px solid #ccd6dd;
+  margin-top: 1.5rem;
   resize: vertical;
-  font-size: 1rem;
+  font-size: 1.05rem;
   font-family: inherit;
-  transition: border-color 0.3s ease;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: inset 0 2px 5px rgba(0,0,0,0.03);
+  min-height: 90px;
 }
 
 textarea:focus {
   border-color: #4a89dc;
   outline: none;
+  box-shadow: 0 0 12px rgba(74, 137, 220, 0.5);
 }
 
 /* Save Button */
 .save-btn {
-  margin-top: 1rem;
-  padding: 0.85rem 1.8rem;
+  margin-top: 1.3rem;
+  padding: 1rem 2rem;
   background: linear-gradient(135deg, #5d9cec, #4a89dc);
   border: none;
   color: #fff;
-  border-radius: 10px;
+  border-radius: 12px;
   cursor: pointer;
-  font-weight: 600;
-  font-size: 1rem;
-  box-shadow: 0 4px 12px rgba(74, 137, 220, 0.4);
-  transition: background 0.3s, transform 0.2s;
+  font-weight: 700;
+  font-size: 1.1rem;
+  box-shadow: 0 6px 16px rgba(74, 137, 220, 0.5);
+  transition: background 0.3s ease, transform 0.2s ease;
+  user-select: none;
 }
 
-.save-btn:hover {
+.save-btn:hover,
+.save-btn:focus {
   background: linear-gradient(135deg, #4a89dc, #357abd);
-  transform: translateY(-2px);
+  transform: translateY(-3px);
+  outline: none;
+  box-shadow: 0 10px 24px rgba(53, 122, 189, 0.7);
 }
 
 /* Weekly Overview */
 .weekly-overview {
-  margin-top: 3rem;
+  margin-top: 3.5rem;
 }
 
 .mock-graph {
   background: #fff9e6;
-  padding: 2.5rem;
-  border-radius: 16px;
-  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.05);
+  padding: 3rem 2.5rem;
+  border-radius: 20px;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.07);
   text-align: center;
   font-style: italic;
   color: #888;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
+  user-select: none;
 }
 
 /* Recent Mood Log */
 .recent-log {
-  margin-top: 3rem;
+  margin-top: 3.5rem;
 }
 
 .log-list {
@@ -173,61 +205,70 @@ textarea:focus {
 
 .log-list li {
   background: #ffffff;
-  border-radius: 14px;
-  padding: 1.2rem 1.5rem;
-  margin-bottom: 1rem;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+  border-radius: 18px;
+  padding: 1.3rem 1.8rem;
+  margin-bottom: 1.3rem;
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.05);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 1rem;
-  font-weight: 500;
+  font-size: 1.05rem;
+  font-weight: 600;
+  user-select: none;
+  transition: box-shadow 0.3s ease;
+}
+
+.log-list li:hover {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
 /* Left side: image + name + note stacked */
 .log-entry-left {
   display: flex;
   align-items: flex-start;
-  gap: 1rem;
+  gap: 1.2rem;
   flex: 1; /* fill available space */
 }
 
 .log-mood-image {
-  width: 48px;
-  height: 48px;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
   object-fit: contain;
-  margin-top: 4px; /* align better with text */
+  margin-top: 3px; /* better vertical align */
   flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(74, 137, 220, 0.3);
 }
 
 .log-mood-text {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.3rem;
 }
 
 .log-mood-name {
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   color: #444;
 }
 
 .log-mood-note {
   font-weight: 400;
-  font-size: 0.95rem;
+  font-size: 1rem;
   color: #555;
-  max-width: 300px;
+  max-width: 320px;
   word-break: break-word;
+  line-height: 1.35;
 }
 
 /* Right side: date */
 .log-date {
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   color: #777;
   white-space: nowrap;
-  margin-left: 1.5rem;
+  margin-left: 1.8rem;
   flex-shrink: 0;
+  user-select: none;
 }
 
 /* Responsive tweaks */
@@ -243,18 +284,82 @@ textarea:focus {
 
   .mock-graph {
     font-size: 1rem;
-    padding: 2rem;
+    padding: 2rem 1.5rem;
   }
 
   .log-list li {
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.5rem;
+    gap: 0.6rem;
   }
   .log-entry-left {
-    gap: 0.75rem;
+    gap: 0.8rem;
   }
   .log-date {
     margin-left: 0;
+    align-self: flex-end;
+  }
+}
+
+.mood-jar-section {
+  margin: 2.5rem auto;
+  max-width: 100%;
+  background: #fff;
+  border-radius: 24px;
+  box-shadow: 0 12px 40px rgba(0, 138, 255, 0.18);
+  padding: 2rem 1.5rem 3rem;
+  text-align: center;
+}
+
+
+/* Mood Jar Section */
+.mood-jar {
+  margin: 2.5rem auto;
+  padding: 2.5rem 2rem;
+  background: #ffffff;
+  border-radius: 24px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.07);
+  text-align: center;
+  max-width: 480px;
+}
+
+/* Jar container with flexible wrapping */
+.jar-container {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+  padding: 1.2rem;
+}
+
+/* Jar bubbles with subtle animation */
+.jar-bubble {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #55dddd, #00aacc);
+  box-shadow: 0 3px 6px rgba(0, 170, 204, 0.5);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  cursor: pointer;
+  will-change: transform, box-shadow;
+  animation: bubble-drop 3s ease-in-out infinite;
+}
+
+/* Bubble hover effect */
+.jar-bubble:hover {
+  transform: scale(1.3) translateY(-8px);
+  box-shadow: 0 8px 20px rgba(0, 170, 204, 0.7);
+}
+
+/* Bubble drop keyframe animation */
+@keyframes bubble-drop {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+    box-shadow: 0 3px 6px rgba(0, 170, 204, 0.5);
+  }
+  50% {
+    transform: translateY(-6px) scale(1.05);
+    box-shadow: 0 6px 14px rgba(0, 170, 204, 0.6);
   }
 }

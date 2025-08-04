@@ -13,7 +13,7 @@
 .auth-form {
   position: relative; /* form is positioned above overlay inline now */
   z-index: 1;
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.19);
   backdrop-filter: blur(14px);
   border-radius: 20px;
   padding: 2.5rem 2rem;
@@ -81,7 +81,7 @@
 
 .auth-card input,
 .auth-form input {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.216);
   border: 1.5px solid transparent;
   border-radius: 12px;
   padding: 0.85rem 1rem;
@@ -107,7 +107,7 @@
 
 .auth-button,
 .auth-form button {
-  background: #4a89dc;
+  background: #F6BB42;
   color: #fff;
   padding: 0.9rem 1rem;
   font-size: 1rem;
@@ -122,9 +122,9 @@
 
 .auth-button:hover,
 .auth-form button:hover {
-  background: #3573c2;
+  background: #F96F52;
   transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(93, 156, 236, 0.4);
+  box-shadow: 0 6px 18px rgba(236, 200, 93, 0.4);
 }
 
 .auth-link,

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import '../styles/MoodTracker.css';
-import MoodRadialChart from '../components/MoodRadialChart';
-
+import JarSVG from '../components/JarSVG';
 
 import happy from '../assets/emotions/Happy.png';
 import sad from '../assets/emotions/Sad.png';
@@ -23,6 +22,18 @@ const moods = [
   { name: 'Grateful', color: '#AC92EC', image: grateful },
 ];
 
+// Fixed jar positions for bubbles (reused)
+const landingPositions = [
+  { cx: 90, cy: 270 },
+  { cx: 120, cy: 260 },
+  { cx: 150, cy: 275 },
+  { cx: 105, cy: 250 },
+  { cx: 135, cy: 260 },
+  { cx: 170, cy: 270 },
+  { cx: 80, cy: 240 },
+  { cx: 145, cy: 240 },
+];
+
 const MoodTracker = () => {
   const [selectedMood, setSelectedMood] = useState('');
   const [note, setNote] = useState('');
@@ -41,16 +52,26 @@ const MoodTracker = () => {
     setNote('');
   };
 
-    const moodCounts = moods.map(({ name }) => ({
-    mood: name,
-    count: recentMoods.filter((entry) => entry.mood === name).length,
-  }));
+  // Map recent moods to bubbles with fixed positions, no falling
+  const bubblesData = recentMoods.slice(0, 8).map((entry, i) => {
+    const moodData = moods.find((m) => m.name === entry.mood);
+    const pos = landingPositions[i % landingPositions.length];
+    return {
+      id: i,
+      cx: pos.cx,
+      cy: pos.cy,
+      mood: entry.mood,
+      color: moodData?.color || '#4a89dc',
+      image: moodData?.image || '',
+      note: entry.note,
+    };
+  });
 
   return (
     <div className="tracker-container">
       <section className="tracker-header">
         <h1>Your Mood History</h1>
-        <p>Keep track of your emotions and reflect on your journey.</p>
+        <p>Track your emotions, reflect, and watch your Mood Jar fill up.</p>
       </section>
 
       <section className="mood-entry">
@@ -79,9 +100,9 @@ const MoodTracker = () => {
         <button className="save-btn" onClick={handleSave}>Save Mood Entry</button>
       </section>
 
-      <section className="weekly-overview">
-        <h2>Weekly Mood Overview</h2>
-        <MoodRadialChart data={moodCounts} />
+      <section className="mood-jar-section">
+        <h2>Your Mood Jar</h2>
+        <JarSVG width={240} height={340} bubblesData={bubblesData} />
       </section>
 
       <section className="recent-log">
