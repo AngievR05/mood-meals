@@ -1,0 +1,260 @@
+/* Layout & Base Styles */
+.tracker-container {
+  padding: 2.5rem 1.5rem;
+  background: linear-gradient(180deg, #f9f9f9, #eef2f7);
+  min-height: 100vh;
+  font-family: 'Segoe UI', sans-serif;
+  color: #333;
+}
+
+/* Header */
+.tracker-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.tracker-header h1 {
+  font-size: 2.8rem;
+  color: #4a89dc;
+  margin-bottom: 0.5rem;
+}
+
+.tracker-header p {
+  font-size: 1.1rem;
+  color: #666;
+}
+
+/* Section Headings */
+.mood-entry h2,
+.weekly-overview h2,
+.recent-log h2 {
+  font-size: 1.8rem;
+  color: #444;
+  margin-bottom: 1rem;
+}
+
+/* Mood Grid (matching Home page) */
+.mood-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 1.2rem;
+  margin-bottom: 2rem;
+}
+
+/* Mood Card UI (copied from Home) */
+.mood-card {
+  border: none;
+  border-radius: 16px;
+  height: 130px;
+  padding: 0.75rem;
+  background: transparent;
+  color: #fff;
+  font-weight: bold;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.mood-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.2);
+  filter: brightness(1.05);
+}
+
+/* Icon background */
+.mood-icon {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.4rem;
+  transition: background-color 0.3s;
+}
+
+.mood-icon img {
+  width: 68px;
+  height: 68px;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.mood-card:hover .mood-icon img {
+  transform: scale(1.1);
+}
+
+/* Mood label text */
+.mood-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+/* Selected state styling */
+.mood-card.selected {
+  outline: 3px solid white;
+  box-shadow: 0 0 0 3px white, 0 0 0 7px rgba(85, 221, 224, 0.4);
+  transform: scale(1.04);
+}
+
+/* Textarea Note */
+textarea {
+  width: 98%;
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid #ccd6dd;
+  margin-top: 1rem;
+  resize: vertical;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: border-color 0.3s ease;
+}
+
+textarea:focus {
+  border-color: #4a89dc;
+  outline: none;
+}
+
+/* Save Button */
+.save-btn {
+  margin-top: 1rem;
+  padding: 0.85rem 1.8rem;
+  background: linear-gradient(135deg, #5d9cec, #4a89dc);
+  border: none;
+  color: #fff;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  box-shadow: 0 4px 12px rgba(74, 137, 220, 0.4);
+  transition: background 0.3s, transform 0.2s;
+}
+
+.save-btn:hover {
+  background: linear-gradient(135deg, #4a89dc, #357abd);
+  transform: translateY(-2px);
+}
+
+/* Weekly Overview */
+.weekly-overview {
+  margin-top: 3rem;
+}
+
+.mock-graph {
+  background: #fff9e6;
+  padding: 2.5rem;
+  border-radius: 16px;
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  font-style: italic;
+  color: #888;
+  font-size: 1.1rem;
+}
+
+/* Recent Mood Log */
+.recent-log {
+  margin-top: 3rem;
+}
+
+.log-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.log-list li {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 1.2rem 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+/* Left side: image + name + note stacked */
+.log-entry-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  flex: 1; /* fill available space */
+}
+
+.log-mood-image {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: contain;
+  margin-top: 4px; /* align better with text */
+  flex-shrink: 0;
+}
+
+.log-mood-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.log-mood-name {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #444;
+}
+
+.log-mood-note {
+  font-weight: 400;
+  font-size: 0.95rem;
+  color: #555;
+  max-width: 300px;
+  word-break: break-word;
+}
+
+/* Right side: date */
+.log-date {
+  font-size: 0.9rem;
+  color: #777;
+  white-space: nowrap;
+  margin-left: 1.5rem;
+  flex-shrink: 0;
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+  .mood-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+
+  .save-btn {
+    width: 100%;
+  }
+
+  .mock-graph {
+    font-size: 1rem;
+    padding: 2rem;
+  }
+
+  .log-list li {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  .log-entry-left {
+    gap: 0.75rem;
+  }
+  .log-date {
+    margin-left: 0;
+  }
+}

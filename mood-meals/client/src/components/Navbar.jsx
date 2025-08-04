@@ -17,7 +17,7 @@ const Navbar = () => {
       </div>
 
       <ul className="navbar-links">
-        <li><Link to="/tracker">Mood Tracker</Link></li>
+        <li><Link to="/mood-tracker">Mood Tracker</Link></li>
         <li><Link to="/meals">My Meals</Link></li>
         <li><Link to="/friends">Friends</Link></li>
         <li><Link to="/profile">Profile</Link></li>
