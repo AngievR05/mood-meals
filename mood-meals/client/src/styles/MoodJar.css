@@ -1,71 +1,62 @@
-.mood-jar-wrapper {
-  margin: 3rem auto;
-  position: relative;
-  user-select: none;
-  filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.12));
-  background: linear-gradient(135deg, #e0f3ff 0%, #a9d7ff 100%);
-  border-radius: 32px;
-  padding: 1rem;
-  max-width: 320px;
-  box-shadow:
-    inset 0 3px 6px rgba(255, 255, 255, 0.6),
-    0 6px 18px rgba(0, 134, 255, 0.2);
+/* Jar shape and body */
+.jar-body {
+  fill: url(#glassGradient);
+  stroke: #3d7db4;
+  stroke-width: 4;
+  filter: url(#jarShadow);
 }
 
-.jar-svg {
-  display: block;
-  width: 100%;
-  height: auto;
-  outline: none;
-  pointer-events: auto; /* Enable pointer events for hover */
-}
-
+/* Bubble group layout */
 .jar-bubble-group {
-  pointer-events: auto;
-  transition: transform 0.25s ease, filter 0.25s ease;
-  will-change: transform;
-  outline: none;
-  transform-origin: center center;
-  z-index: 1;
+  clip-path: url(#jarClip);
+  pointer-events: none;
+}
+
+/* Individual bubble */
+.jar-bubble {
+  cursor: pointer;
+  pointer-events: all;
+  transition: transform 0.3s ease;
   position: relative;
 }
 
-.jar-bubble-group.popping {
-  animation-name: bubblePopIn;
-  animation-fill-mode: forwards;
-  animation-timing-function: cubic-bezier(0.3, 0, 0, 1);
-  animation-duration: 0.5s;
+/* Hover scale effect */
+.jar-bubble:hover {
+  transform: scale(1.15);
 }
 
-.jar-bubble-group:hover {
-  transform: scale(1.5);
-  filter: drop-shadow(0 8px 22px rgba(0, 170, 204, 0.9));
-  z-index: 10;
-  cursor: pointer;
-}
-
-.jar-bubble-group:focus-visible {
-  outline: 3px solid #2581a6;
-  outline-offset: 4px;
-}
-
-.jar-bubble {
-  pointer-events: none;
-  cursor: default;
-  filter: url(#bubbleGlow);
-  transition: fill 0.3s ease;
-}
-
+/* Bubble pop-in animation */
 @keyframes bubblePopIn {
   0% {
-    transform: scale(0);
+    transform: scale(0.2);
     opacity: 0;
-  }
-  70% {
-    transform: scale(1.15);
-    opacity: 1;
   }
   100% {
     transform: scale(1);
+    opacity: 1;
   }
+}
+
+.popping {
+  animation: bubblePopIn 0.5s ease-out;
+}
+
+/* Tooltip styling */
+.tooltip {
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  font-size: 0.75rem;
+  padding: 6px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 10;
+  transform: translate(-50%, -120%);
+  transition: opacity 0.3s ease;
+  opacity: 0;
+}
+
+.jar-bubble:hover .tooltip {
+  opacity: 1;
 }
