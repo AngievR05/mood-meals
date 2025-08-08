@@ -1,19 +1,68 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import MoodRadialChart from '../components/MoodRadialChart';
 import '../styles/Profile.css';
 
 const Profile = () => {
+  const [user, setUser] = useState(null);
+  const [moodStats, setMoodStats] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        navigate('/login');
+        return;
+      }
+
+      const config = {
+        headers: {
+          'x-auth-token': token,
+        },
+      };
+
+      try {
+        const userRes = await axios.get('http://localhost:5000/api/user/profile', config);
+        setUser(userRes.data);
+
+        const moodStatsRes = await axios.get('http://localhost:5000/api/user/mood-stats', config);
+        setMoodStats(moodStatsRes.data);
+      } catch (error) {
+        console.error('Error fetching profile data:', error);
+        // If token is invalid or expired, redirect to login
+        if (error.response && error.response.status === 401) {
+          localStorage.removeItem('token');
+          navigate('/login');
+        }
+      }
+    };
+
+    fetchProfileData();
+  }, [navigate]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    navigate('/login');
+  };
+
+  if (!user || !moodStats) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="profile-container">
       {/* Header */}
       <div className="profile-header">
         <div className="profile-avatar"></div>
         <div className="profile-info">
-          <h2>User's Name</h2>
-          <span className="username">@username</span>
-          <p className="email">user@example.com</p>
+          <h2>{user.username}</h2>
+          <span className="username">@{user.username}</span>
+          <p className="email">{user.email}</p>
         </div>
         <div className="profile-actions">
-          <button className="btn logout-btn">Logout</button>
+          <button className="btn logout-btn" onClick={handleLogout}>Logout</button>
           <button className="btn edit-btn">Edit Profile</button>
         </div>
       </div>
@@ -26,18 +75,18 @@ const Profile = () => {
         <div className="stats-cards">
           <div className="stat-card">
             <h4>Most Frequent Mood</h4>
-            <p className="highlight">Happy</p>
+            <p className="highlight">{moodStats.mostFrequentMood}</p>
             <span className="change">+5% from last month</span>
           </div>
           <div className="stat-card">
             <h4>Longest Streak</h4>
-            <p className="highlight">10 Days</p>
+            <p className="highlight">{moodStats.longestStreak} Days</p>
           </div>
         </div>
 
         <div className="mood-chart">
           <p>Mood Over Time</p>
-          <div className="chart-placeholder">[Graph Placeholder]</div>
+          <MoodRadialChart data={moodStats.moodChartData || []} />
         </div>
       </section>
 
