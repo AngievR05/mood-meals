@@ -1,0 +1,127 @@
+.friends-page {
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Connect section */
+.connect-section {
+  background: #f4c542;
+  text-align: center;
+  padding: 2rem;
+}
+
+.friend-input {
+  margin-top: 1rem;
+}
+
+.friend-input input {
+  padding: 0.5rem;
+  width: 250px;
+  border: none;
+  border-radius: 6px;
+}
+
+.friend-input button {
+  padding: 0.5rem 1rem;
+  margin-left: 0.5rem;
+  border: none;
+  background: black;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Meal logs */
+.meal-logs-section {
+  background: #5d9cec;
+  color: white;
+  padding: 2rem;
+}
+
+.meal-logs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.meal-log-card {
+  background: rgba(255,255,255,0.1);
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.avatar-placeholder {
+  width: 40px;
+  height: 40px;
+  background: #ccc;
+  border-radius: 50%;
+}
+
+/* Friends list */
+.friends-section {
+  padding: 2rem;
+  background: white;
+  text-align: center;
+}
+
+.friends-list {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+}
+
+.friend-card {
+  background: #f9f9f9;
+  padding: 1rem;
+  border-radius: 8px;
+  width: 200px;
+}
+
+.emoji-placeholder {
+  font-size: 2rem;
+}
+
+/* Mood log */
+.mood-log-section {
+  background: #a8d37d;
+  padding: 1rem;
+}
+
+.mood-log-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mood-log-buttons button {
+  margin-left: 0.5rem;
+}
+
+/* Encouragement */
+.encouragement-section {
+  padding: 2rem;
+  text-align: center;
+}
+
+.encouragement-section textarea {
+  width: 80%;
+  height: 80px;
+  margin-bottom: 1rem;
+}
+
+/* Recent posts */
+.recent-posts-section {
+  background: #f45b42;
+  padding: 2rem;
+}
+
+.posts-grid {
+  display: flex;
+  gap: 1rem;
+}
+
+.post-card {
+  background: rgba(255,255,255,0.2);
+  padding: 1rem;
+  border-radius: 8px;
+  width: 250px;
+}

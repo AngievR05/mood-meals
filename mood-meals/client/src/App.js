@@ -8,7 +8,7 @@ import Home from './pages/Home';
 import MealSuggestions from './components/MealSuggestions';
 import MealsDashboard from './pages/MealsDashboard'; // <-- Added import
 import RecipePage from './components/RecipePage';
-
+import Friends from './pages/Friends';  
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -34,6 +34,7 @@ function App() {
                   <Route path="home" element={<Home />} />
                   <Route path="suggestions" element={<MealSuggestions />} />
                   <Route path="meals" element={<MealsDashboard />} /> {/* <-- New route */}
+                  <Route path="friends" element={<Friends />} />
                   <Route path="recipes/:mealName" element={<RecipePage />} />
                   <Route path="mood-tracker" element={<MoodTracker />} />
                   <Route path="profile" element={<Profile />} />
