@@ -1,0 +1,55 @@
+.meals-dashboard {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f9f9f9;
+  min-height: 100vh;
+}
+
+.dashboard-header {
+  background: #5d9cec;
+  color: white;
+  padding: 2rem;
+  text-align: center;
+  border-radius: 0 0 16px 16px;
+}
+
+.dashboard-header h1 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.dashboard-header p {
+  margin-bottom: 1.5rem;
+  font-size: 1rem;
+}
+
+.primary-btn {
+  background: black;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.primary-btn:hover {
+  background: #333;
+}
+
+.filter-buttons {
+  margin-top: 1rem;
+}
+
+.filter-buttons button {
+  background: #e3e3e3;
+  margin: 0.3rem;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.filter-buttons button:hover {
+  background: #ccc;
+}

@@ -1,0 +1,42 @@
+.grocery-section {
+  background: #8fd694;
+  padding: 2rem;
+}
+
+.grocery-section h2 {
+  margin-bottom: 1rem;
+}
+
+.grocery-list {
+  background: white;
+  padding: 1rem;
+  border-radius: 12px;
+}
+
+.grocery-list ul {
+  list-style: none;
+  padding: 0;
+}
+
+.grocery-list li {
+  display: flex;
+  align-items: center;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+.grocery-list li:last-child {
+  border-bottom: none;
+}
+
+.grocery-list img {
+  width: 32px;
+  height: 32px;
+  margin-right: 0.8rem;
+}
+
+.qty {
+  margin-left: auto;
+  font-weight: bold;
+  color: #444;
+}

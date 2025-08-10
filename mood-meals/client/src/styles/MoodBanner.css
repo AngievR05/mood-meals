@@ -1,0 +1,28 @@
+.mood-banner {
+  text-align: center;
+  padding: 2rem;
+  background: white;
+}
+
+.mood-banner h2 {
+  font-size: 1.5rem;
+  margin-bottom: 0.3rem;
+}
+
+.mood-banner p {
+  color: #555;
+  margin-bottom: 1rem;
+}
+
+.mood-banner .primary-btn {
+  background: black;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+.mood-banner .primary-btn:hover {
+  background: #333;
+}
