@@ -1,28 +1,29 @@
+:root {
+  --indicator-gradient: linear-gradient(90deg,#4fc1e9,#3bafda);
+  --radius-md: 12px;
+  --shadow-sm: 0 3px 12px rgba(0,0,0,0.05);
+}
+
 .mood-indicator {
-  background: linear-gradient(to right, #4fc1e9, #3bafda);
-  padding: 1.2rem;
-  border-radius: 12px;
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
-  margin-bottom: 2rem;
-  text-align: center;
+  background: var(--indicator-gradient);
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  color:#fff;
+  text-align:center;
+  font-family: 'Segoe UI', sans-serif;
 }
 
-.mood-indicator h3 {
-  font-size: 1.4rem;
-  margin-bottom: 0.5rem;
-}
-
-.mood-indicator p {
-  font-size: 1.1rem;
-  color: #232323;
-}
+.mood-indicator h3 { font-size:1.1rem; margin:0; font-weight:800; }
+.mood-indicator p { margin-top:.5rem; font-size:1rem; color: rgba(255,255,255,0.95); }
 
 .mood-quote {
-  margin-top: 1rem;
+  margin-top: .8rem;
   font-style: italic;
-  color: #474747;
-  background-color: #fff;
-  padding: 1rem;
-  border-left: 4px solid #2a9ac3;
-  border-radius: 8px;
+  background: rgba(255,255,255,0.95);
+  color: #253238;
+  padding:.9rem;
+  border-radius:10px;
+  border-left:4px solid rgba(0,151,199,0.9);
+  text-align:left;
 }

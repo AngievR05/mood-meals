@@ -1,55 +1,68 @@
+:root {
+  --primary-blue: #5d9cec;
+  --secondary-blue: #4a89dc;
+  --neutral-light: #f9f9f9;
+  --white: #fff;
+  --radius-lg: 16px;
+  --shadow-sm: 0 4px 12px rgba(0,0,0,0.05);
+  --shadow-md: 0 6px 18px rgba(0,0,0,0.12);
+}
+
 .meals-dashboard {
   font-family: 'Segoe UI', sans-serif;
-  background-color: #f9f9f9;
+  background-color: var(--neutral-light);
   min-height: 100vh;
-}
-
-.dashboard-header {
-  background: #5d9cec;
-  color: white;
   padding: 2rem;
+  color: #222;
+}
+
+/* Header */
+.dashboard-header {
+  background: linear-gradient(90deg, var(--primary-blue), var(--secondary-blue));
+  color: var(--white);
+  padding: 1.6rem;
   text-align: center;
-  border-radius: 0 0 16px 16px;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  box-shadow: var(--shadow-sm);
 }
 
-.dashboard-header h1 {
-  font-size: 2rem;
-  margin-bottom: 0.5rem;
-}
+.dashboard-header h1 { font-size: 1.95rem; margin:0; font-weight: 800; }
+.dashboard-header p { margin-top: .35rem; opacity: .95; font-weight:600; }
 
-.dashboard-header p {
-  margin-bottom: 1.5rem;
-  font-size: 1rem;
-}
-
+/* Primary Button */
 .primary-btn {
-  background: black;
-  color: white;
-  padding: 0.6rem 1.2rem;
-  border-radius: 8px;
+  background: linear-gradient(90deg,#4bb7f0,#3b9be0);
+  color: var(--white);
+  padding: .6rem 1.2rem;
+  border-radius: 12px;
   border: none;
   cursor: pointer;
-  font-weight: 500;
+  font-weight:700;
+  box-shadow: var(--shadow-md);
+  transition: transform .12s ease, box-shadow .12s ease;
+  user-select:none;
 }
 
-.primary-btn:hover {
-  background: #333;
-}
+.primary-btn:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(59,155,224,0.18); }
 
+/* Filters */
 .filter-buttons {
   margin-top: 1rem;
+  display:flex;
+  justify-content:center;
+  gap:.6rem;
+  flex-wrap:wrap;
 }
 
 .filter-buttons button {
-  background: #e3e3e3;
-  margin: 0.3rem;
-  border: none;
-  padding: 0.4rem 0.8rem;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  cursor: pointer;
+  background: #eef6ff;
+  color: var(--primary-blue);
+  border:none;
+  padding:.5rem .9rem;
+  border-radius: 10px;
+  font-weight:700;
+  cursor:pointer;
+  box-shadow: var(--shadow-sm);
 }
 
-.filter-buttons button:hover {
-  background: #ccc;
-}
+.filter-buttons button:hover { background: var(--primary-blue); color: #fff; box-shadow: var(--shadow-md); }

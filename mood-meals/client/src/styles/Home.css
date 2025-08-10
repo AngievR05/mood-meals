@@ -1,30 +1,55 @@
+:root {
+  --primary-blue: #5d9cec;
+  --secondary-blue: #4a89dc;
+  --blue-darker: #357abd;
+  --accent-green: #8fd694;
+  --accent-yellow: #ffce54;
+  --accent-orange: #f6bb42;
+  --neutral-light: #f9f9f9;
+  --neutral-dark: #333;
+  --white: #fff;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.14);
+  --shadow-lg: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
 .home-container {
   font-family: 'Segoe UI', sans-serif;
   padding: 2rem;
-  background-color: #f9f9f9;
+  background-color: var(--neutral-light);
   min-height: 100vh;
 }
 
+/* Header */
 .home-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #ffffff;
+  background-color: var(--white);
   padding: 1.5rem 2rem;
-  border-radius: 16px;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
   margin-bottom: 2rem;
   flex-wrap: wrap;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.home-header:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 .home-header h1 {
-  font-size: 2.5rem;
-  color: #333;
+  font-size: 2.3rem;
+  font-weight: 700;
+  color: var(--neutral-dark);
 }
 
 .home-header p {
   color: #777;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
 }
 
 .header-left {
@@ -34,7 +59,7 @@
 .header-right {
   width: 170px;
   height: 170px;
-  background-color: #f2f2f2;
+  background-color: #f3f6fc;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -48,11 +73,12 @@
 }
 
 .header-mood-image {
-  width: 170px;
-  height: 170px;
+  width: 150px;
+  height: 150px;
   object-fit: contain;
 }
 
+/* Sections */
 .mood-section,
 .grocery-section,
 .meals-section {
@@ -60,91 +86,95 @@
 }
 
 .mood-section h2 {
-  font-size: 1.8rem;
+  font-size: 1.6rem;
+  font-weight: 700;
   margin-bottom: 1rem;
   color: #444;
 }
 
+/* Mood Grid */
 .mood-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-  gap: 1.2rem;
-  margin-bottom: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 1.4rem;
+  margin-bottom: 2.5rem;
+  padding: 0 0.75rem;
 }
 
-/* =============== */
-/* 🎨 Mood Card UI */
-/* =============== */
+/* Mood Cards */
 .mood-card {
   border: none;
-  border-radius: 16px;
-  height: 130px;
-  padding: 0.75rem;
-  background: transparent;
-  color: #fff;
-  font-weight: bold;
+  border-radius: var(--radius-lg);
+  height: 140px;
+  padding: 1rem;
+  background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+  color: var(--white);
+  font-weight: 700;
   text-align: center;
   cursor: pointer;
-  transition: all 0.3s ease-in-out;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
-  position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, filter 0.3s ease;
+  box-shadow: var(--shadow-md);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
 }
 
-.mood-card:hover {
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.2);
-  filter: brightness(1.05);
+.mood-card:hover,
+.mood-card:focus {
+  transform: translateY(-6px) scale(1.06);
+  box-shadow: var(--shadow-lg);
+  filter: brightness(1.1);
 }
 
-/* Icon background */
+/* Mood Icon */
 .mood-icon {
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 255, 255, 0.22);
   border-radius: 50%;
-  width: 70px;
-  height: 70px;
+  width: 75px;
+  height: 75px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 0.4rem;
-  transition: background-color 0.3s;
+  margin-bottom: 0.5rem;
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.4);
 }
 
 .mood-icon img {
-  width: 68px;
-  height: 68px;
+  width: 70px;
+  height: 70px;
   object-fit: contain;
-  transition: transform 0.3s ease;
+  transition: transform 0.35s ease;
 }
 
 .mood-card:hover .mood-icon img {
-  transform: scale(1.1);
+  transform: scale(1.2);
 }
 
-/* Mood label text */
+/* Mood Label */
 .mood-label {
-  font-size: 0.9rem;
-  font-weight: 600;
+  font-size: 1rem;
+  font-weight: 700;
   color: #fff;
+  text-shadow: 0 0 6px rgba(0, 0, 0, 0.18);
 }
 
-/* Selected state styling */
+/* Selected State */
 .mood-card.selected {
-  outline: 3px solid white;
-  box-shadow: 0 0 0 3px white, 0 0 0 7px rgba(85, 221, 224, 0.4);
-  transform: scale(1.04);
+  outline: 3px solid #fff;
+  box-shadow:
+    0 0 0 3px #fff,
+    0 0 14px 8px rgba(85, 221, 224, 0.6),
+    0 12px 30px rgba(0, 0, 0, 0.3);
+  transform: scale(1.08);
+  filter: brightness(1.15);
 }
 
+/* Mood Status Layout */
 .mood-status-wrapper {
   display: flex;
   gap: 1.5rem;
   flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: stretch;
   margin-top: 2rem;
 }
 
@@ -153,65 +183,27 @@
   flex: 1 1 300px;
 }
 
-/* Ensure footer isn't cramped */
+/* Footer */
 .footer {
   margin-top: 4rem;
 }
 
-/* ============= */
-/* 📱 Responsive */
-/* ============= */
+/* Responsive */
 @media (max-width: 768px) {
   .mood-grid {
     grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
   }
-
-    .home-header {
+  .home-header {
     flex-direction: column;
     text-align: center;
   }
-
   .header-right {
     margin-top: 1rem;
   }
-
-  .mood-card {
-    height: 110px;
-    padding: 0.6rem;
-  }
-
-  .mood-icon {
-    width: 50px;
-    height: 50px;
-  }
-
-  .mood-icon img {
-    width: 44px;
-    height: 44px;
-  }
-
-  .mood-label {
-    font-size: 0.85rem;
-  }
 }
 
-
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-    opacity: 1;
+@media (max-width: 480px) {
+  .mood-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
-  50% {
-    transform: scale(1.1);
-    opacity: 0.9;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-.pulse {
-  animation: pulse 0.8s ease;
 }

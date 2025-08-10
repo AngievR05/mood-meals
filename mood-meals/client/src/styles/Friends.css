@@ -1,127 +1,161 @@
+:root{
+  --accent-yellow: #ffce54;
+  --neutral-light: #f9f9f9;
+  --neutral-dark: #333;
+  --white: #fff;
+  --radius-md: 12px;
+  --shadow-sm: 0 4px 12px rgba(0,0,0,0.06);
+}
+
 .friends-page {
   font-family: 'Segoe UI', sans-serif;
-}
-
-/* Connect section */
-.connect-section {
-  background: #f4c542;
-  text-align: center;
+  background: linear-gradient(180deg, var(--neutral-light), #fff);
+  min-height: 100vh;
   padding: 2rem;
+  color: var(--neutral-dark);
 }
 
+/* Hero / Connect */
+.connect-section {
+  background: linear-gradient(90deg, #ffeaa7, var(--accent-yellow));
+  color: #222;
+  text-align: center;
+  padding: 1.8rem;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.connect-section h2 { font-size: 1.45rem; margin: 0; font-weight: 700; }
+.connect-section p { margin-top: .4rem; color:#333; opacity:0.9; }
+
+/* Inputs */
 .friend-input {
   margin-top: 1rem;
+  display:flex;
+  justify-content:center;
+  gap:.6rem;
+  flex-wrap:wrap;
 }
 
 .friend-input input {
-  padding: 0.5rem;
-  width: 250px;
-  border: none;
-  border-radius: 6px;
+  padding: 0.6rem 0.9rem;
+  width: 270px;
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 10px;
+  background: #fff;
+  transition: box-shadow .18s ease, transform .12s ease;
+}
+
+.friend-input input:focus {
+  outline: none;
+  box-shadow: 0 6px 22px rgba(255, 206, 84, 0.14);
+  transform: translateY(-1px);
 }
 
 .friend-input button {
-  padding: 0.5rem 1rem;
-  margin-left: 0.5rem;
+  padding: 0.6rem 0.9rem;
   border: none;
-  background: black;
-  color: white;
-  border-radius: 6px;
+  background: #222;
+  color: var(--white);
+  border-radius: 10px;
   cursor: pointer;
+  font-weight: 700;
+  transition: transform .12s ease, opacity .12s ease;
 }
 
-/* Meal logs */
+.friend-input button:hover { transform: translateY(-2px); opacity: .95; }
+
+/* Meal logs / grid */
 .meal-logs-section {
-  background: #5d9cec;
-  color: white;
-  padding: 2rem;
+  background: linear-gradient(180deg,#fff, #fff7e9);
+  color: #222;
+  padding: 1.6rem;
+  margin-top: 1.4rem;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
 }
 
 .meal-logs-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
   gap: 1rem;
+  margin-top: 1rem;
 }
 
 .meal-log-card {
-  background: rgba(255,255,255,0.1);
+  background: var(--white);
   padding: 1rem;
-  border-radius: 8px;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+  display:flex;
+  gap:.8rem;
+  align-items:center;
 }
 
-.avatar-placeholder {
-  width: 40px;
-  height: 40px;
-  background: #ccc;
+/* Avatar / emoji */
+.avatar-placeholder,
+.emoji-placeholder {
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
+  background: #f3f3f3;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:1.6rem;
+  flex-shrink:0;
 }
 
 /* Friends list */
 .friends-section {
-  padding: 2rem;
-  background: white;
-  text-align: center;
+  padding: 1.6rem;
+  background: #fff;
+  border-radius: var(--radius-md);
+  margin-top: 1.4rem;
+  text-align:center;
+  box-shadow: var(--shadow-sm);
 }
 
 .friends-list {
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
+  display:flex;
+  justify-content:center;
+  gap:1rem;
+  flex-wrap:wrap;
+  margin-top: .8rem;
 }
 
 .friend-card {
-  background: #f9f9f9;
-  padding: 1rem;
-  border-radius: 8px;
+  background:#fafafa;
+  padding: .9rem;
+  border-radius: 12px;
   width: 200px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  transition: transform .14s ease, box-shadow .14s ease;
 }
 
-.emoji-placeholder {
-  font-size: 2rem;
-}
+.friend-card:hover { transform: translateY(-6px); box-shadow: 0 10px 30px rgba(0,0,0,0.06); }
 
-/* Mood log */
+/* Mood log small */
 .mood-log-section {
-  background: #a8d37d;
+  background: linear-gradient(180deg,#fef9e9,#fff);
   padding: 1rem;
+  border-radius: 12px;
+  margin-top: 1rem;
 }
 
-.mood-log-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+.mood-log-card { display:flex; align-items:center; justify-content:space-between; gap:1rem; }
+.mood-log-buttons button { margin-left: .5rem; padding: .45rem .7rem; border-radius:8px; border:none; cursor:pointer; }
 
-.mood-log-buttons button {
-  margin-left: 0.5rem;
-}
+/* encouragement */
+.encouragement-section { padding:1.2rem; text-align:center; margin-top:1rem; }
+.encouragement-section textarea { width:90%; height:80px; border-radius:10px; padding: .8rem; border:1px solid #eee; }
 
-/* Encouragement */
-.encouragement-section {
-  padding: 2rem;
-  text-align: center;
-}
+/* recent posts */
+.recent-posts-section { background: #fff; padding:1rem; margin-top:1rem; border-radius:12px; box-shadow: var(--shadow-sm); }
+.posts-grid { display:flex; gap:1rem; overflow:auto; padding-bottom:.4rem; }
+.post-card { min-width:200px; background:#fff; padding:.9rem; border-radius:10px; box-shadow: 0 6px 16px rgba(0,0,0,0.04); }
 
-.encouragement-section textarea {
-  width: 80%;
-  height: 80px;
-  margin-bottom: 1rem;
-}
-
-/* Recent posts */
-.recent-posts-section {
-  background: #f45b42;
-  padding: 2rem;
-}
-
-.posts-grid {
-  display: flex;
-  gap: 1rem;
-}
-
-.post-card {
-  background: rgba(255,255,255,0.2);
-  padding: 1rem;
-  border-radius: 8px;
-  width: 250px;
+@media (max-width: 600px) {
+  .friend-input input { width: 100%; max-width: 320px; }
+  .meal-logs-grid { grid-template-columns: repeat(1,1fr); }
 }

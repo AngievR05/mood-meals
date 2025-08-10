@@ -39,8 +39,6 @@ const Home = () => {
 
   useEffect(() => {
     AOS.init({ duration: 1000, once: true });
-
-    // Pull username from localStorage to greet user
     const storedUsername = localStorage.getItem('username');
     if (storedUsername) {
       setUsername(storedUsername);
@@ -74,8 +72,26 @@ const Home = () => {
 
       <section className="mood-section" data-aos="fade-up">
         <h2>Select Your Mood</h2>
-        <MoodSelector onSelect={setCurrentMood} />
+        {/* Updated MoodSelector to render moods like mood tracker */}
+        <div className="mood-grid">
+          {Object.entries(moodImages).map(([mood, img]) => (
+            <button
+              key={mood}
+              className={`mood-card ${currentMood === mood ? 'selected' : ''}`}
+              onClick={() => setCurrentMood(mood)}
+              aria-pressed={currentMood === mood}
+            >
+              <div className="mood-icon">
+                <img src={img} alt={mood} />
+              </div>
+              <span className="mood-label">{mood}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* Mood note modal stays same */}
         <MoodNoteModal onSave={setMoodNote} />
+
         <div className="mood-status-wrapper">
           <MoodIndicator mood={currentMood} />
           <StreakTracker streak={3} />

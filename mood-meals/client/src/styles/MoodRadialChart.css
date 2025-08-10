@@ -1,23 +1,31 @@
+:root {
+  --white: #fff;
+  --radius-lg: 24px;
+  --shadow-md: 0 6px 20px rgba(0,0,0,0.08);
+}
+
 .mood-chart-container {
   width: 95%;
-  margin: 2rem auto;
-  padding: 3rem 2rem;
-  border-radius: 24px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  overflow: hidden; 
-  max-height: 500px;
+  margin: 1.8rem auto;
+  padding: 1.6rem;
+  border-radius: var(--radius-lg);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  position:relative;
+  overflow:hidden;
+  max-height: 520px;
+  background: linear-gradient(180deg,#fff,#fbfdff);
+  box-shadow: var(--shadow-md);
+  font-family: 'Segoe UI', sans-serif;
 }
 
 .mood-chart {
-  width: 100%;
-  max-width: 500px;
-  height: 400px;
-  position: relative;
-  overflow: visible; 
-  z-index: 1;
-  padding: 2rem;
-  box-sizing: content-box;
+  width:100%;
+  max-width:520px;
+  height:420px;
+  position:relative;
+  z-index:1;
+  padding: 1rem;
+  box-sizing:content-box;
 }

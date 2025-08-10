@@ -1,112 +1,66 @@
+:root {
+  --primary-blue: #5d9cec;
+  --secondary-blue: #4a89dc;
+  --white: #fff;
+  --radius-lg: 20px;
+  --shadow-lg: 0 12px 30px rgba(0,0,0,0.09);
+}
+
 .meal-suggestions {
-  margin-top: 2rem;
-  background: linear-gradient(135deg, #5d9cec, #4a89dc);
-  padding: 2rem 2.5rem;
-  border-radius: 24px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease-in-out;
-  width: 100%;
-  max-width: 1370px;
-  margin-left: auto;
-  margin-right: auto;
-  backdrop-filter: blur(6px);
-  border: 1px solid rgba(0, 191, 165, 0.1);
+  margin-top: 1.6rem;
+  background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+  padding: 1.8rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  transition: transform .2s ease;
+  max-width: 1400px;
+  margin-left:auto;
+  margin-right:auto;
+  border: 1px solid rgba(255,255,255,0.08);
 }
 
 .meal-suggestions h2 {
-  font-size: 2rem;
+  font-size: 1.6rem;
   color: #ffffff;
-  margin-bottom: 2rem;
-  font-weight: 700;
-  text-align: center;
-  letter-spacing: -0.5px;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  margin-bottom: 1rem;
+  font-weight:700;
+  text-align:center;
 }
 
-/* React Slick overrides */
-.slick-slide {
-  padding: 0 12px;
-  box-sizing: border-box;
-}
+/* slick overrides (kept for react-slick) */
+.slick-slide { padding: 0 10px; box-sizing:border-box; }
+.slick-dots li button:before { color: rgba(255,255,255,0.6); }
+.slick-dots li.slick-active button:before { color: #fff; }
+.slick-prev:before, .slick-next:before { color: #fff; font-size: 22px; }
 
-.slick-dots li button:before {
-  color: #b0bec5;
-  font-size: 12px;
-}
-
-.slick-dots li.slick-active button:before {
-  color: #00bfa5;
-}
-
-.slick-prev:before,
-.slick-next:before {
-  color: #00bfa5;
-  font-size: 28px;
-}
-
-/* Meal Card Styles */
+/* meal card */
 .meal-card {
-  background: rgba(255, 255, 255, 0.879);
-  border-radius: 20px;
-  box-shadow: 0 6px 24px rgba(0, 65, 195, 0.074);
-  overflow: hidden;
-  transition: transform 0.35s ease, box-shadow 0.35s ease;
-  text-align: center;
-  padding-bottom: 1.2rem;
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(0, 191, 165, 0.1);
+  background: rgba(255,255,255,0.95);
+  border-radius: 16px;
+  box-shadow: 0 10px 36px rgba(0,0,0,0.06);
+  overflow:hidden;
+  transition: transform .25s ease, box-shadow .25s ease;
+  text-align:center;
 }
 
-.meal-card:hover {
-  transform: translateY(-6px) scale(1.03);
-  box-shadow: 0 10px 28px rgba(0, 191, 165, 0.2);
-}
+.meal-card:hover { transform: translateY(-8px); box-shadow: 0 24px 60px rgba(0,0,0,0.12); }
 
-.meal-image {
-  width: 100%;
-  height: 200px;
-  object-fit: cover;
-  border-bottom: 2px solid #e0f2f1;
-  transition: filter 0.3s ease;
-}
+.meal-image { width:100%; height:180px; object-fit:cover; display:block; }
+.meal-name { font-weight:800; margin-top: .8rem; color: #263238; }
 
-.meal-card:hover .meal-image {
-  filter: brightness(1.05);
-}
-
-.meal-name {
-  font-weight: 700;
-  font-size: 1.2rem;
-  color: #263238;
-  margin-top: 1rem;
-  letter-spacing: -0.3px;
-  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
-}
-
-/* Recipe Button with Icon */
 .view-recipe-btn {
-  margin-top: 0.8rem;
-  padding: 0.55rem 1.4rem;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #fff;
-  background: linear-gradient(to right, #4fc1e9, #3bafda);
-  border: none;
-  border-radius: 999px;
-  cursor: pointer;
-  transition: background 0.3s ease, transform 0.2s ease;
-  box-shadow: 0 4px 12px rgba(0, 191, 165, 0.2);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
+  margin-top: .8rem;
+  padding: .5rem 1.2rem;
+  font-weight:700;
+  color:#fff;
+  background: linear-gradient(90deg,#4fc1e9,#3bafda);
+  border:none;
+  border-radius:999px;
+  cursor:pointer;
+  display:inline-flex;
+  gap:.5rem;
+  align-items:center;
+  box-shadow: 0 8px 22px rgba(59,175,218,0.16);
 }
 
-.view-recipe-btn:hover {
-  background: linear-gradient(to right, #ac92ec, #967adc);
-  transform: translateY(-2px);
-}
-
-/* Icon inside button */
-.view-recipe-btn .icon {
-  font-size: 1.1rem;
-}
+.view-recipe-btn:hover { transform: translateY(-3px); background: linear-gradient(90deg,#2fb4f0,#2b8fd6); }

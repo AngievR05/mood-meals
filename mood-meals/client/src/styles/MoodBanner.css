@@ -1,28 +1,30 @@
+:root {
+  --white: #fff;
+  --neutral-dark: #333;
+  --radius-md: 10px;
+  --shadow-sm: 0 6px 18px rgba(0,0,0,0.06);
+}
+
 .mood-banner {
-  text-align: center;
-  padding: 2rem;
-  background: white;
+  text-align:center;
+  padding: 1.4rem;
+  background: var(--white);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  font-family: 'Segoe UI', sans-serif;
 }
 
-.mood-banner h2 {
-  font-size: 1.5rem;
-  margin-bottom: 0.3rem;
-}
-
-.mood-banner p {
-  color: #555;
-  margin-bottom: 1rem;
-}
+.mood-banner h2 { font-size:1.2rem; margin:0; font-weight:700; color:var(--neutral-dark); }
+.mood-banner p { color:#666; margin: .5rem 0; }
 
 .mood-banner .primary-btn {
-  background: black;
-  color: white;
-  padding: 0.6rem 1.2rem;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
+  background: #222;
+  color: #fff;
+  padding: .55rem 1rem;
+  border-radius: 10px;
+  border:none;
+  cursor:pointer;
+  font-weight:700;
 }
 
-.mood-banner .primary-btn:hover {
-  background: #333;
-}
+.mood-banner .primary-btn:hover { opacity:.95; transform: translateY(-3px); }

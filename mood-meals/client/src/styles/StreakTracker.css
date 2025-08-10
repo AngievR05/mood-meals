@@ -1,20 +1,20 @@
+:root {
+  --accent-yellow: #ffce54;
+  --accent-orange: #f6bb42;
+  --radius-md: 12px;
+  --shadow-sm: 0 6px 18px rgba(0,0,0,0.06);
+}
+
 .streak-container {
-  background: linear-gradient(to right, #ffce54, #f6bb42);
-  padding: 1.5rem;
-  border-radius: 16px;
-  text-align: center;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
-  margin-bottom: 2rem;
-  color: #333;
+  background: linear-gradient(90deg,var(--accent-yellow),var(--accent-orange));
+  padding: 1rem;
+  border-radius: 12px;
+  text-align:center;
+  box-shadow: var(--shadow-sm);
+  color: #222;
+  font-family:'Segoe UI',sans-serif;
 }
 
-.streak-container h3 {
-  margin-bottom: 0.5rem;
-  font-size: 1.5rem;
-}
-
-.streak-days {
-  font-size: 2rem;
-  font-weight: bold;
-  margin: 0.5rem 0;
-}
+.streak-container h3 { margin:0; font-size:1.1rem; font-weight:800; }
+.streak-days { font-size:1.85rem; font-weight:900; margin:.4rem 0; }
+.streak-container p { margin:0; opacity:.9; }

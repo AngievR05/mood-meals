@@ -1,3 +1,14 @@
+:root{
+  --primary-blue: #5d9cec;
+  --secondary-blue: #4a89dc;
+  --accent-yellow: #ffce54;
+  --neutral-light: #f9f9f9;
+  --neutral-dark: #333;
+  --white: #ffffff;
+  --radius-md: 12px;
+  --shadow-sm: 0 4px 12px rgba(0,0,0,0.06);
+}
+
 .footer-marquee-wrapper {
   position: fixed;
   bottom: 0;
@@ -5,15 +16,19 @@
   width: 100%;
   overflow: hidden;
   background-color: #656d78;
-  color: white;
-  padding: 0.75rem 0;
+  color: var(--white);
+  padding: 0.6rem 0;
   z-index: 1000;
+  box-shadow: var(--shadow-sm);
+  font-family: 'Segoe UI', sans-serif;
 }
 
 .footer-marquee {
   display: flex;
   width: max-content;
-  animation: scroll-left 60s linear infinite;
+  gap: 2.5rem;
+  animation: scroll-left 50s linear infinite;
+  align-items: center;
 }
 
 .footer-marquee-wrapper:hover .footer-marquee {
@@ -23,15 +38,18 @@
 .footer-marquee span {
   white-space: nowrap;
   font-size: 0.95rem;
-  font-weight: 500;
-  padding-right: 4rem;
+  font-weight: 600;
+  padding-right: 1rem;
+  opacity: 0.95;
 }
 
 @keyframes scroll-left {
-  0% {
-    transform: translateX(0%);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+/* small screens: reduce size */
+@media (max-width: 480px) {
+  .footer-marquee span { font-size: 0.85rem; padding-right: .6rem; }
+  .footer-marquee { gap: 1.2rem; animation-duration: 60s; }
 }

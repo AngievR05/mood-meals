@@ -1,93 +1,31 @@
+:root {
+  --primary-blue: #5d9cec;
+  --secondary-blue: #4a89dc;
+  --white: #f0f4ff;
+  --radius-lg: 20px;
+  --shadow-lg: 0 10px 30px rgba(74,137,220,0.35);
+}
+
 .recipe-page {
   max-width: 1100px;
-  margin: 3rem auto;
-  padding: 2.5rem 3rem;
-  background: linear-gradient(135deg, #5d9cec 0%, #4a89dc 100%);
-  border-radius: 20px;
-  box-shadow:
-    0 10px 30px rgba(74, 137, 220, 0.4),
-    inset 0 0 60px rgba(255, 255, 255, 0.15);
-  color: #f0f4ff;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  transition: background 0.3s ease;
+  margin: 2.2rem auto;
+  padding: 2rem;
+  background: linear-gradient(135deg,#5d9cec 0%, #4a89dc 100%);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  color: var(--white);
+  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.12);
 }
 
-.recipe-page:hover {
-  background: linear-gradient(135deg, #4a89dc 0%, #5d9cec 100%);
-  box-shadow:
-    0 12px 40px rgba(93, 156, 236, 0.6),
-    inset 0 0 70px rgba(255, 255, 255, 0.2);
-}
+.recipe-page h1 { font-size:2.6rem; text-align:center; margin-bottom:.6rem; color:#eaf4ff; font-weight:900; text-shadow: 1px 1px 6px rgba(0,0,0,0.25); letter-spacing: .6px;}
 
-.recipe-page h1 {
-  font-size: 3rem;
-  text-align: center;
-  margin-bottom: 0.7rem;
-  color: #e0eaff;
-  text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.3);
-  letter-spacing: 1.5px;
-}
+.recipe-description { font-size:1.05rem; color: #dbeeff; text-align:center; margin:0 auto 1.4rem; max-width:680px; font-style:italic; line-height:1.45; }
 
-.recipe-description {
-  font-size: 1.2rem;
-  color: #d7e3fc;
-  text-align: center;
-  margin-bottom: 2.5rem;
-  font-style: italic;
-  line-height: 1.5;
-  max-width: 650px;
-  margin-left: auto;
-  margin-right: auto;
-}
+.recipe-page h2 { font-size:1.25rem; margin-top:1.6rem; margin-bottom:.8rem; color:#cfe3ff; border-bottom: 3px solid rgba(255,255,255,0.12); padding-bottom:.4rem; font-weight:700; }
 
-.recipe-page h2 {
-  font-size: 1.75rem;
-  margin-top: 2.5rem;
-  margin-bottom: 1.25rem;
-  color: #c1d1ff;
-  border-bottom: 3px solid #aac8ff;
-  padding-bottom: 0.6rem;
-  letter-spacing: 0.05em;
-  font-weight: 600;
-  transition: color 0.3s ease;
-}
-
-.recipe-page h2:hover {
-  color: #f0f4ff;
-  border-color: #e1f0ff;
-}
-
-.recipe-list {
-  /* list-style: none; */
-  padding-left: 2rem;
-  line-height: 1.85;
-  color: #d7dff9;
-  font-weight: 500;
-  font-size: 1.1rem;
-  transition: color 0.25s ease;
-}
-
-.recipe-list li {
-  margin-bottom: 0.75rem;
-  position: relative;
-  padding-left: 1.2rem;
-}
-
-.recipe-list li::before {
-  /* content: "•"; */
-  position: absolute;
-  left: 0;
-  color: #aad1ff;
-  font-size: 1.4rem;
-  line-height: 1;
-  top: 0;
-  user-select: none;
-}
-
-.recipe-list li:hover {
-  color: #f0f4ff;
-  cursor: default;
-  text-shadow: 0 0 6px #aac8ff;
-}
+.recipe-list { padding-left:1.4rem; line-height:1.8; color:#e6f0ff; font-weight:600; }
+.recipe-list li { margin-bottom:.6rem; position:relative; padding-left:1.1rem; }
+.recipe-list li::before { position:absolute; left:0; top:0; color:#d1e8ff; font-size:1.2rem; user-select:none; content: '•'; }
+.recipe-list li:hover { color:#fff; text-shadow: 0 0 6px rgba(255,255,255,0.08); cursor:default; }
