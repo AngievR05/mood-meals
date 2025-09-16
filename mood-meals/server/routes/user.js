@@ -1,19 +1,10 @@
+// routes/users.js
 const express = require('express');
 const router = express.Router();
-const {
-  getUserProfile,
-  getMoodStats,
-} = require('../controllers/userController');
-const authMiddleware = require('../middleware/authMiddleware');
+const auth = require('../middleware/auth');
+const { getUser, updateUser } = require('../controllers/userController');
 
-// @route   GET api/user/profile
-// @desc    Get user profile data
-// @access  Private
-router.get('/profile', authMiddleware, getUserProfile);
-
-// @route   GET api/user/mood-stats
-// @desc    Get user mood statistics
-// @access  Private
-router.get('/mood-stats', authMiddleware, getMoodStats);
+router.get('/me', auth, getUser);
+router.put('/me', auth, updateUser);
 
 module.exports = router;

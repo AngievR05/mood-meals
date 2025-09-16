@@ -1,71 +1,58 @@
-const pool = require('../config/db');
+// controllers/authController.js
+const { pool } = require('../config/db');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-exports.register = async (req, res) => {
-  const { username, email, password } = req.body;
-
+exports.register = async (req, res, next) => {
   try {
-    // Check if email already exists
-    const [userByEmail] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
-    if (userByEmail.length > 0) {
-      return res.status(400).json({ message: 'Email already registered' });
+    const { username, email, password } = req.body;
+
+    if (!username || !email || !password) {
+      return res.status(400).json({ error: 'All fields are required' });
     }
 
-    // Check if username already exists
-    const [userByUsername] = await pool.query('SELECT * FROM users WHERE username = ?', [username]);
-    if (userByUsername.length > 0) {
-      return res.status(400).json({ message: 'Username already taken' });
+    // Check if user exists
+    const [existing] = await pool.execute('SELECT id FROM users WHERE email = ?', [email]);
+    if (existing.length > 0) {
+      return res.status(400).json({ error: 'Email already in use' });
     }
 
-    // Hash password and insert user
-    const hashedPassword = await bcrypt.hash(password, 10);
-    await pool.query(
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Insert user
+    const [result] = await pool.execute(
       'INSERT INTO users (username, email, password) VALUES (?, ?, ?)',
       [username, email, hashedPassword]
     );
 
-    res.status(201).json({ message: 'User registered successfully' });
+    const token = jwt.sign({ id: result.insertId }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    res.status(201).json({ token });
   } catch (err) {
-    console.error('Register error:', err);
-    res.status(500).json({ message: 'Server error', error: err.message });
+    next(err);
   }
 };
 
-exports.login = async (req, res) => {
-  const { identifier, password } = req.body;
-
-  console.log('Login attempt with identifier:', identifier);
-
+exports.login = async (req, res, next) => {
   try {
-    const [users] = await pool.query(
-      'SELECT * FROM users WHERE username = ? OR email = ?',
-      [identifier, identifier]
-    );
+    const { email, password } = req.body;
 
-    if (!users || users.length === 0) {
-      console.log('No user found for identifier:', identifier);
-      return res.status(400).json({ message: 'Invalid credentials' });
+    const [rows] = await pool.execute('SELECT * FROM users WHERE email = ?', [email]);
+    if (rows.length === 0) {
+      return res.status(400).json({ error: 'Invalid credentials' });
     }
 
-    const user = users[0];
-
+    const user = rows[0];
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      console.log('Password mismatch for user:', user.username);
-      return res.status(400).json({ message: 'Invalid credentials' });
-    }
+    if (!isMatch) return res.status(400).json({ error: 'Invalid credentials' });
 
-    const token = jwt.sign(
-      { id: user.id, username: user.username, email: user.email },
-      process.env.JWT_SECRET,
-      { expiresIn: '2h' }
-    );
+    const token = jwt.sign({ id: user.id, role: user.role || 'user' }, process.env.JWT_SECRET, {
+      expiresIn: '7d',
+    });
 
-    console.log('Login successful:', user.username);
-    res.json({ token, username: user.username, email: user.email });
+    res.json({ token });
   } catch (err) {
-    console.error('Login error:', err);
-    res.status(500).json({ message: 'Server error', details: err.message });
+    next(err);
   }
 };
