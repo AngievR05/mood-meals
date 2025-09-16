@@ -29,10 +29,10 @@ const Navbar = () => {
       {/* Search + Logout */}
       <div className="navbar-actions">
         <div className="navbar-search">
-          <input type="text" placeholder="Search..." />
+          <input type="text" placeholder="Search..." className="form-input" />
         </div>
         <button
-          className="logout-button"
+          className="btn btn-primary"
           onClick={() => logout(navigate)}
         >
           Logout

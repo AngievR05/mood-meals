@@ -1,31 +1,12 @@
-:root {
-  --white: #fff;
-  --radius-lg: 24px;
-  --shadow-md: 0 6px 20px rgba(0,0,0,0.08);
-}
+/*
+==================================================
+|            MOOD RADIAL CHART STYLES            |
+==================================================
+*/
 
-.mood-chart-container {
-  width: 95%;
-  margin: 1.8rem auto;
-  padding: 1.6rem;
-  border-radius: var(--radius-lg);
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  position:relative;
-  overflow:hidden;
-  max-height: 520px;
-  background: linear-gradient(180deg,#fff,#fbfdff);
-  box-shadow: var(--shadow-md);
-  font-family: 'Segoe UI', sans-serif;
-}
-
-.mood-chart {
-  width:100%;
-  max-width:520px;
-  height:420px;
-  position:relative;
-  z-index:1;
-  padding: 1rem;
-  box-sizing:content-box;
+.mood-radial-chart-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--space-lg);
 }

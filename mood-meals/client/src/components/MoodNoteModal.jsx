@@ -13,22 +13,23 @@ const MoodNoteModal = ({ onSave }) => {
 
   return (
     <>
-      <button className="open-modal-btn" onClick={() => setIsOpen(true)}>
+      <button className="btn btn-primary" onClick={() => setIsOpen(true)}>
         + Add Mood Note
       </button>
 
       {isOpen && (
-        <div className="modal-backdrop">
-          <div className="modal">
+        <div className="modal-overlay">
+          <div className="modal-content mood-note-modal">
             <h3>Why do you feel this way?</h3>
             <textarea
               value={note}
               onChange={(e) => setNote(e.target.value)}
               placeholder="Type your thoughts..."
+              className="form-input"
             />
             <div className="modal-actions">
-              <button onClick={() => setIsOpen(false)}>Cancel</button>
-              <button onClick={handleSubmit}>Save</button>
+              <button className="btn btn-secondary" onClick={() => setIsOpen(false)}>Cancel</button>
+              <button className="btn btn-primary" onClick={handleSubmit}>Save</button>
             </div>
           </div>
         </div>

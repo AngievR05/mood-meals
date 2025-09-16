@@ -5,12 +5,12 @@ const Friends = () => {
   return (
     <div className="friends-page">
       {/* Connect with Friends */}
-      <section className="connect-section">
+      <section className="connect-section card">
         <h2>Connect with Friends</h2>
         <p>Track your moods and meals together.</p>
         <div className="friend-input">
-          <input type="text" placeholder="Add a Friend..." />
-          <button>Add Friend</button>
+          <input type="text" placeholder="Add a Friend..." className="form-input" />
+          <button className="btn btn-primary">Add Friend</button>
         </div>
       </section>
 
@@ -94,17 +94,17 @@ const Friends = () => {
             <p>Recent updates from your friends.</p>
           </div>
           <div className="mood-log-buttons">
-            <button>View Log</button>
-            <button className="secondary">Support this Friend</button>
+            <button className="btn btn-primary">View Log</button>
+            <button className="btn btn-secondary">Support this Friend</button>
           </div>
         </div>
       </section>
 
       {/* Send Encouragement */}
-      <section className="encouragement-section">
+      <section className="encouragement-section card">
         <h2>Send Encouragement</h2>
-        <textarea placeholder="Write a supportive message..." />
-        <button>Send</button>
+        <textarea placeholder="Write a supportive message..." className="form-input" />
+        <button className="btn btn-primary">Send</button>
       </section>
 
       {/* Recent Posts by Friends */}

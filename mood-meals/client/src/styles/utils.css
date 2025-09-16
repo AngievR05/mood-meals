@@ -1,0 +1,149 @@
+
+.btn {
+  display: inline-block;
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-bold);
+  text-align: center;
+  text-decoration: none;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: var(--text-color-light);
+}
+
+.btn-primary:hover {
+  background-color: var(--secondary-color);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(74, 137, 220, 0.4);
+}
+
+.btn-secondary {
+  background-color: var(--neutral-light);
+  color: var(--neutral-dark);
+  border: 1px solid var(--neutral-medium);
+}
+
+.btn-secondary:hover {
+  background-color: var(--neutral-medium);
+  color: var(--text-color-light);
+}
+
+.btn-destructive {
+  background-color: var(--destructive-color);
+  color: var(--text-color-light);
+}
+
+.btn-destructive:hover {
+  background-color: #c04330;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(233, 87, 63, 0.4);
+}
+
+.btn:disabled {
+  background-color: var(--neutral-medium);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.form-group {
+  margin-bottom: var(--space-md);
+}
+
+.form-label {
+  display: block;
+  margin-bottom: var(--space-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.form-input {
+  background: var(--neutral-light);
+  border: 1.5px solid transparent;
+  border-radius: var(--border-radius);
+  padding: var(--space-sm) var(--space-md);
+  color: var(--text-color);
+  font-size: var(--font-size-body);
+  width: 100%;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.form-input:focus {
+  border-color: var(--primary-color);
+  background-color: var(--background-color);
+  box-shadow: 0 0 0 3px rgba(93, 156, 236, 0.3);
+}
+
+.form-input::placeholder {
+  color: var(--neutral-medium);
+}
+
+.form-input-error {
+  border-color: var(--destructive-color);
+  animation: shake 0.5s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.form-error-message {
+  color: var(--destructive-color);
+  font-size: 0.9rem;
+  margin-top: var(--space-xs);
+}
+
+
+.card {
+  background: var(--background-color);
+  border-radius: var(--border-radius);
+  padding: var(--space-lg);
+  box-shadow: var(--box-shadow);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+  background: var(--background-color);
+  border-radius: var(--border-radius);
+  padding: var(--space-lg);
+  width: 90%;
+  max-width: 500px;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { transform: translateY(-20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}

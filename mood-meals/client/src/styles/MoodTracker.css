@@ -1,131 +1,84 @@
-:root {
-  --blue-light: #5d9cec;
-  --blue-dark: #4a89dc;
-  --blue-darker: #357abd;
-  --soft-bg: #f9f9f9;
-  --card-bg: #ffffff;
-  --radius-lg: 16px;
-  --radius-md: 12px;
-  --shadow-light: 0 4px 12px rgba(0,0,0,0.05);
-  --shadow-medium: 0 6px 16px rgba(0,0,0,0.12);
-  --shadow-strong: 0 10px 28px rgba(0,0,0,0.22);
-}
+/*
+==================================================
+|                MOOD TRACKER STYLES             |
+==================================================
+*/
 
 .tracker-container {
-  padding: 2rem;
-  background: linear-gradient(180deg,var(--soft-bg),#eef5fb);
-  min-height:100vh;
-  font-family:'Segoe UI',sans-serif;
-  color:#333;
+  padding: var(--space-lg);
 }
 
-.tracker-header { text-align:center; margin-bottom:1.6rem; }
-.tracker-header h1 { font-size:2rem; color:var(--blue-dark); margin:0; font-weight:800; }
-.tracker-header p { color:#6b7280; margin-top:.4rem; }
-
-/* Section headings */
-.mood-entry h2, .weekly-overview h2, .recent-log h2 {
-  font-size:1.25rem; color:#444; margin-bottom:1rem; font-weight:700;
-  border-bottom:3px solid var(--blue-dark); padding-bottom:.35rem; width:fit-content;
-  margin-left:auto; margin-right:auto;
+.tracker-header {
+  text-align: center;
+  margin-bottom: var(--space-xl);
 }
 
-/* Mood grid & cards (consistent with Home) */
+.mood-entry {
+  margin-bottom: var(--space-xl);
+}
+
 .mood-grid {
-  display:grid;
-  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-  gap:1.2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
 }
 
 .mood-card {
-  border-radius: var(--radius-lg);
-  height:130px;
-  padding: .95rem;
-  background: linear-gradient(135deg,var(--blue-light),var(--blue-dark));
-  color:#fff;
-  font-weight:800;
-  text-align:center;
-  cursor:pointer;
-  box-shadow: var(--shadow-medium);
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  transition: transform .2s ease, box-shadow .2s ease, filter .12s ease;
+  background-color: var(--neutral-light);
+  color: var(--text-color);
+  border-radius: var(--border-radius);
+  padding: var(--space-md);
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
 }
 
-.mood-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-strong); filter: brightness(1.06); outline:none; }
-
-/* Textarea */
-textarea {
-  width:100%;
-  padding:1rem 1.2rem;
-  border-radius: var(--radius-md);
-  border:1.25px solid #ccd6dd;
-  margin-top:1rem;
-  font-size:1rem;
-  min-height:100px;
-  box-shadow: inset 0 2px 6px rgba(0,0,0,0.03);
+.mood-card.selected {
+  border-color: var(--primary-color);
+  transform: scale(1.05);
 }
 
-textarea:focus { border-color: var(--blue-dark); box-shadow: 0 0 14px rgba(74,137,220,0.14); outline:none; }
-
-/* Save button */
-.save-btn {
-  margin-top:1rem;
-  padding: .9rem 1.8rem;
-  background: linear-gradient(135deg,var(--blue-light),var(--blue-dark));
-  border:none;
-  color:#fff;
-  border-radius:14px;
-  font-weight:800;
-  box-shadow: 0 8px 22px rgba(74,137,220,0.12);
-  cursor:pointer;
+.mood-icon img {
+  width: 60px;
+  height: 60px;
+  margin-bottom: var(--space-sm);
 }
 
-.save-btn:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(53,122,189,0.18); }
-
-/* Weekly Overview / Recent Logs */
-.weekly-overview { margin-top:1.6rem; }
-.mock-graph {
-  background:#fff9e6;
-  padding:1.6rem;
-  border-radius:18px;
-  box-shadow: inset 0 0 14px rgba(0,0,0,0.04);
-  text-align:center;
-  font-style:italic;
-  color:#8b7a00;
+.mood-label {
+  font-weight: var(--font-weight-medium);
 }
 
-/* Recent log list */
-.log-list { list-style:none; padding:0; margin:0; margin-top:1rem; }
-.log-list li {
-  background: var(--card-bg);
-  border-radius: 14px;
-  padding: 1rem;
-  margin-bottom: .9rem;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.05);
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+.mood-jar-section {
+  text-align: center;
+  margin-bottom: var(--space-xl);
 }
 
-.log-list li:hover { box-shadow: 0 12px 30px rgba(0,0,0,0.08); }
+.recent-log {
+  margin-bottom: var(--space-xl);
+}
 
-.log-entry-left { display:flex; gap:1rem; align-items:flex-start; }
-.log-mood-image { width:52px; height:52px; border-radius:50%; object-fit:contain; box-shadow: 0 3px 12px rgba(74,137,220,0.2); }
-.log-mood-name { font-weight:700; color:#333; }
-.log-mood-note { color:#555; max-width:340px; word-break:break-word; line-height:1.4; }
+.log-list {
+  list-style: none;
+  padding: 0;
+}
 
-.log-date { font-size:.95rem; color:#777; flex-shrink:0; }
+.log-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-md);
+  border-bottom: 1px solid var(--neutral-light);
+}
 
-/* Mood jar */
-.mood-jar-section { margin-top:1.8rem; background:var(--card-bg); border-radius:18px; padding:1.2rem; box-shadow: 0 10px 30px rgba(0,138,255,0.08); text-align:center; }
+.log-entry-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
 
-.jar-bubble { width:30px; height:30px; border-radius:50%; background: linear-gradient(145deg,#55dddd,#00aacc); box-shadow: 0 3px 6px rgba(0,170,204,0.45); transition: transform .18s ease; cursor:pointer; animation: bubble-drop 3s ease-in-out infinite alternate; }
-.jar-bubble:hover { transform: scale(1.25) translateY(-6px); }
-
-@keyframes bubble-drop {
-  0%,100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-6px) scale(1.05); }
+.log-mood-image {
+  width: 40px;
+  height: 40px;
 }

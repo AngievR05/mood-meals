@@ -1,62 +1,12 @@
-/* Jar shape and body */
-.jar-body {
-  fill: url(#glassGradient);
-  stroke: #3d7db4;
-  stroke-width: 4;
-  filter: url(#jarShadow);
-}
+/*
+==================================================
+|                 MOOD JAR STYLES                |
+==================================================
+*/
 
-/* Bubble group layout */
-.jar-bubble-group {
-  clip-path: url(#jarClip);
-  pointer-events: none;
-}
-
-/* Individual bubble */
-.jar-bubble {
-  cursor: pointer;
-  pointer-events: all;
-  transition: transform 0.3s ease;
-  position: relative;
-}
-
-/* Hover scale effect */
-.jar-bubble:hover {
-  transform: scale(1.15);
-}
-
-/* Bubble pop-in animation */
-@keyframes bubblePopIn {
-  0% {
-    transform: scale(0.2);
-    opacity: 0;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-.popping {
-  animation: bubblePopIn 0.5s ease-out;
-}
-
-/* Tooltip styling */
-.tooltip {
-  position: absolute;
-  background-color: rgba(0, 0, 0, 0.75);
-  color: #fff;
-  font-size: 0.75rem;
-  padding: 6px 10px;
-  border-radius: 6px;
-  white-space: nowrap;
-  pointer-events: none;
-  z-index: 10;
-  transform: translate(-50%, -120%);
-  transition: opacity 0.3s ease;
-  opacity: 0;
-}
-
-.jar-bubble:hover .tooltip {
-  opacity: 1;
+.mood-jar-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--space-lg);
 }

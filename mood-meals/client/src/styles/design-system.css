@@ -1,0 +1,49 @@
+:root {
+  --primary-color: #5d9cec;
+  --link-color: #337ab7;
+  --secondary-color: #4a89dc;
+  --accent-color: #f6bb42;
+  --destructive-color: #e9573f;
+  --success-color: #8cc152;
+  --neutral-dark: #333;
+  --neutral-medium: #888;
+  --neutral-light: #f4f4f4;
+  --background-color: #ffffff;
+  --text-color: #333;
+  --text-color-light: #ffffff;
+
+  --font-family-sans: 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+  --font-family-serif: 'Georgia', 'Times New Roman', serif;
+
+  --font-size-h1: 2.5rem;
+  --font-size-h2: 2rem;
+  --font-size-h3: 1.75rem;
+  --font-size-h4: 1.5rem;
+  --font-size-h5: 1.25rem;
+  --font-size-h6: 1rem;
+  --font-size-body: 1rem;
+
+  --font-weight-light: 300;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+
+  --line-height-heading: 1.2;
+  --line-height-body: 1.6;
+
+
+  --space-xs: 0.25rem; /* 4px */
+  --space-sm: 0.5rem;  /* 8px */
+  --space-md: 1rem;    /* 16px */
+  --space-lg: 2rem;    /* 32px */
+  --space-xl: 4rem;    /* 64px */
+
+
+  --breakpoint-xs: 480px;
+  --breakpoint-sm: 768px;
+  --breakpoint-md: 1024px;
+
+
+  --border-radius: 12px;
+  --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}

@@ -1,67 +1,25 @@
-:root {
-  --accent-aqua: #55DDE0;
-  --white: #fff;
-  --radius-md: 12px;
-  --shadow-lg: 0 10px 25px rgba(0,0,0,0.22);
+/*
+==================================================
+|              MOOD NOTE MODAL STYLES            |
+==================================================
+*/
+
+.mood-note-modal .modal-content {
+  text-align: center;
 }
 
-.open-modal-btn {
-  background-color: var(--accent-aqua);
-  color: var(--white);
-  padding: .55rem .9rem;
-  border: none;
-  border-radius: 20px;
-  font-size: .95rem;
-  cursor: pointer;
-  font-weight:700;
+.mood-note-modal h3 {
+  font-size: var(--font-size-h3);
+  margin-bottom: var(--space-md);
 }
 
-.modal-backdrop {
-  position:fixed;
-  top:0; left:0;
-  width:100%; height:100%;
-  background: rgba(0,0,0,0.45);
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  z-index:2000;
-  padding:1rem;
+.mood-note-modal textarea {
+  width: 100%;
+  min-height: 150px;
+  padding: var(--space-md);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--neutral-light);
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-body);
+  resize: vertical;
 }
-
-.modal {
-  background: var(--white);
-  padding:1.6rem;
-  width:100%;
-  max-width:460px;
-  border-radius: 12px;
-  box-shadow: var(--shadow-lg);
-  font-family: 'Segoe UI', sans-serif;
-}
-
-.modal textarea {
-  width:100%;
-  height:120px;
-  padding:.9rem;
-  border-radius:10px;
-  border:1px solid #e6e6e6;
-  resize:vertical;
-  font-size:1rem;
-}
-
-.modal-actions {
-  display:flex;
-  justify-content:space-between;
-  gap:.6rem;
-  margin-top:.9rem;
-}
-
-.modal-actions button {
-  padding:.55rem .9rem;
-  border-radius:10px;
-  border:none;
-  cursor:pointer;
-  font-weight:700;
-}
-
-.modal-actions button:first-child { background:#efefef; color:#333; }
-.modal-actions button:last-child { background:var(--accent-aqua); color:#fff; }

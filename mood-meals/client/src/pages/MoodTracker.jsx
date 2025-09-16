@@ -69,12 +69,12 @@ const MoodTracker = () => {
 
   return (
     <div className="tracker-container">
-      <section className="tracker-header">
+      <section className="tracker-header card">
         <h1>Your Mood History</h1>
         <p>Track your emotions, reflect, and watch your Mood Jar fill up.</p>
       </section>
 
-      <section className="mood-entry">
+      <section className="mood-entry card">
         <h2>Add Your Mood Entry</h2>
         <div className="mood-grid">
           {moods.map((mood) => (
@@ -96,16 +96,17 @@ const MoodTracker = () => {
           placeholder="Add an optional note about your mood..."
           value={note}
           onChange={(e) => setNote(e.target.value)}
+          className="form-input"
         />
-        <button className="save-btn" onClick={handleSave}>Save Mood Entry</button>
+        <button className="btn btn-primary" onClick={handleSave}>Save Mood Entry</button>
       </section>
 
-      <section className="mood-jar-section">
+      <section className="mood-jar-section card">
         <h2>Your Mood Jar</h2>
         <JarSVG width={240} height={340} bubblesData={bubblesData} />
       </section>
 
-      <section className="recent-log">
+      <section className="recent-log card">
         <h2>Recent Mood Log</h2>
         <ul className="log-list">
           {recentMoods.map(({ mood, note, date }, idx) => {
