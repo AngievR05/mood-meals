@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/MoodTracker.css';
 import JarSVG from '../components/JarSVG';
-import spinner from '../assets/images/Group2.png'; // spinner image
+import spinner from '../assets/images/Group2.png';
 
 import happy from '../assets/emotions/Happy.png';
 import sad from '../assets/emotions/Sad.png';
@@ -64,13 +64,11 @@ const MoodTracker = () => {
     fetchMoods();
   }, [token]);
 
+  // Save mood
   const handleSave = async () => {
     if (!selectedMood) return setError('Please select a mood!');
     setLoading(true);
     setError('');
-
-    const today = new Date().toISOString().split('T')[0];
-    const newEntry = { mood: selectedMood, note: note || '' };
 
     try {
       const res = await fetch('http://localhost:5000/api/moods', {
@@ -79,12 +77,13 @@ const MoodTracker = () => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(newEntry),
+        body: JSON.stringify({ mood: selectedMood, note }),
       });
       const savedMood = await res.json();
       if (!res.ok) throw new Error(savedMood.message || 'Failed to save mood');
 
-      setRecentMoods([savedMood, ...recentMoods]);
+      // Replace today's mood if exists
+      setRecentMoods([savedMood, ...recentMoods.filter(m => m.id !== savedMood.id)]);
       setSelectedMood('');
       setNote('');
     } catch (err) {
@@ -94,9 +93,9 @@ const MoodTracker = () => {
     }
   };
 
-  // Map recent moods to bubbles for JarSVG
+  // Prepare bubbles for JarSVG
   const bubblesData = recentMoods.slice(0, 8).map((entry, i) => {
-    const moodData = moods.find((m) => m.name === entry.mood);
+    const moodData = moods.find(m => m.name === entry.mood);
     const pos = landingPositions[i % landingPositions.length];
     return {
       id: i,
@@ -109,8 +108,9 @@ const MoodTracker = () => {
     };
   });
 
+  // Highlight today's mood
   const today = new Date().toISOString().split('T')[0];
-  const todaysMood = recentMoods.find((m) => m.date === today);
+  const todaysMood = recentMoods.find(m => m.created_at?.startsWith(today));
 
   return (
     <div className="tracker-container">
@@ -123,7 +123,7 @@ const MoodTracker = () => {
         <h2>Add Your Mood Entry</h2>
         {error && <p className="auth-error">{error}</p>}
         <div className="mood-grid">
-          {moods.map((mood) => (
+          {moods.map(mood => (
             <button
               key={mood.name}
               className={`mood-card ${selectedMood === mood.name ? 'selected' : ''} ${
@@ -163,10 +163,12 @@ const MoodTracker = () => {
         <h2>Recent Mood Log</h2>
         {loading && <p>Loading moods...</p>}
         <ul className="log-list">
-          {recentMoods.map(({ mood, note, date }, idx) => {
-            const moodData = moods.find((m) => m.name === mood);
+          {recentMoods.length === 0 && !loading && <p>No moods logged yet.</p>}
+          {recentMoods.map(({ id, mood, note, created_at }, idx) => {
+            const moodData = moods.find(m => m.name === mood);
+            const date = created_at ? new Date(created_at).toLocaleDateString() : '';
             return (
-              <li key={idx} className="log-item">
+              <li key={id || idx} className="log-item">
                 <div className="log-entry-left">
                   <img src={moodData?.image} alt={mood} className="log-mood-image" />
                   <div className="log-mood-text">
