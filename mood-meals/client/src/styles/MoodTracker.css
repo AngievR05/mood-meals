@@ -6,6 +6,8 @@
 
 .tracker-container {
   padding: var(--space-lg);
+  max-width: 100%;
+  margin: 0 auto;
 }
 
 .tracker-header {
@@ -33,11 +35,17 @@
   cursor: pointer;
   transition: all 0.3s ease;
   border: 2px solid transparent;
+  position: relative;
 }
 
 .mood-card.selected {
   border-color: var(--primary-color);
   transform: scale(1.05);
+}
+
+.mood-card.today {
+  border-color: #ff9900; /* Highlight today's mood */
+  box-shadow: 0 0 10px rgba(255, 153, 0, 0.6);
 }
 
 .mood-icon img {
@@ -48,6 +56,28 @@
 
 .mood-label {
   font-weight: var(--font-weight-medium);
+}
+
+/* Loading spinner inside button */
+.btn img {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.btn.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: var(--space-sm) var(--space-md);
+}
+
+/* Error messages */
+.auth-error {
+  color: #ed5565;
+  font-weight: var(--font-weight-medium);
+  margin-bottom: var(--space-sm);
+  text-align: center;
 }
 
 .mood-jar-section {
@@ -81,4 +111,24 @@
 .log-mood-image {
   width: 40px;
   height: 40px;
+}
+
+/* Optional: recent mood text */
+.log-mood-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.log-mood-name {
+  font-weight: var(--font-weight-medium);
+}
+
+.log-mood-note {
+  font-size: 0.9rem;
+  color: var(--neutral-dark);
+}
+
+.log-date {
+  font-size: 0.85rem;
+  color: var(--neutral-dark);
 }

@@ -3,25 +3,24 @@ const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
 
-const { pool } = require('./config/db'); // mysql2 promise pool
+const { pool } = require('./config/db');
 const authRoutes = require('./routes/auth');
-const userRoutes = require('./routes/user'); // update file names if you use plural 'users'
-const moodsRoutes = require('./routes/moods'); // optional, only if present
-const mealsRoutes = require('./routes/meals'); // optional
-const groceriesRoutes = require('./routes/groceries'); // optional
-const recommendationsRoutes = require('./routes/recommendations'); // optional
-const errorHandler = require('./middleware/errorHandler'); // use the error handler from earlier
+const userRoutes = require('./routes/user');
+const moodsRoutes = require('./routes/moods');
+const mealsRoutes = require('./routes/meals');
+const groceriesRoutes = require('./routes/groceries');
+const recommendationsRoutes = require('./routes/recommendations');
+const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
-
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
 
-// health
-app.get('/', (req, res) => res.json({ ok: true, msg: 'Mood Meals backend is alive 🚀' }));
+// Health check
+app.get('/', (req, res) => res.json({ ok: true, msg: 'Mood Meals backend alive 🚀' }));
 
-// mount APIs (keep your existing route paths like /api/auth if you prefer)
+// Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/moods', moodsRoutes);
@@ -29,20 +28,35 @@ app.use('/api/meals', mealsRoutes);
 app.use('/api/groceries', groceriesRoutes);
 app.use('/api/recommendations', recommendationsRoutes);
 
-// error handler (last)
+// Error handler
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
+const DEFAULT_PORT = parseInt(process.env.PORT, 10) || 5000;
+const MAX_PORT_TRIES = 10;
 
-async function start() {
+async function start(port = DEFAULT_PORT, attempt = 0) {
   try {
-    // quick DB sanity check
     await pool.query('SELECT 1');
     console.log('✅ MySQL pool connected');
-    app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+
+    const server = app.listen(port, () => console.log(`Server running on http://localhost:${port}`));
+    server.on('error', (err) => {
+      if (err.code === 'EADDRINUSE') {
+        if (attempt < MAX_PORT_TRIES) {
+          console.warn(`⚠️ Port ${port} busy, trying ${port + 1}...`);
+          start(port + 1, attempt + 1);
+        } else {
+          console.error(`❌ No free ports after ${MAX_PORT_TRIES} tries. Exiting.`);
+          process.exit(1);
+        }
+      } else {
+        console.error(err);
+        process.exit(1);
+      }
+    });
   } catch (err) {
-    console.error('❌ Failed to connect to DB on startup:', err.message);
-    process.exit(1); // crash early so you fix env / DB
+    console.error('❌ DB connection failed:', err.message);
+    process.exit(1);
   }
 }
 

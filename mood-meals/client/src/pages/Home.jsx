@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 
-import MoodSelector from '../components/MoodSelector';
 import MoodNoteModal from '../components/MoodNoteModal';
 import GrocerySection from '../components/GrocerySection';
 import MealSuggestions from '../components/MealSuggestions';
@@ -20,6 +19,7 @@ import confused from '../assets/emotions/Confused.png';
 import grateful from '../assets/emotions/Grateful.png';
 
 import '../styles/Home.css';
+import spinner from '../assets/images/Group2.png';
 
 const moodImages = {
   Happy: happy,
@@ -36,14 +36,60 @@ const Home = () => {
   const [moodNote, setMoodNote] = useState('');
   const [currentMood, setCurrentMood] = useState('');
   const [username, setUsername] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const token = localStorage.getItem('token');
 
   useEffect(() => {
     AOS.init({ duration: 1000, once: true });
     const storedUsername = localStorage.getItem('username');
-    if (storedUsername) {
-      setUsername(storedUsername);
+    if (storedUsername) setUsername(storedUsername);
+
+    const fetchTodayMood = async () => {
+      setLoading(true);
+      setError('');
+      try {
+        const res = await fetch('http://localhost:5000/api/moods/today', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        if (res.ok && data.mood) {
+          setCurrentMood(data.mood);
+          setMoodNote(data.note || '');
+        }
+      } catch (err) {
+        setError('Failed to load today’s mood');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (token) fetchTodayMood();
+  }, [token]);
+
+  const handleMoodSelect = async (mood) => {
+    setCurrentMood(mood);
+    setError('');
+    setLoading(true);
+
+    try {
+      const res = await fetch('http://localhost:5000/api/moods', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ mood, note: moodNote }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Failed to save mood');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
-  }, []);
+  };
 
   return (
     <div className="home-container">
@@ -57,29 +103,34 @@ const Home = () => {
               <>How are you feeling today?</>
             )}
           </p>
+          {error && <p className="auth-error">{error}</p>}
         </div>
         {currentMood && (
           <div className="header-right">
-            <img
-              key={currentMood}
-              src={moodImages[currentMood]}
-              alt={currentMood}
-              className="header-mood-image pulse"
-            />
+            {loading ? (
+              <img src={spinner} alt="Loading..." style={{ width: 36 }} />
+            ) : (
+              <img
+                key={currentMood}
+                src={moodImages[currentMood]}
+                alt={currentMood}
+                className="header-mood-image pulse"
+              />
+            )}
           </div>
         )}
       </header>
 
       <section className="mood-section" data-aos="fade-up">
         <h2>Select Your Mood</h2>
-        {/* Updated MoodSelector to render moods like mood tracker */}
         <div className="mood-grid">
           {Object.entries(moodImages).map(([mood, img]) => (
             <button
               key={mood}
               className={`mood-card ${currentMood === mood ? 'selected' : ''}`}
-              onClick={() => setCurrentMood(mood)}
+              onClick={() => handleMoodSelect(mood)}
               aria-pressed={currentMood === mood}
+              disabled={loading}
             >
               <div className="mood-icon">
                 <img src={img} alt={mood} />
@@ -89,14 +140,13 @@ const Home = () => {
           ))}
         </div>
 
-        {/* Mood note modal stays same */}
         <MoodNoteModal onSave={setMoodNote} />
-
-        <div className="mood-status-wrapper">
-          <MoodIndicator mood={currentMood} />
-          <StreakTracker streak={3} />
-        </div>
       </section>
+
+      <div className="mood-status-wrapper">
+        <MoodIndicator mood={currentMood} />
+        <StreakTracker streak={3} />
+      </div>
 
       <section className="grocery-section" data-aos="fade-up" data-aos-delay="100">
         <GrocerySection />

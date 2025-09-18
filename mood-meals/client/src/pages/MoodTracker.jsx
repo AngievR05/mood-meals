@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/MoodTracker.css';
 import JarSVG from '../components/JarSVG';
+import spinner from '../assets/images/Group2.png'; // spinner image
 
 import happy from '../assets/emotions/Happy.png';
 import sad from '../assets/emotions/Sad.png';
@@ -22,7 +23,6 @@ const moods = [
   { name: 'Grateful', color: '#AC92EC', image: grateful },
 ];
 
-// Fixed jar positions for bubbles (reused)
 const landingPositions = [
   { cx: 90, cy: 270 },
   { cx: 120, cy: 260 },
@@ -37,22 +37,64 @@ const landingPositions = [
 const MoodTracker = () => {
   const [selectedMood, setSelectedMood] = useState('');
   const [note, setNote] = useState('');
-  const [recentMoods, setRecentMoods] = useState([
-    { mood: 'Happy', note: 'Feeling great!', date: '2025-10-01' },
-    { mood: 'Sad', note: 'A little down.', date: '2025-10-02' },
-    { mood: 'Bored', note: 'Nothing interesting.', date: '2025-10-03' },
-  ]);
+  const [recentMoods, setRecentMoods] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSave = () => {
-    if (!selectedMood) return alert('Please select a mood!');
+  const token = localStorage.getItem('token');
+
+  // Fetch moods on mount
+  useEffect(() => {
+    const fetchMoods = async () => {
+      setLoading(true);
+      setError('');
+      try {
+        const res = await fetch('http://localhost:5000/api/moods', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) throw new Error('Failed to fetch moods');
+        const data = await res.json();
+        setRecentMoods(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchMoods();
+  }, [token]);
+
+  const handleSave = async () => {
+    if (!selectedMood) return setError('Please select a mood!');
+    setLoading(true);
+    setError('');
+
     const today = new Date().toISOString().split('T')[0];
-    const newEntry = { mood: selectedMood, note: note || '', date: today };
-    setRecentMoods([newEntry, ...recentMoods]);
-    setSelectedMood('');
-    setNote('');
+    const newEntry = { mood: selectedMood, note: note || '' };
+
+    try {
+      const res = await fetch('http://localhost:5000/api/moods', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(newEntry),
+      });
+      const savedMood = await res.json();
+      if (!res.ok) throw new Error(savedMood.message || 'Failed to save mood');
+
+      setRecentMoods([savedMood, ...recentMoods]);
+      setSelectedMood('');
+      setNote('');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Map recent moods to bubbles with fixed positions, no falling
+  // Map recent moods to bubbles for JarSVG
   const bubblesData = recentMoods.slice(0, 8).map((entry, i) => {
     const moodData = moods.find((m) => m.name === entry.mood);
     const pos = landingPositions[i % landingPositions.length];
@@ -67,6 +109,9 @@ const MoodTracker = () => {
     };
   });
 
+  const today = new Date().toISOString().split('T')[0];
+  const todaysMood = recentMoods.find((m) => m.date === today);
+
   return (
     <div className="tracker-container">
       <section className="tracker-header card">
@@ -76,13 +121,17 @@ const MoodTracker = () => {
 
       <section className="mood-entry card">
         <h2>Add Your Mood Entry</h2>
+        {error && <p className="auth-error">{error}</p>}
         <div className="mood-grid">
           {moods.map((mood) => (
             <button
               key={mood.name}
-              className={`mood-card ${selectedMood === mood.name ? 'selected' : ''}`}
+              className={`mood-card ${selectedMood === mood.name ? 'selected' : ''} ${
+                todaysMood?.mood === mood.name ? 'today' : ''
+              }`}
               style={{ background: mood.color }}
               onClick={() => setSelectedMood(mood.name)}
+              disabled={loading}
             >
               <div className="mood-icon">
                 <img src={mood.image} alt={mood.name} />
@@ -97,8 +146,12 @@ const MoodTracker = () => {
           value={note}
           onChange={(e) => setNote(e.target.value)}
           className="form-input"
+          disabled={loading}
         />
-        <button className="btn btn-primary" onClick={handleSave}>Save Mood Entry</button>
+
+        <button className="btn btn-primary" onClick={handleSave} disabled={loading}>
+          {loading ? <img src={spinner} alt="Loading..." style={{ width: 24 }} /> : 'Save Mood Entry'}
+        </button>
       </section>
 
       <section className="mood-jar-section card">
@@ -108,17 +161,14 @@ const MoodTracker = () => {
 
       <section className="recent-log card">
         <h2>Recent Mood Log</h2>
+        {loading && <p>Loading moods...</p>}
         <ul className="log-list">
           {recentMoods.map(({ mood, note, date }, idx) => {
             const moodData = moods.find((m) => m.name === mood);
             return (
               <li key={idx} className="log-item">
                 <div className="log-entry-left">
-                  <img
-                    src={moodData?.image}
-                    alt={mood}
-                    className="log-mood-image"
-                  />
+                  <img src={moodData?.image} alt={mood} className="log-mood-image" />
                   <div className="log-mood-text">
                     <div className="log-mood-name">{mood}</div>
                     <div className="log-mood-note">{note}</div>
