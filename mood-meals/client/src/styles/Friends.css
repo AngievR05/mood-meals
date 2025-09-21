@@ -1,5 +1,6 @@
-:root{
+:root {
   --accent-yellow: #ffce54;
+  --accent-green: #8fd694;
   --neutral-light: #f9f9f9;
   --neutral-dark: #333;
   --white: #fff;
@@ -7,6 +8,7 @@
   --shadow-sm: 0 4px 12px rgba(0,0,0,0.06);
 }
 
+/* Page base */
 .friends-page {
   font-family: 'Segoe UI', sans-serif;
   background: linear-gradient(180deg, var(--neutral-light), #fff);
@@ -15,12 +17,12 @@
   color: var(--neutral-dark);
 }
 
-/* Hero / Connect */
+/* Connect / Add Friend Section */
 .connect-section {
   background: linear-gradient(90deg, #ffeaa7, var(--accent-yellow));
   color: #222;
   text-align: center;
-  padding: 1.8rem;
+  padding: 2rem 1.5rem;
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
 }
@@ -28,13 +30,13 @@
 .connect-section h2 { font-size: 1.45rem; margin: 0; font-weight: 700; }
 .connect-section p { margin-top: .4rem; color:#333; opacity:0.9; }
 
-/* Inputs */
+/* Friend input */
 .friend-input {
   margin-top: 1rem;
-  display:flex;
-  justify-content:center;
-  gap:.6rem;
-  flex-wrap:wrap;
+  display: flex;
+  justify-content: center;
+  gap: .6rem;
+  flex-wrap: wrap;
 }
 
 .friend-input input {
@@ -53,9 +55,9 @@
 }
 
 .friend-input button {
-  padding: 0.6rem 0.9rem;
+  padding: 0.6rem 1rem;
   border: none;
-  background: #222;
+  background: var(--neutral-dark);
   color: var(--white);
   border-radius: 10px;
   cursor: pointer;
@@ -65,9 +67,47 @@
 
 .friend-input button:hover { transform: translateY(-2px); opacity: .95; }
 
-/* Meal logs / grid */
+/* Friends list */
+.friends-list {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.friend-card {
+  background: #fafafa;
+  padding: .9rem 1rem;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 200px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  transition: transform .14s ease, box-shadow .14s ease;
+}
+
+.friend-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+}
+
+.friend-card button {
+  background: #f77a7a;
+  border: none;
+  color: #fff;
+  padding: .3rem .6rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.friend-card button:hover { opacity: .9; transform: translateY(-1px); }
+
+/* Meal logs section */
 .meal-logs-section {
-  background: linear-gradient(180deg,#fff, #fff7e9);
+  background: linear-gradient(180deg, #fff, #fff7e9);
   color: #222;
   padding: 1.6rem;
   margin-top: 1.4rem;
@@ -77,7 +117,7 @@
 
 .meal-logs-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1rem;
   margin-top: 1rem;
 }
@@ -87,9 +127,9 @@
   padding: 1rem;
   border-radius: 12px;
   box-shadow: 0 6px 18px rgba(0,0,0,0.04);
-  display:flex;
-  gap:.8rem;
-  align-items:center;
+  display: flex;
+  gap: .8rem;
+  align-items: center;
 }
 
 /* Avatar / emoji */
@@ -99,63 +139,30 @@
   height: 48px;
   border-radius: 50%;
   background: #f3f3f3;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:1.6rem;
-  flex-shrink:0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  flex-shrink: 0;
 }
 
-/* Friends list */
-.friends-section {
-  padding: 1.6rem;
-  background: #fff;
-  border-radius: var(--radius-md);
-  margin-top: 1.4rem;
-  text-align:center;
-  box-shadow: var(--shadow-sm);
-}
-
-.friends-list {
-  display:flex;
-  justify-content:center;
-  gap:1rem;
-  flex-wrap:wrap;
-  margin-top: .8rem;
-}
-
-.friend-card {
-  background:#fafafa;
-  padding: .9rem;
-  border-radius: 12px;
-  width: 200px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-  transition: transform .14s ease, box-shadow .14s ease;
-}
-
-.friend-card:hover { transform: translateY(-6px); box-shadow: 0 10px 30px rgba(0,0,0,0.06); }
-
-/* Mood log small */
-.mood-log-section {
-  background: linear-gradient(180deg,#fef9e9,#fff);
-  padding: 1rem;
-  border-radius: 12px;
+/* Encouragement section */
+.encouragement-section {
+  padding: 1.2rem;
+  text-align: center;
   margin-top: 1rem;
 }
 
-.mood-log-card { display:flex; align-items:center; justify-content:space-between; gap:1rem; }
-.mood-log-buttons button { margin-left: .5rem; padding: .45rem .7rem; border-radius:8px; border:none; cursor:pointer; }
+.encouragement-section textarea {
+  width: 90%;
+  height: 80px;
+  border-radius: 10px;
+  padding: .8rem;
+  border: 1px solid #eee;
+}
 
-/* encouragement */
-.encouragement-section { padding:1.2rem; text-align:center; margin-top:1rem; }
-.encouragement-section textarea { width:90%; height:80px; border-radius:10px; padding: .8rem; border:1px solid #eee; }
-
-/* recent posts */
-.recent-posts-section { background: #fff; padding:1rem; margin-top:1rem; border-radius:12px; box-shadow: var(--shadow-sm); }
-.posts-grid { display:flex; gap:1rem; overflow:auto; padding-bottom:.4rem; }
-.post-card { min-width:200px; background:#fff; padding:.9rem; border-radius:10px; box-shadow: 0 6px 16px rgba(0,0,0,0.04); }
-
+/* Responsive */
 @media (max-width: 600px) {
   .friend-input input { width: 100%; max-width: 320px; }
-  .meal-logs-grid { grid-template-columns: repeat(1,1fr); }
+  .meal-logs-grid { grid-template-columns: repeat(1, 1fr); }
 }

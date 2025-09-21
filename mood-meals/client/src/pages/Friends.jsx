@@ -1,139 +1,77 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import "../styles/Friends.css";
 
 const Friends = () => {
+  const [friends, setFriends] = useState([]);
+  const [newFriend, setNewFriend] = useState("");
+
+  const fetchFriends = async () => {
+    try {
+      const res = await axios.get("/api/friends", {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
+      setFriends(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const addFriend = async () => {
+    if (!newFriend) return;
+    try {
+      await axios.post(
+        "/api/friends",
+        { friendEmail: newFriend },
+        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
+      );
+      setNewFriend("");
+      fetchFriends(); // Refresh list
+    } catch (err) {
+      alert(err.response?.data?.error || "Error adding friend");
+    }
+  };
+
+  const removeFriend = async (id) => {
+    try {
+      await axios.delete(`/api/friends/${id}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
+      fetchFriends(); // Refresh list
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchFriends();
+  }, []);
+
   return (
     <div className="friends-page">
-      {/* Connect with Friends */}
       <section className="connect-section card">
         <h2>Connect with Friends</h2>
-        <p>Track your moods and meals together.</p>
         <div className="friend-input">
-          <input type="text" placeholder="Add a Friend..." className="form-input" />
-          <button className="btn btn-primary">Add Friend</button>
+          <input
+            type="email"
+            placeholder="Add Friend by Email..."
+            value={newFriend}
+            onChange={(e) => setNewFriend(e.target.value)}
+          />
+          <button onClick={addFriend}>Add Friend</button>
         </div>
       </section>
 
-      {/* Friends' Meal Logs */}
-      <section className="meal-logs-section">
-        <h2>Your Friends' Meal Logs</h2>
-        <div className="meal-logs-grid">
-          {[
-            {
-              name: "John Doe",
-              status: "Feeling great after that salad!",
-              meal: "Green Salad",
-              tag: "Healthy Meal",
-              time: "2 hrs ago",
-            },
-            {
-              name: "Jane Smith",
-              status: "That soup really helped.",
-              meal: "Chicken Soup",
-              tag: "Comfort Food",
-              time: "3 hrs ago",
-            },
-            {
-              name: "Chris Lee",
-              status: "A bit tired today, but surviving!",
-              meal: "Sushi",
-              tag: "Special Occasion",
-              time: "4 hrs ago",
-            },
-            {
-              name: "Alice Wong",
-              status: "Not my best mood, but trying to eat well.",
-              meal: "Quinoa Bowl",
-              tag: "Healthy Meal",
-              time: "5 hrs ago",
-            },
-          ].map((log, index) => (
-            <div key={index} className="meal-log-card">
-              <div className="avatar-placeholder" />
-              <div className="meal-log-info">
-                <h3>{log.name}</h3>
-                <p>{log.status}</p>
-                <p className="meal-tag">
-                  Last meal logged: <strong>{log.meal}</strong>
-                </p>
-                <div className="log-meta">
-                  <span className="tag">{log.tag}</span>
-                  <span className="time">Posted {log.time}</span>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Your Friends */}
       <section className="friends-section">
         <h2>Your Friends</h2>
         <div className="friends-list">
-          {[
-            { name: "John Doe", mood: "Feeling Happy!", meal: "Spaghetti" },
-            { name: "Jane Smith", mood: "Feeling Relaxed!", meal: "Salad" },
-            { name: "Sam Green", mood: "Feeling Content!", meal: "Chicken Stir Fry" },
-          ].map((friend, index) => (
-            <div key={index} className="friend-card">
+          {friends.map((friend) => (
+            <div key={friend.id} className="friend-card">
               <div className="emoji-placeholder">😊</div>
-              <h3>{friend.name}</h3>
-              <p>{friend.mood}</p>
-              <p>Last meal shared: <strong>{friend.meal}</strong></p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Friend's Mood Log */}
-      <section className="mood-log-section">
-        <div className="mood-log-card">
-          <div className="mood-avatar" />
-          <div className="mood-log-info">
-            <h4>Friend's Mood Log</h4>
-            <p>Recent updates from your friends.</p>
-          </div>
-          <div className="mood-log-buttons">
-            <button className="btn btn-primary">View Log</button>
-            <button className="btn btn-secondary">Support this Friend</button>
-          </div>
-        </div>
-      </section>
-
-      {/* Send Encouragement */}
-      <section className="encouragement-section card">
-        <h2>Send Encouragement</h2>
-        <textarea placeholder="Write a supportive message..." className="form-input" />
-        <button className="btn btn-primary">Send</button>
-      </section>
-
-      {/* Recent Posts by Friends */}
-      <section className="recent-posts-section">
-        <h2>Recent Posts by Friends</h2>
-        <div className="posts-grid">
-          {[
-            {
-              user: "Jane Smith",
-              text: "Just enjoyed a fresh salad!",
-              tags: ["Healthy", "Salad"],
-            },
-            {
-              user: "John Doe",
-              text: "Great evening with friends!",
-              tags: ["Fun", "Dinner"],
-            },
-          ].map((post, index) => (
-            <div key={index} className="post-card">
-              <div className="post-image-placeholder" />
-              <div className="post-info">
-                <p>{post.text}</p>
-                <div className="post-tags">
-                  {post.tags.map((tag, i) => (
-                    <span key={i} className="tag">{tag}</span>
-                  ))}
-                </div>
-                <span className="post-user">{post.user}</span>
-              </div>
+              <h3>{friend.username}</h3>
+              <p>Mood: {friend.mood || "No recent mood"}</p>
+              <p>Last Meal: {friend.last_meal || "No meal logged"}</p>
+              <button onClick={() => removeFriend(friend.id)}>Remove</button>
             </div>
           ))}
         </div>
