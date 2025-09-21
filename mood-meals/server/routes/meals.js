@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const { pool } = require("../config/db");
-const auth = require("../middleware/auth");
+const { verifyToken } = require("../middleware/auth"); // 👈 fixed
 
 // CREATE new meal (admin-only for now)
-router.post("/", auth, async (req, res) => {
+router.post("/", verifyToken, async (req, res) => {
   try {
     const { name, description, ingredients, mood, image_url } = req.body;
     await pool.query(

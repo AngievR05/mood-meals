@@ -81,6 +81,10 @@
 .grocery-list {
   list-style: none;
   padding-left: 0;
+  min-height: 60px; /* so you can drop even if empty */
+  background: #fafafa;
+  border-radius: 12px;
+  padding: 0.6rem;
 }
 
 .grocery-list li {
@@ -89,10 +93,14 @@
   padding: 0.65rem 0.9rem;
   border-radius: 10px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
   font-size: 1rem;
   transition: background 0.15s ease, transform 0.15s ease;
+  cursor: grab;
+}
+
+.grocery-list li:active {
+  cursor: grabbing;
 }
 
 .grocery-list li:hover {
@@ -105,32 +113,13 @@
   text-decoration: line-through;
   color: #4c8a4c;
   font-weight: 700;
-  cursor: default;
 }
 
-.qty {
+.qty-input {
+  width: 60px;
   margin-left: 0.6rem;
-  font-size: 0.9rem;
-  color: #555;
-  font-style: italic;
-}
-
-.check-icon {
-  font-size: 1.1rem;
-  color: #3aa34a;
-  margin-left: 0.5rem;
-}
-
-/* ❌ Delete button styling */
-.delete-icon {
-  font-size: 1rem;
-  color: var(--accent-red);
-  margin-left: 0.8rem;
-  cursor: pointer;
-  transition: transform 0.15s ease, color 0.15s ease;
-}
-
-.delete-icon:hover {
-  color: #e05353;
-  transform: scale(1.2);
+  padding: 0.2rem 0.4rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 0.85rem;
 }

@@ -4,7 +4,7 @@ const { verifyToken } = require("../middleware/auth");
 
 const router = express.Router();
 
-// GET all groceries for logged-in user
+// GET groceries
 router.get("/", verifyToken, async (req, res) => {
   try {
     const [rows] = await pool.query(
@@ -13,12 +13,12 @@ router.get("/", verifyToken, async (req, res) => {
     );
     res.json(rows);
   } catch (err) {
-    console.error("Error fetching groceries:", err);
+    console.error(err);
     res.status(500).json({ error: "Server error" });
   }
 });
 
-// POST new grocery item
+// POST grocery
 router.post("/", verifyToken, async (req, res) => {
   const { item_name, quantity } = req.body;
   try {
@@ -34,12 +34,12 @@ router.post("/", verifyToken, async (req, res) => {
       purchased: 0,
     });
   } catch (err) {
-    console.error("Error adding grocery:", err);
+    console.error(err);
     res.status(500).json({ error: "Server error" });
   }
 });
 
-// UPDATE grocery (mark purchased or edit)
+// PUT grocery
 router.put("/:id", verifyToken, async (req, res) => {
   const { id } = req.params;
   const { item_name, quantity, purchased } = req.body;
@@ -49,10 +49,9 @@ router.put("/:id", verifyToken, async (req, res) => {
       "UPDATE groceries SET item_name = ?, quantity = ?, purchased = ? WHERE id = ? AND user_id = ?",
       [item_name, quantity, purchased, id, req.user.id]
     );
-
     res.json({ id, item_name, quantity, purchased });
   } catch (err) {
-    console.error("Error updating grocery:", err);
+    console.error(err);
     res.status(500).json({ error: "Server error" });
   }
 });
@@ -60,15 +59,11 @@ router.put("/:id", verifyToken, async (req, res) => {
 // DELETE grocery
 router.delete("/:id", verifyToken, async (req, res) => {
   const { id } = req.params;
-
   try {
-    await pool.query("DELETE FROM groceries WHERE id = ? AND user_id = ?", [
-      id,
-      req.user.id,
-    ]);
+    await pool.query("DELETE FROM groceries WHERE id = ? AND user_id = ?", [id, req.user.id]);
     res.json({ success: true });
   } catch (err) {
-    console.error("Error deleting grocery:", err);
+    console.error(err);
     res.status(500).json({ error: "Server error" });
   }
 });
