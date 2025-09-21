@@ -1,48 +1,75 @@
-const express = require('express');
-const { pool } = require('../config/db');
-const { verifyToken } = require('../middleware/auth');
+const express = require("express");
+const { pool } = require("../config/db");
+const { verifyToken } = require("../middleware/auth");
 
 const router = express.Router();
 
-// CREATE grocery
-router.post('/', verifyToken, async (req, res, next) => {
+// GET all groceries for logged-in user
+router.get("/", verifyToken, async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      "SELECT id, item_name, quantity, purchased FROM groceries WHERE user_id = ? ORDER BY created_at DESC",
+      [req.user.id]
+    );
+    res.json(rows);
+  } catch (err) {
+    console.error("Error fetching groceries:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// POST new grocery item
+router.post("/", verifyToken, async (req, res) => {
   const { item_name, quantity } = req.body;
   try {
-    const [result] = await pool.query('INSERT INTO groceries (user_id, item_name, quantity) VALUES (?, ?, ?)', [req.user.id, item_name, quantity]);
-    res.json({ id: result.insertId, item_name, quantity });
+    const [result] = await pool.query(
+      "INSERT INTO groceries (user_id, item_name, quantity, purchased) VALUES (?, ?, ?, ?)",
+      [req.user.id, item_name, quantity || "1 unit", 0]
+    );
+    res.json({
+      id: result.insertId,
+      user_id: req.user.id,
+      item_name,
+      quantity: quantity || "1 unit",
+      purchased: 0,
+    });
   } catch (err) {
-    next(err);
+    console.error("Error adding grocery:", err);
+    res.status(500).json({ error: "Server error" });
   }
 });
 
-// READ groceries
-router.get('/', verifyToken, async (req, res, next) => {
-  try {
-    const [groceries] = await pool.query('SELECT * FROM groceries WHERE user_id = ? ORDER BY created_at DESC', [req.user.id]);
-    res.json(groceries);
-  } catch (err) {
-    next(err);
-  }
-});
-
-// UPDATE grocery
-router.put('/:id', verifyToken, async (req, res, next) => {
+// UPDATE grocery (mark purchased or edit)
+router.put("/:id", verifyToken, async (req, res) => {
+  const { id } = req.params;
   const { item_name, quantity, purchased } = req.body;
+
   try {
-    await pool.query('UPDATE groceries SET item_name = ?, quantity = ?, purchased = ? WHERE id = ? AND user_id = ?', [item_name, quantity, purchased, req.params.id, req.user.id]);
-    res.json({ message: 'Grocery updated' });
+    await pool.query(
+      "UPDATE groceries SET item_name = ?, quantity = ?, purchased = ? WHERE id = ? AND user_id = ?",
+      [item_name, quantity, purchased, id, req.user.id]
+    );
+
+    res.json({ id, item_name, quantity, purchased });
   } catch (err) {
-    next(err);
+    console.error("Error updating grocery:", err);
+    res.status(500).json({ error: "Server error" });
   }
 });
 
 // DELETE grocery
-router.delete('/:id', verifyToken, async (req, res, next) => {
+router.delete("/:id", verifyToken, async (req, res) => {
+  const { id } = req.params;
+
   try {
-    await pool.query('DELETE FROM groceries WHERE id = ? AND user_id = ?', [req.params.id, req.user.id]);
-    res.json({ message: 'Grocery deleted' });
+    await pool.query("DELETE FROM groceries WHERE id = ? AND user_id = ?", [
+      id,
+      req.user.id,
+    ]);
+    res.json({ success: true });
   } catch (err) {
-    next(err);
+    console.error("Error deleting grocery:", err);
+    res.status(500).json({ error: "Server error" });
   }
 });
 

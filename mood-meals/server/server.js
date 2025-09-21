@@ -8,7 +8,7 @@ const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 const moodsRoutes = require('./routes/moods');
 const mealsRoutes = require('./routes/meals');
-const groceriesRoutes = require('./routes/groceries');
+const groceriesRouter = require("./routes/groceries");
 const recommendationsRoutes = require('./routes/recommendations');
 const errorHandler = require('./middleware/errorHandler');
 
@@ -25,7 +25,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/moods', moodsRoutes);
 app.use('/api/meals', mealsRoutes);
-app.use('/api/groceries', groceriesRoutes);
+app.use("/api/groceries", groceriesRouter);
 app.use('/api/recommendations', recommendationsRoutes);
 
 // Error handler

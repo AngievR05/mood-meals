@@ -1,6 +1,6 @@
 import React from "react";
 import "../styles/MealsDashboard.css";
-import GroceryList from "../components/GroceryList";
+import GrocerySection from "../components/GrocerySection";
 import MealsList from "../components/MealsList";
 import RecommendedMeals from "../components/RecommendedMeals";
 import MoodBanner from "../components/MoodBanner";
@@ -26,8 +26,9 @@ const MealsDashboard = () => {
       {/* Grocery Section */}
       <section className="grocery-section">
         <h2>My Grocery List</h2>
-        <GroceryList />
+        <GrocerySection />
       </section>
+
 
       {/* Meals You Can Make */}
       <MealsList />
