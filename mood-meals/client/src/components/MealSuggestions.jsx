@@ -19,14 +19,21 @@ const MealSuggestions = ({ currentMood }) => {
       setError("");
       try {
         const token = localStorage.getItem("token");
+        if (!token) throw new Error("No authentication token found.");
+
         const res = await axios.get(
-          `/api/meals/mood/${encodeURIComponent(currentMood)}`,
+          `http://localhost:5000/api/meals/mood/${encodeURIComponent(currentMood)}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
+
+        if (!Array.isArray(res.data)) throw new Error("Unexpected API response");
+
         setMeals(res.data);
       } catch (err) {
-        console.error("Error fetching meals by mood:", err);
-        setError("Failed to load meals. Try again later.");
+        console.error("Error fetching meals by mood:", err.response || err.message || err);
+        setError(
+          err.response?.data?.message || err.message || "Failed to load meals. Try again later."
+        );
       } finally {
         setLoading(false);
       }
@@ -35,21 +42,23 @@ const MealSuggestions = ({ currentMood }) => {
     fetchMealsByMood();
   }, [currentMood]);
 
-  const settings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 3,
-    slidesToScroll: 1,
-    arrows: true,
-    responsive: [
-      { breakpoint: 1024, settings: { slidesToShow: 2 } },
-      { breakpoint: 640, settings: { slidesToShow: 1 } },
-    ],
-  };
-
   const openRecipe = (meal) => {
     navigate(`/recipes/${encodeURIComponent(meal.name)}`);
+  };
+
+  const settings = {
+    dots: true,
+    infinite: meals.length > 3,
+    speed: 500,
+    slidesToShow: Math.min(meals.length, 3),
+    slidesToScroll: 1,
+    arrows: true,
+    centerMode: meals.length < 3,
+    centerPadding: "0px",
+    responsive: [
+      { breakpoint: 1024, settings: { slidesToShow: Math.min(meals.length, 2) } },
+      { breakpoint: 640, settings: { slidesToShow: 1 } },
+    ],
   };
 
   if (!currentMood)
@@ -62,8 +71,7 @@ const MealSuggestions = ({ currentMood }) => {
 
   if (loading) return <p className="meal-loading">Loading meals...</p>;
   if (error) return <p className="meal-error">{error}</p>;
-  if (!meals.length)
-    return <p className="meal-empty">No meals found for this mood.</p>;
+  if (!meals.length) return <p className="meal-empty">No meals found for this mood.</p>;
 
   return (
     <div className="meal-suggestions">
@@ -78,10 +86,7 @@ const MealSuggestions = ({ currentMood }) => {
               loading="lazy"
             />
             <p className="meal-name">{meal.name}</p>
-            <button
-              className="view-recipe-btn"
-              onClick={() => openRecipe(meal)}
-            >
+            <button className="view-recipe-btn" onClick={() => openRecipe(meal)}>
               View Recipe
             </button>
           </div>

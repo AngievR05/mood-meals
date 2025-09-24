@@ -5,17 +5,25 @@ import "../styles/MealsList.css";
 const MealsList = ({ role, fetchMealsTrigger }) => {
   const [meals, setMeals] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   const fetchMeals = async () => {
     try {
       setLoading(true);
+      setError("");
       const token = localStorage.getItem("token");
-      const res = await axios.get("/api/meals", {
+      if (!token) throw new Error("No authentication token found.");
+
+      const res = await axios.get("http://localhost:5000/api/meals", {
         headers: { Authorization: `Bearer ${token}` },
       });
+
+      if (!Array.isArray(res.data)) throw new Error("Unexpected API response");
+
       setMeals(res.data);
     } catch (err) {
-      console.error("Error fetching meals:", err);
+      console.error("Error fetching meals:", err.response || err.message || err);
+      setError(err.response?.data?.message || err.message || "Failed to load meals");
     } finally {
       setLoading(false);
     }
@@ -29,16 +37,18 @@ const MealsList = ({ role, fetchMealsTrigger }) => {
     if (!window.confirm("Are you sure you want to delete this meal?")) return;
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`/api/meals/${id}`, {
+      await axios.delete(`http://localhost:5000/api/meals/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchMeals(); // refresh list
     } catch (err) {
-      console.error("Error deleting meal:", err);
+      console.error("Error deleting meal:", err.response || err.message || err);
+      alert(err.response?.data?.message || err.message || "Failed to delete meal");
     }
   };
 
   if (loading) return <p>Loading meals...</p>;
+  if (error) return <p className="meal-error">{error}</p>;
 
   return (
     <section className="meals-section">

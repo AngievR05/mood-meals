@@ -14,8 +14,15 @@
   box-shadow: var(--shadow-sm);
 }
 
-.meals-section h2 { margin-bottom: .6rem; font-weight:700; }
-.meals-section p { margin-bottom: 1rem; color: #214452; }
+.meals-section h2 { 
+  margin-bottom: 0.6rem; 
+  font-weight:700; 
+}
+
+.meals-section p { 
+  margin-bottom: 1rem; 
+  color: #214452; 
+}
 
 .meals-grid {
   display:grid;
@@ -30,9 +37,43 @@
   backdrop-filter: blur(4px);
   transition: transform .18s ease, box-shadow .18s ease;
   box-shadow: 0 8px 26px rgba(0,0,0,0.04);
+  display: flex;
+  flex-direction: column; /* stack content vertically */
 }
 
-.meal-card:hover { transform: translateY(-6px); box-shadow: 0 16px 40px rgba(0,0,0,0.06);}
+.meal-card:hover { 
+  transform: translateY(-6px); 
+  box-shadow: 0 16px 40px rgba(0,0,0,0.06);
+}
 
-.meal-card h3 { margin: 0; font-weight:700; }
-.meal-card p { font-size: .95rem; color:#345; margin-top:.5rem; }
+.meal-card h3 { 
+  margin: 0; 
+  font-weight:700; 
+}
+
+.meal-card p { 
+  font-size: .95rem; 
+  color:#345; 
+  margin: 0.5rem 0 1rem 0; /* space between description and buttons */
+}
+
+.admin-buttons {
+  display: flex;
+  flex-direction: row; /* stack buttons vertically */
+  gap: 0.5rem;
+}
+
+.admin-buttons button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  background-color: var(--primary-blue);
+  color: var(--white);
+  transition: background 0.2s ease;
+}
+
+.admin-buttons button:hover {
+  background-color: #4a89dc;
+}
