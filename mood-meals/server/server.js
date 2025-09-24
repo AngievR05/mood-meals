@@ -8,9 +8,8 @@ const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 const moodsRoutes = require('./routes/moods');
 const mealsRoutes = require('./routes/meals');
-const groceriesRouter = require("./routes/groceries");
+const groceriesRouter = require('./routes/groceries');
 const recommendationsRoutes = require('./routes/recommendations');
-const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 app.use(helmet());
@@ -25,11 +24,21 @@ app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/moods', moodsRoutes);
 app.use('/api/meals', mealsRoutes);
-app.use("/api/groceries", groceriesRouter);
+app.use('/api/groceries', groceriesRouter);
 app.use('/api/recommendations', recommendationsRoutes);
 
-// Error handler
-app.use(errorHandler);
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ error: 'Route not found' });
+});
+
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(err.status || 500).json({
+    error: err.message || 'Internal Server Error',
+  });
+});
 
 const DEFAULT_PORT = parseInt(process.env.PORT, 10) || 5000;
 const MAX_PORT_TRIES = 10;

@@ -18,3 +18,24 @@
 .streak-container h3 { margin:0; font-size:1.1rem; font-weight:800; }
 .streak-days { font-size:1.85rem; font-weight:900; margin:.4rem 0; }
 .streak-container p { margin:0; opacity:.9; }
+
+/* Inline streak in tracker-header */
+.tracker-header .streak-inline {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.tracker-header .streak-inline h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.tracker-header .streak-inline .streak-days {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #ff9900;
+}

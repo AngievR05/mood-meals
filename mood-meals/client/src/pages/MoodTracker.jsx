@@ -1,6 +1,6 @@
-// src/pages/MoodTracker.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'; 
 import '../styles/MoodTracker.css';
+import '../styles/StreakTracker.css';
 import JarSVG from '../components/JarSVG';
 import spinner from '../assets/images/Group2.png';
 
@@ -39,31 +39,57 @@ const MoodTracker = () => {
   const [selectedMood, setSelectedMood] = useState('');
   const [note, setNote] = useState('');
   const [recentMoods, setRecentMoods] = useState([]);
+  const [todaysMood, setTodaysMood] = useState(null);
+  const [streak, setStreak] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   const token = localStorage.getItem('token');
 
-  // Fetch moods
+  const fetchJSON = async (url, options) => {
+    const res = await fetch(url, options);
+    const contentType = res.headers.get('content-type');
+    let data = null;
+    if (contentType && contentType.includes('application/json')) {
+      data = await res.json();
+    }
+    if (!res.ok) {
+      throw new Error(data?.message || 'Request failed');
+    }
+    return data;
+  };
+
+  // Fetch moods, streak, and today's mood
   useEffect(() => {
-    const fetchMoods = async () => {
+    const fetchData = async () => {
       setLoading(true);
       setError('');
       try {
-        const res = await fetch('http://localhost:5000/api/moods', {
+        const moodsData = await fetchJSON('http://localhost:5000/api/moods', {
           headers: { Authorization: `Bearer ${token}` },
         });
-        if (!res.ok) throw new Error('Failed to fetch moods');
-        const data = await res.json();
-        setRecentMoods(Array.isArray(data) ? data : []);
+        setRecentMoods(Array.isArray(moodsData) ? moodsData : []);
+
+        const todayData = await fetchJSON('http://localhost:5000/api/moods/today', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setTodaysMood(todayData);
+
+        const streakData = await fetchJSON('http://localhost:5000/api/user/streak', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setStreak(streakData.streak || 0);
       } catch (err) {
         setError(err.message);
         setRecentMoods([]);
+        setTodaysMood(null);
+        setStreak(0);
       } finally {
         setLoading(false);
       }
     };
-    if (token) fetchMoods();
+
+    if (token) fetchData();
   }, [token]);
 
   // Save mood
@@ -72,7 +98,7 @@ const MoodTracker = () => {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch('http://localhost:5000/api/moods', {
+      const savedMood = await fetchJSON('http://localhost:5000/api/moods', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -80,9 +106,17 @@ const MoodTracker = () => {
         },
         body: JSON.stringify({ mood: selectedMood, note }),
       });
-      const savedMood = await res.json();
-      if (!res.ok) throw new Error(savedMood?.message || 'Failed to save mood');
+
+      // Update recent moods and today's mood
       setRecentMoods(prev => [savedMood, ...(prev || []).filter(m => m.id !== savedMood.id)]);
+      setTodaysMood(savedMood);
+
+      // Refresh streak
+      const streakData = await fetchJSON('http://localhost:5000/api/user/streak', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setStreak(streakData.streak || 0);
+
       setSelectedMood('');
       setNote('');
     } catch (err) {
@@ -106,14 +140,15 @@ const MoodTracker = () => {
     };
   });
 
-  const today = new Date().toISOString().split('T')[0];
-  const todaysMood = (recentMoods || []).find(m => m.created_at?.startsWith(today));
-
   return (
     <div className="tracker-container">
       <section className="tracker-header card">
         <h1>Your Mood History</h1>
         <p>Track your emotions, reflect, and watch your Mood Jar fill up.</p>
+        <div className="streak-inline">
+          <h3>🔥 Current Streak:</h3>
+          <span className="streak-days">{streak} {streak === 1 ? 'day' : 'days'}</span>
+        </div>
       </section>
 
       <section className="mood-entry card">
