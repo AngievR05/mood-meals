@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const { pool } = require("../config/db");
-const { verifyToken } = require("../middleware/auth"); // 👈 fixed
+const { verifyToken, verifyAdmin } = require("../middleware/auth");
 
-// CREATE new meal (admin-only for now)
-router.post("/", verifyToken, async (req, res) => {
+// CREATE new meal (admin-only)
+router.post("/", verifyToken, verifyAdmin, async (req, res) => {
   try {
     const { name, description, ingredients, mood, image_url } = req.body;
     await pool.query(
@@ -18,8 +18,36 @@ router.post("/", verifyToken, async (req, res) => {
   }
 });
 
-// GET all meals
-router.get("/", async (req, res) => {
+// UPDATE meal (admin-only)
+router.put("/:id", verifyToken, verifyAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, description, ingredients, mood, image_url } = req.body;
+    await pool.query(
+      "UPDATE meals SET name = ?, description = ?, ingredients = ?, mood = ?, image_url = ? WHERE id = ?",
+      [name, description, JSON.stringify(ingredients), mood, image_url, id]
+    );
+    res.json({ message: "Meal updated successfully" });
+  } catch (err) {
+    console.error("Error updating meal:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// DELETE meal (admin-only)
+router.delete("/:id", verifyToken, verifyAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    await pool.query("DELETE FROM meals WHERE id = ?", [id]);
+    res.json({ message: "Meal deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting meal:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// GET all meals (any logged-in user)
+router.get("/", verifyToken, async (req, res) => {
   try {
     const [rows] = await pool.query("SELECT * FROM meals");
     res.json(rows);
@@ -29,8 +57,8 @@ router.get("/", async (req, res) => {
   }
 });
 
-// GET meals by mood
-router.get("/mood/:mood", async (req, res) => {
+// GET meals by mood (any logged-in user)
+router.get("/mood/:mood", verifyToken, async (req, res) => {
   try {
     const [rows] = await pool.query("SELECT * FROM meals WHERE mood = ?", [
       req.params.mood,
@@ -42,8 +70,8 @@ router.get("/mood/:mood", async (req, res) => {
   }
 });
 
-// GET meal by ID
-router.get("/:id", async (req, res) => {
+// GET meal by ID (any logged-in user)
+router.get("/:id", verifyToken, async (req, res) => {
   try {
     const [rows] = await pool.query("SELECT * FROM meals WHERE id = ?", [
       req.params.id,

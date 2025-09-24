@@ -5,39 +5,20 @@ import bgImage from '../assets/images/background.jpg';
 
 const Register = () => {
   const navigate = useNavigate();
-
-  const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: '',
-  });
-
+  const [formData, setFormData] = useState({ username: '', email: '', password: '' });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
   const handleChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const validateForm = () => {
     const { username, email, password } = formData;
-
-    if (username.trim().length < 3) {
-      return 'Username must be at least 3 characters';
-    }
-
+    if (username.trim().length < 3) return 'Username must be at least 3 characters';
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return 'Enter a valid email address';
-    }
-
-    if (password.length < 6) {
-      return 'Password must be at least 6 characters';
-    }
-
+    if (!emailRegex.test(email)) return 'Enter a valid email address';
+    if (password.length < 6) return 'Password must be at least 6 characters';
     return null;
   };
 
@@ -55,17 +36,12 @@ const Register = () => {
     try {
       const res = await fetch('http://localhost:5000/api/auth/register', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData), // role optional; backend defaults to 'user'
       });
 
       const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || 'Registration failed');
-      }
+      if (!res.ok) throw new Error(data.message || 'Registration failed');
 
       setSuccess('🎉 Registered successfully! Redirecting...');
       setTimeout(() => navigate('/'), 2000);
@@ -81,25 +57,13 @@ const Register = () => {
         backgroundImage: `url(${bgImage})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        position: 'relative',
         minHeight: '100vh',
+        position: 'relative',
       }}
     >
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.4)',
-          zIndex: 0,
-        }}
-      ></div>
+      <div style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,0.4)' }}></div>
 
-      <form
-        className="auth-card"
-        onSubmit={handleRegister}
-        style={{ position: 'relative', zIndex: 1 }}
-      >
+      <form className="auth-card" onSubmit={handleRegister} style={{ position: 'relative', zIndex: 1 }}>
         <h2>Create Your Mood Meals Account</h2>
 
         <input
@@ -129,9 +93,7 @@ const Register = () => {
         {error && <p className="auth-error">{error}</p>}
         {success && <p className="auth-success">{success}</p>}
 
-        <button type="submit" className="auth-button">
-          Register
-        </button>
+        <button type="submit" className="auth-button">Register</button>
 
         <p className="auth-link">
           Already have an account?{' '}

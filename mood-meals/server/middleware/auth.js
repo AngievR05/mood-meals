@@ -6,11 +6,18 @@ function verifyToken(req, res, next) {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');
-    req.user = { id: decoded.id };
+    req.user = { id: decoded.id, role: decoded.role };
     next();
-  } catch {
+  } catch (err) {
     res.status(401).json({ message: 'Invalid token' });
   }
 }
 
-module.exports = { verifyToken };
+function verifyAdmin(req, res, next) {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ message: 'Forbidden: Admins only' });
+  }
+  next();
+}
+
+module.exports = { verifyToken, verifyAdmin };

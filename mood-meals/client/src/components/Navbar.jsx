@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import '../styles/Navbar.css';
 import logo from '../assets/images/Group2.png';
@@ -6,6 +6,23 @@ import { logout } from '../utils/auth';
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const [role, setRole] = useState('user');
+
+  // Update role whenever component mounts or localStorage changes
+  useEffect(() => {
+    const storedRole = localStorage.getItem('role') || 'user';
+    setRole(storedRole);
+  }, []);
+
+  // Optional: Watch localStorage for changes (if user role can change dynamically)
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const updatedRole = localStorage.getItem('role') || 'user';
+      setRole(updatedRole);
+    };
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   return (
     <nav className="navbar">
@@ -24,6 +41,9 @@ const Navbar = () => {
         <li><Link to="/meals">My Meals</Link></li>
         <li><Link to="/friends">Friends</Link></li>
         <li><Link to="/profile">Profile</Link></li>
+
+        {/* Only show Admin Panel for admins */}
+        {role === 'admin' && <li><Link to="/admin">Admin Panel</Link></li>}
       </ul>
 
       {/* Search + Logout */}
