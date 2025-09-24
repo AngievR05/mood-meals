@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react'; 
+import React, { useState, useEffect } from 'react';
 import '../styles/MoodTracker.css';
 import '../styles/StreakTracker.css';
 import JarSVG from '../components/JarSVG';
 import spinner from '../assets/images/Group2.png';
+import MoodRadialChart from '../components/MoodRadialChart';
 
 import happy from '../assets/emotions/Happy.png';
 import sad from '../assets/emotions/Sad.png';
@@ -92,7 +93,6 @@ const MoodTracker = () => {
     if (token) fetchData();
   }, [token]);
 
-  // Save mood
   const handleSave = async () => {
     if (!selectedMood) return setError('Please select a mood!');
     setLoading(true);
@@ -143,7 +143,7 @@ const MoodTracker = () => {
   return (
     <div className="tracker-container">
       <section className="tracker-header card">
-        <h1>Your Mood History</h1>
+        <h1>Your Mood Tracker</h1>
         <p>Track your emotions, reflect, and watch your Mood Jar fill up.</p>
         <div className="streak-inline">
           <h3>🔥 Current Streak:</h3>
@@ -155,7 +155,7 @@ const MoodTracker = () => {
         <h2>Add Your Mood Entry</h2>
         {error && <p className="auth-error">{error}</p>}
         <div className="mood-grid">
-          {(moods || []).map(mood => (
+          {moods.map(mood => (
             <button
               key={mood.name}
               className={`mood-card ${selectedMood === mood.name ? 'selected' : ''} ${
@@ -186,34 +186,37 @@ const MoodTracker = () => {
         </button>
       </section>
 
-      <section className="mood-jar-section card">
-        <h2>Your Mood Jar</h2>
-        <JarSVG width={240} height={340} bubblesData={bubblesData} />
-      </section>
+      <section className="mood-jar-log-wrapper card">
+        <div className="mood-jar-section">
+          <h2>Your Mood Jar</h2>
+          <JarSVG width={240} height={340} bubblesData={bubblesData} />
+        </div>
 
-      <section className="recent-log card">
-        <h2>Recent Mood Log</h2>
-        {loading && <p>Loading moods...</p>}
-        <ul className="log-list">
-          {(!recentMoods || recentMoods.length === 0) && !loading && <p>No moods logged yet.</p>}
-          {(recentMoods || []).map(({ id, mood, note, created_at }, idx) => {
-            const moodData = moods.find(m => m.name === mood);
-            const date = created_at ? new Date(created_at).toLocaleDateString() : '';
-            return (
-              <li key={id || idx} className="log-item">
-                <div className="log-entry-left">
-                  <img src={moodData?.image} alt={mood} className="log-mood-image" />
-                  <div className="log-mood-text">
-                    <div className="log-mood-name">{mood}</div>
-                    <div className="log-mood-note">{note}</div>
+        <div className="recent-log">
+          <h2>Recent Mood Log</h2>
+          {loading && <p>Loading moods...</p>}
+          <ul className="log-list">
+            {(!recentMoods || recentMoods.length === 0) && !loading && <p>No moods logged yet.</p>}
+            {recentMoods.map(({ id, mood, note, created_at }, idx) => {
+              const moodData = moods.find(m => m.name === mood);
+              const date = created_at ? new Date(created_at).toLocaleDateString() : '';
+              return (
+                <li key={id || idx} className="log-item">
+                  <div className="log-entry-left">
+                    <img src={moodData?.image} alt={mood} className="log-mood-image" />
+                    <div className="log-mood-text">
+                      <div className="log-mood-name">{mood}</div>
+                      <div className="log-mood-note">{note}</div>
+                    </div>
                   </div>
-                </div>
-                <span className="log-date">{date}</span>
-              </li>
-            );
-          })}
-        </ul>
+                  <span className="log-date">{date}</span>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
       </section>
+      <MoodRadialChart />
     </div>
   );
 };

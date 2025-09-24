@@ -1,12 +1,26 @@
-/*
-==================================================
-|            MOOD RADIAL CHART STYLES            |
-==================================================
-*/
-
 .mood-radial-chart-container {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   padding: var(--space-lg);
+  margin-top: var(--space-xl);
+}
+
+.mood-chart {
+  width: 100%;
+  max-width: 400px;
+  height: 320px;
+}
+
+.mood-radial-chart-container h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: var(--space-md);
+}
+
+.auth-error {
+  color: #ed5565;
+  font-weight: 500;
+  margin-top: var(--space-sm);
 }

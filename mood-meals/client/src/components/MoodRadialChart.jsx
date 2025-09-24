@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Doughnut } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -21,23 +21,56 @@ const moodColors = {
   Grateful: '#AC92EC',
 };
 
-const MoodRadialChart = ({ data }) => {
-  const labels = data.map(d => d.mood);
-  const counts = data.map(d => d.count);
-  const backgroundColors = data.map(d => moodColors[d.mood] || '#ccc');
+const MoodRadialChart = () => {
+  const [chartData, setChartData] = useState({ labels: [], datasets: [] });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const chartData = {
-    labels,
-    datasets: [
-      {
-        data: counts,
-        backgroundColor: backgroundColors,
-        borderWidth: 3,
-        borderColor: '#fff',
-        hoverOffset: 30,
-      },
-    ],
-  };
+  const token = localStorage.getItem('token');
+
+  useEffect(() => {
+    const fetchAllMoods = async () => {
+      setLoading(true);
+      setError('');
+      try {
+        const res = await fetch('http://localhost:5000/api/moods', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) throw new Error('Failed to fetch mood data');
+        const data = await res.json(); // Expected: [{ mood: 'Happy', note: '...', created_at: '...' }, ...]
+
+        // Count each mood
+        const counts = data.reduce((acc, entry) => {
+          acc[entry.mood] = (acc[entry.mood] || 0) + 1;
+          return acc;
+        }, {});
+
+        const labels = Object.keys(counts);
+        const values = Object.values(counts);
+        const backgroundColors = labels.map(l => moodColors[l] || '#ccc');
+
+        setChartData({
+          labels,
+          datasets: [
+            {
+              data: values,
+              backgroundColor: backgroundColors,
+              borderWidth: 3,
+              borderColor: '#fff',
+              hoverOffset: 30,
+            },
+          ],
+        });
+      } catch (err) {
+        setError(err.message);
+        setChartData({ labels: [], datasets: [] });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (token) fetchAllMoods();
+  }, [token]);
 
   const options = {
     responsive: true,
@@ -56,10 +89,7 @@ const MoodRadialChart = ({ data }) => {
         labels: {
           boxWidth: 18,
           padding: 16,
-          font: {
-            size: 15,
-            weight: '500',
-          },
+          font: { size: 15, weight: '500' },
           color: '#333',
           usePointStyle: true,
           pointStyle: 'circle',
@@ -86,10 +116,16 @@ const MoodRadialChart = ({ data }) => {
   };
 
   return (
-    <div className="mood-chart-container">
-      <div className="mood-chart">
-        <Doughnut data={chartData} options={options} />
-      </div>
+    <div className="mood-radial-chart-container card">
+      <h2>All-Time Mood Overview</h2>
+      {loading && <p>Loading chart...</p>}
+      {error && <p className="auth-error">{error}</p>}
+      {!loading && !error && chartData.labels.length > 0 && (
+        <div className="mood-chart">
+          <Doughnut data={chartData} options={options} />
+        </div>
+      )}
+      {!loading && !error && chartData.labels.length === 0 && <p>No moods logged yet.</p>}
     </div>
   );
 };

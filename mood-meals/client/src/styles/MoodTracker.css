@@ -147,3 +147,18 @@
   font-weight: 800;
   color: #ff9900;
 }
+
+.mood-jar-log-wrapper {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.mood-jar-section, .recent-log {
+  flex: 1 1 300px; /* Responsive columns */
+}
+
+/* Adjust margin-bottom for cards inside flex layout */
+.mood-jar-section, .recent-log {
+  margin-bottom: var(--space-xl);
+}
