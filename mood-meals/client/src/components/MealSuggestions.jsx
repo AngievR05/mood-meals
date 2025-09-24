@@ -8,21 +8,30 @@ import "slick-carousel/slick/slick-theme.css";
 
 const MealSuggestions = ({ currentMood }) => {
   const [meals, setMeals] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchMealsByMood = async () => {
       if (!currentMood) return;
+      setLoading(true);
+      setError("");
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get(`/api/meals/mood/${currentMood}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await axios.get(
+          `/api/meals/mood/${encodeURIComponent(currentMood)}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
         setMeals(res.data);
       } catch (err) {
         console.error("Error fetching meals by mood:", err);
+        setError("Failed to load meals. Try again later.");
+      } finally {
+        setLoading(false);
       }
     };
+
     fetchMealsByMood();
   }, [currentMood]);
 
@@ -51,6 +60,11 @@ const MealSuggestions = ({ currentMood }) => {
       </div>
     );
 
+  if (loading) return <p className="meal-loading">Loading meals...</p>;
+  if (error) return <p className="meal-error">{error}</p>;
+  if (!meals.length)
+    return <p className="meal-empty">No meals found for this mood.</p>;
+
   return (
     <div className="meal-suggestions">
       <h2>🍽️ Meals for "{currentMood}" Mood</h2>
@@ -58,7 +72,7 @@ const MealSuggestions = ({ currentMood }) => {
         {meals.map((meal) => (
           <div key={meal.id} className="meal-card">
             <img
-              src={meal.image_url}
+              src={meal.image_url || "/default-meal.png"}
               alt={meal.name}
               className="meal-image"
               loading="lazy"

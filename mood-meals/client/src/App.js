@@ -16,6 +16,8 @@ import AdminRoute from './components/AdminRoute';
 import MoodTracker from './pages/MoodTracker';
 import Profile from './pages/Profile';
 import AdminPanel from './pages/AdminPanel'; // your admin page
+import AddMealPage from "./pages/AddMealPage";
+import EditMealPage from "./pages/EditMealPage";
 
 function App() {
   return (
@@ -40,6 +42,8 @@ function App() {
                   <Route path="recipes/:mealName" element={<RecipePage />} />
                   <Route path="mood-tracker" element={<MoodTracker />} />
                   <Route path="profile" element={<Profile />} />
+                  <Route path="/admin/add-meal" element={<AddMealPage />} />
+                  <Route path="/admin/edit-meal/:id" element={<EditMealPage />} />
 
                   {/* Admin-only route */}
                   <Route

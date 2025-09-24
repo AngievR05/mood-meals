@@ -3,13 +3,30 @@ const router = express.Router();
 const { pool } = require("../config/db");
 const { verifyToken, verifyAdmin } = require("../middleware/auth");
 
+const multer = require('multer');
+const path = require('path');
+
+// Set up multer storage
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, 'uploads/'),
+  filename: (req, file, cb) => cb(null, Date.now() + path.extname(file.originalname)),
+});
+const upload = multer({ storage });
+
+// Upload endpoint (admin-only)
+router.post('/upload', verifyToken, verifyAdmin, upload.single('image'), (req, res) => {
+  if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
+  res.json({ imageUrl: `http://localhost:5000/uploads/${req.file.filename}` });
+});
+
+
 // CREATE new meal (admin-only)
 router.post("/", verifyToken, verifyAdmin, async (req, res) => {
   try {
-    const { name, description, ingredients, mood, image_url } = req.body;
+    const { name, description, ingredients, mood, image_url, steps } = req.body;
     await pool.query(
-      "INSERT INTO meals (name, description, ingredients, mood, image_url) VALUES (?, ?, ?, ?, ?)",
-      [name, description, JSON.stringify(ingredients), mood, image_url]
+      "INSERT INTO meals (name, description, ingredients, mood, image_url, steps) VALUES (?, ?, ?, ?, ?, ?)",
+      [name, description, JSON.stringify(ingredients), mood, image_url, JSON.stringify(steps || [])]
     );
     res.status(201).json({ message: "Meal added successfully" });
   } catch (err) {
@@ -22,10 +39,10 @@ router.post("/", verifyToken, verifyAdmin, async (req, res) => {
 router.put("/:id", verifyToken, verifyAdmin, async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, description, ingredients, mood, image_url } = req.body;
+    const { name, description, ingredients, mood, image_url, steps } = req.body;
     await pool.query(
-      "UPDATE meals SET name = ?, description = ?, ingredients = ?, mood = ?, image_url = ? WHERE id = ?",
-      [name, description, JSON.stringify(ingredients), mood, image_url, id]
+      "UPDATE meals SET name = ?, description = ?, ingredients = ?, mood = ?, image_url = ?, steps = ? WHERE id = ?",
+      [name, description, JSON.stringify(ingredients), mood, image_url, JSON.stringify(steps || []), id]
     );
     res.json({ message: "Meal updated successfully" });
   } catch (err) {
@@ -50,7 +67,12 @@ router.delete("/:id", verifyToken, verifyAdmin, async (req, res) => {
 router.get("/", verifyToken, async (req, res) => {
   try {
     const [rows] = await pool.query("SELECT * FROM meals");
-    res.json(rows);
+    const meals = rows.map(row => ({
+      ...row,
+      ingredients: JSON.parse(row.ingredients),
+      steps: row.steps ? JSON.parse(row.steps) : []
+    }));
+    res.json(meals);
   } catch (err) {
     console.error("Error fetching meals:", err);
     res.status(500).json({ message: "Server error" });
@@ -60,10 +82,13 @@ router.get("/", verifyToken, async (req, res) => {
 // GET meals by mood (any logged-in user)
 router.get("/mood/:mood", verifyToken, async (req, res) => {
   try {
-    const [rows] = await pool.query("SELECT * FROM meals WHERE mood = ?", [
-      req.params.mood,
-    ]);
-    res.json(rows);
+    const [rows] = await pool.query("SELECT * FROM meals WHERE mood = ?", [req.params.mood]);
+    const meals = rows.map(row => ({
+      ...row,
+      ingredients: JSON.parse(row.ingredients),
+      steps: row.steps ? JSON.parse(row.steps) : []
+    }));
+    res.json(meals);
   } catch (err) {
     console.error("Error fetching meals by mood:", err);
     res.status(500).json({ message: "Server error" });
@@ -73,12 +98,17 @@ router.get("/mood/:mood", verifyToken, async (req, res) => {
 // GET meal by ID (any logged-in user)
 router.get("/:id", verifyToken, async (req, res) => {
   try {
-    const [rows] = await pool.query("SELECT * FROM meals WHERE id = ?", [
-      req.params.id,
-    ]);
+    const [rows] = await pool.query("SELECT * FROM meals WHERE id = ?", [req.params.id]);
     if (rows.length === 0)
       return res.status(404).json({ message: "Meal not found" });
-    res.json(rows[0]);
+
+    const meal = {
+      ...rows[0],
+      ingredients: JSON.parse(rows[0].ingredients),
+      steps: rows[0].steps ? JSON.parse(rows[0].steps) : []
+    };
+
+    res.json(meal);
   } catch (err) {
     console.error("Error fetching meal:", err);
     res.status(500).json({ message: "Server error" });
