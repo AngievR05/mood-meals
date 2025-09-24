@@ -3,39 +3,53 @@
   --accent-orange: #f6bb42;
   --radius-md: 12px;
   --shadow-sm: 0 6px 18px rgba(0,0,0,0.06);
+  --streak-progress-color: #ff9900;
+  --streak-bg-color: rgba(255, 204, 0, 0.2);
 }
 
 .streak-container {
   background: linear-gradient(90deg,var(--accent-yellow),var(--accent-orange));
   padding: 1rem;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   text-align:center;
   box-shadow: var(--shadow-sm);
   color: #222;
   font-family:'Segoe UI',sans-serif;
+  display: inline-block;
 }
 
-.streak-container h3 { margin:0; font-size:1.1rem; font-weight:800; }
-.streak-days { font-size:1.85rem; font-weight:900; margin:.4rem 0; }
-.streak-container p { margin:0; opacity:.9; }
-
-/* Inline streak in tracker-header */
-.tracker-header .streak-inline {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0.75rem;
-  margin-top: 0.5rem;
+.streak-container h3 {
+  margin:0;
+  font-size:1.1rem;
+  font-weight:800;
 }
 
-.tracker-header .streak-inline h3 {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 700;
+.streak-container p {
+  margin:0;
+  opacity:.9;
+  font-weight:600;
 }
 
-.tracker-header .streak-inline .streak-days {
-  font-size: 1.25rem;
-  font-weight: 800;
-  color: #ff9900;
+.streak-ring {
+  margin: 1rem auto;
+  display: block;
+  transform: rotate(-90deg);
+}
+
+.streak-ring-bg {
+  stroke: var(--streak-bg-color);
+}
+
+.streak-ring-progress {
+  stroke: var(--streak-progress-color);
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.5s ease;
+}
+
+.streak-ring-text {
+  font-size: 1.2rem;
+  font-weight: 900;
+  fill: #222;
+  dominant-baseline: middle;
+  transform: rotate(90deg);
 }
