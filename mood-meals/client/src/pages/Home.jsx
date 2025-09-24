@@ -179,14 +179,17 @@ const Home = () => {
         </button>
       </section>
 
-      {/* Mood Status */}
-      <div className="mood-status-wrapper">
-        <StreakTracker currentMood={selectedMood || todayMood?.mood} />
-      </div>
+{/* Streak + Grocery Section */}
+<section className="streak-grocery-wrapper">
+  <div className="streak-wrapper">
+    <StreakTracker currentMood={selectedMood || todayMood?.mood} />
+  </div>
+  <div className="grocery-wrapper">
+    <GrocerySection />
+  </div>
+</section>
 
 
-      {/* Grocery + Meals */}
-      <GrocerySection />
       <MealSuggestions currentMood={selectedMood || todayMood?.mood} />
     </div>
   );

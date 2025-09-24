@@ -1,16 +1,16 @@
 .tracker-container {
   padding: var(--space-lg);
   max-width: 100%;
-  margin: 0 auto;
+  margin: 0;
 }
 
 .tracker-header {
   text-align: center;
-  margin-bottom: var(--space-xl);
+  margin-bottom: var(--space-md);
 }
 
 .mood-entry {
-  margin-bottom: var(--space-xl);
+  margin-bottom: var(--space-md);
 }
 
 .mood-grid {
@@ -76,11 +76,11 @@
 
 .mood-jar-section {
   text-align: center;
-  margin-bottom: var(--space-xl);
+  margin-bottom: var(--space-md);
 }
 
 .recent-log {
-  margin-bottom: var(--space-xl);
+  margin-bottom: var(--space-md);
 }
 
 .log-list {
@@ -160,5 +160,5 @@
 
 /* Adjust margin-bottom for cards inside flex layout */
 .mood-jar-section, .recent-log {
-  margin-bottom: var(--space-xl);
+  margin-bottom: var(--space-md);
 }

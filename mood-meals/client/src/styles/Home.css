@@ -80,16 +80,8 @@
 
 /* Sections */
 .mood-section,
-.grocery-section,
 .meals-section {
-  margin-bottom: 3rem;
-}
-
-.mood-section h2 {
-  font-size: 1.6rem;
-  font-weight: 700;
   margin-bottom: 1rem;
-  color: #444;
 }
 
 /* Mood Grid */
@@ -170,40 +162,48 @@
   filter: brightness(1.15);
 }
 
-/* Mood Status Layout */
-.mood-status-wrapper {
+/* Streak + Grocery Layout */
+.streak-grocery-wrapper {
   display: flex;
-  gap: 1.5rem;
-  flex-wrap: wrap;
+  gap: 2rem;
   margin-top: 2rem;
+  flex-wrap: wrap; /* stacks on smaller screens */
+  align-items: stretch; /* ensures children take full height */
 }
 
-.mood-indicator,
+.streak-wrapper {
+  flex: 1 1 25%; /* ~1/4 width */
+  min-width: 250px;
+  display: flex;
+}
+
 .streak-container {
-  flex: 1 1 300px;
+  flex: 1; /* make it fill parent height */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 1.5rem;
+  border-radius: var(--radius-md);
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+  color: #222;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(90deg,var(--accent-yellow),var(--accent-orange));
+  transition: background 0.3s ease;
 }
 
-/* Footer */
-.footer {
-  margin-top: 4rem;
+.grocery-wrapper {
+  flex: 2 1 70%; /* ~2/3 width */
+  min-width: 300px;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-  .mood-grid {
-    grid-template-columns: repeat(3, 1fr);
+  .streak-grocery-wrapper {
+    flex-direction: column; /* stack on tablet/mobile */
   }
-  .home-header {
-    flex-direction: column;
-    text-align: center;
-  }
-  .header-right {
-    margin-top: 1rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .mood-grid {
-    grid-template-columns: repeat(2, 1fr);
+  .streak-wrapper,
+  .grocery-wrapper {
+    flex: 1 1 100%;
   }
 }

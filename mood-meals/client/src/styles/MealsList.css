@@ -1,79 +1,142 @@
 :root {
   --primary-blue: #5d9cec;
+  --secondary-blue: #4a89dc;
   --neutral-light: #f9f9f9;
+  --text-dark: #0d2633;
+  --text-muted: #345;
   --white: #fff;
   --radius-md: 12px;
-  --shadow-sm: 0 6px 18px rgba(0,0,0,0.06);
+  --shadow-sm: 0 6px 18px rgba(0, 0, 0, 0.06);
+  --shadow-hover: 0 16px 40px rgba(0, 0, 0, 0.08);
 }
 
+/* Section styling */
 .meals-section {
-  background: linear-gradient(180deg,#eaf6ff,#dfefff);
-  padding: 1.6rem;
-  color: #0d2633;
-  border-radius: 12px;
+  background: linear-gradient(180deg, #eaf6ff, #dfefff);
+  padding: 2rem 1.6rem;
+  color: var(--text-dark);
+  border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
 }
 
-.meals-section h2 { 
-  margin-bottom: 0.6rem; 
-  font-weight:700; 
+.meals-section h2 {
+  margin-bottom: 0.4rem;
+  font-weight: 700;
+  font-size: 1.4rem;
 }
 
-.meals-section p { 
-  margin-bottom: 1rem; 
-  color: #214452; 
+.meals-section > p {
+  margin-bottom: 1.6rem;
+  color: #214452;
+  font-size: 0.95rem;
 }
 
+/* Grid layout */
 .meals-grid {
-  display:grid;
-  grid-template-columns: repeat(auto-fill,minmax(220px,1fr));
-  gap: 1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.2rem;
 }
 
+/* Card styling */
 .meal-card {
-  background: rgba(255,255,255,0.92);
-  padding: 1rem;
-  border-radius: 12px;
-  backdrop-filter: blur(4px);
-  transition: transform .18s ease, box-shadow .18s ease;
-  box-shadow: 0 8px 26px rgba(0,0,0,0.04);
+  background: var(--white);
+  padding: 1.2rem;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
   display: flex;
-  flex-direction: column; /* stack content vertically */
+  flex-direction: column;
+  justify-content: space-between;
 }
 
-.meal-card:hover { 
-  transform: translateY(-6px); 
-  box-shadow: 0 16px 40px rgba(0,0,0,0.06);
+.meal-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-hover);
 }
 
-.meal-card h3 { 
-  margin: 0; 
-  font-weight:700; 
+.meal-card h3 {
+  margin: 0;
+  font-weight: 700;
+  font-size: 1.1rem;
 }
 
-.meal-card p { 
-  font-size: .95rem; 
-  color:#345; 
-  margin: 0.5rem 0 1rem 0; /* space between description and buttons */
+.meal-card p {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin: 0.6rem 0 1rem 0;
+  flex-grow: 1; /* push buttons down */
 }
 
+/* Actions */
+.meal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin-top: auto;
+}
+
+.recipe-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  background: var(--primary-blue);
+  color: var(--white);
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.recipe-btn:hover {
+  background: var(--secondary-blue);
+}
+
+.save-btn {
+  font-size: 1.4rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #888;
+  transition: color 0.2s ease;
+}
+
+.save-btn:hover {
+  color: var(--primary-blue);
+}
+
+.save-btn.saved {
+  color: gold;
+}
+
+/* Admin controls */
 .admin-buttons {
+  margin-top: 0.8rem;
   display: flex;
-  flex-direction: row; /* stack buttons vertically */
-  gap: 0.5rem;
+  gap: 0.6rem;
 }
 
 .admin-buttons button {
-  padding: 0.5rem 1rem;
+  padding: 0.4rem 0.8rem;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
   background-color: var(--primary-blue);
   color: var(--white);
+  font-size: 0.85rem;
   transition: background 0.2s ease;
 }
 
 .admin-buttons button:hover {
-  background-color: #4a89dc;
+  background-color: var(--secondary-blue);
+}
+
+/* Empty state + error */
+.no-meals,
+.meal-error {
+  text-align: center;
+  color: var(--text-muted);
+  margin-top: 1.2rem;
+  font-size: 0.95rem;
 }

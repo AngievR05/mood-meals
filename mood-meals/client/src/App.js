@@ -18,6 +18,8 @@ import Profile from './pages/Profile';
 import AdminPanel from './pages/AdminPanel'; // your admin page
 import AddMealPage from "./pages/AddMealPage";
 import EditMealPage from "./pages/EditMealPage";
+import RecipesPage from "./pages/RecipesPage";
+import SavedMealsPage from "./pages/SavedMealsPage";
 
 function App() {
   return (
@@ -44,6 +46,8 @@ function App() {
                   <Route path="profile" element={<Profile />} />
                   <Route path="/admin/add-meal" element={<AddMealPage />} />
                   <Route path="/admin/edit-meal/:id" element={<EditMealPage />} />
+                  <Route path="/recipes" element={<RecipesPage />} />
+                  <Route path="/saved-meals" element={<SavedMealsPage />} />
 
                   {/* Admin-only route */}
                   <Route

@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import "../styles/MealsList.css";
 
-const MealsList = ({ role, fetchMealsTrigger }) => {
+const MealsList = ({ role, fetchMealsTrigger, filter, currentMood }) => {
   const [meals, setMeals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const fetchMeals = async () => {
     try {
@@ -47,6 +49,44 @@ const MealsList = ({ role, fetchMealsTrigger }) => {
     }
   };
 
+  const handleSaveMeal = async (mealId) => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.post(
+        `http://localhost:5000/api/meals/${mealId}/save`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      // Optimistic update
+      setMeals((prev) =>
+        prev.map((meal) =>
+          meal.id === mealId ? { ...meal, saved: !meal.saved } : meal
+        )
+      );
+    } catch (err) {
+      console.error("Error saving meal:", err.response || err.message || err);
+      alert(err.response?.data?.message || "Failed to save meal");
+    }
+  };
+
+  const handleViewRecipe = (mealId) => {
+    navigate(`/recipes/${mealId}`);
+  };
+
+  // Filtering logic
+  const filteredMeals = meals.filter((meal) => {
+    if (filter === "all") return true;
+    if (filter === "mood" && currentMood) {
+      return meal.mood?.toLowerCase() === currentMood.name.toLowerCase();
+    }
+    if (filter === "saved") {
+      return meal.saved === true;
+    }
+    return true;
+  });
+
   if (loading) return <p>Loading meals...</p>;
   if (error) return <p className="meal-error">{error}</p>;
 
@@ -54,20 +94,44 @@ const MealsList = ({ role, fetchMealsTrigger }) => {
     <section className="meals-section">
       <h2>Meals You Can Make</h2>
       <p>Discover delicious meals to cook based on your groceries and mood.</p>
-      <div className="meals-grid">
-        {meals.map((meal) => (
-          <div className="meal-card" key={meal.id}>
-            <h3>{meal.name}</h3>
-            <p>{meal.description}</p>
-            {role === "admin" && (
-              <div className="admin-buttons">
-                <button>Edit</button>
-                <button onClick={() => handleDelete(meal.id)}>Delete</button>
+
+      {filteredMeals.length === 0 ? (
+        <p className="no-meals">No meals match this filter.</p>
+      ) : (
+        <div className="meals-grid">
+          {filteredMeals.map((meal) => (
+            <div className="meal-card" key={meal.id}>
+              <h3>{meal.name}</h3>
+              <p>{meal.description}</p>
+
+              {/* Actions */}
+              <div className="meal-actions">
+                <button
+                  className="recipe-btn"
+                  onClick={() => handleViewRecipe(meal.id)}
+                >
+                  View Recipe
+                </button>
+                <button
+                  className={`save-btn ${meal.saved ? "saved" : ""}`}
+                  onClick={() => handleSaveMeal(meal.id)}
+                  title={meal.saved ? "Unsave Meal" : "Save Meal"}
+                >
+                  {meal.saved ? "★" : "☆"}
+                </button>
               </div>
-            )}
-          </div>
-        ))}
-      </div>
+
+              {/* Admin controls */}
+              {role === "admin" && (
+                <div className="admin-buttons">
+                  <button>Edit</button>
+                  <button onClick={() => handleDelete(meal.id)}>Delete</button>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
     </section>
   );
 };
