@@ -1,3 +1,4 @@
+// src/pages/MoodTracker.js
 import React, { useState, useEffect } from 'react';
 import '../styles/MoodTracker.css';
 import JarSVG from '../components/JarSVG';
@@ -43,7 +44,7 @@ const MoodTracker = () => {
 
   const token = localStorage.getItem('token');
 
-  // Fetch moods on mount
+  // Fetch moods
   useEffect(() => {
     const fetchMoods = async () => {
       setLoading(true);
@@ -54,14 +55,15 @@ const MoodTracker = () => {
         });
         if (!res.ok) throw new Error('Failed to fetch moods');
         const data = await res.json();
-        setRecentMoods(data);
+        setRecentMoods(Array.isArray(data) ? data : []);
       } catch (err) {
         setError(err.message);
+        setRecentMoods([]);
       } finally {
         setLoading(false);
       }
     };
-    fetchMoods();
+    if (token) fetchMoods();
   }, [token]);
 
   // Save mood
@@ -69,7 +71,6 @@ const MoodTracker = () => {
     if (!selectedMood) return setError('Please select a mood!');
     setLoading(true);
     setError('');
-
     try {
       const res = await fetch('http://localhost:5000/api/moods', {
         method: 'POST',
@@ -80,10 +81,8 @@ const MoodTracker = () => {
         body: JSON.stringify({ mood: selectedMood, note }),
       });
       const savedMood = await res.json();
-      if (!res.ok) throw new Error(savedMood.message || 'Failed to save mood');
-
-      // Replace today's mood if exists
-      setRecentMoods([savedMood, ...recentMoods.filter(m => m.id !== savedMood.id)]);
+      if (!res.ok) throw new Error(savedMood?.message || 'Failed to save mood');
+      setRecentMoods(prev => [savedMood, ...(prev || []).filter(m => m.id !== savedMood.id)]);
       setSelectedMood('');
       setNote('');
     } catch (err) {
@@ -93,24 +92,22 @@ const MoodTracker = () => {
     }
   };
 
-  // Prepare bubbles for JarSVG
-  const bubblesData = recentMoods.slice(0, 8).map((entry, i) => {
+  const bubblesData = (recentMoods || []).slice(0, 8).map((entry, i) => {
     const moodData = moods.find(m => m.name === entry.mood);
     const pos = landingPositions[i % landingPositions.length];
     return {
-      id: i,
+      id: entry.id || i,
       cx: pos.cx,
       cy: pos.cy,
-      mood: entry.mood,
-      color: moodData?.color || '#4a89dc',
+      mood: entry.mood || '',
+      color: moodData?.color || '#ddd',
       image: moodData?.image || '',
-      note: entry.note,
+      note: entry.note || '',
     };
   });
 
-  // Highlight today's mood
   const today = new Date().toISOString().split('T')[0];
-  const todaysMood = recentMoods.find(m => m.created_at?.startsWith(today));
+  const todaysMood = (recentMoods || []).find(m => m.created_at?.startsWith(today));
 
   return (
     <div className="tracker-container">
@@ -123,7 +120,7 @@ const MoodTracker = () => {
         <h2>Add Your Mood Entry</h2>
         {error && <p className="auth-error">{error}</p>}
         <div className="mood-grid">
-          {moods.map(mood => (
+          {(moods || []).map(mood => (
             <button
               key={mood.name}
               className={`mood-card ${selectedMood === mood.name ? 'selected' : ''} ${
@@ -142,7 +139,7 @@ const MoodTracker = () => {
         </div>
 
         <textarea
-          placeholder="Add an optional note about your mood..."
+          placeholder="Add an optional note..."
           value={note}
           onChange={(e) => setNote(e.target.value)}
           className="form-input"
@@ -163,8 +160,8 @@ const MoodTracker = () => {
         <h2>Recent Mood Log</h2>
         {loading && <p>Loading moods...</p>}
         <ul className="log-list">
-          {recentMoods.length === 0 && !loading && <p>No moods logged yet.</p>}
-          {recentMoods.map(({ id, mood, note, created_at }, idx) => {
+          {(!recentMoods || recentMoods.length === 0) && !loading && <p>No moods logged yet.</p>}
+          {(recentMoods || []).map(({ id, mood, note, created_at }, idx) => {
             const moodData = moods.find(m => m.name === mood);
             const date = created_at ? new Date(created_at).toLocaleDateString() : '';
             return (

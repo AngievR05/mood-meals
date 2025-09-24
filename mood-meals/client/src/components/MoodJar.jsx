@@ -6,10 +6,19 @@ const moodColors = {
   Angry: '#f26c63',
   Sad: '#70c1b3',
   Sick: '#f7cac9',
-  Anxiety: '#cbaacb'
+  Anxiety: '#cbaacb',
 };
 
-const MoodJar = ({ moodEntries }) => {
+const MoodJar = ({ moodEntries = [] }) => {
+  if (!moodEntries.length) {
+    return (
+      <div className="mood-jar-wrapper">
+        <h2 className="mood-jar-title">Mood Tracker</h2>
+        <p>No moods logged yet.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="mood-jar-wrapper">
       <h2 className="mood-jar-title">Mood Tracker</h2>

@@ -1,162 +1,103 @@
-import React, { useState, useEffect } from 'react';
-import AOS from 'aos';
-import 'aos/dist/aos.css';
+import React, { useState, useEffect } from "react";
+import "../styles/Home.css";
+import "../styles/design-system.css";
+import "../styles/utils.css";
 
-import MoodNoteModal from '../components/MoodNoteModal';
-import GrocerySection from '../components/GrocerySection';
-import MealSuggestions from '../components/MealSuggestions';
-import StreakTracker from '../components/StreakTracker';
-import MoodIndicator from '../components/MoodIndicator';
-import Footer from '../components/Footer';
+import MoodIndicator from "../components/MoodIndicator";
+import StreakTracker from "../components/StreakTracker";
+import GrocerySection from "../components/GrocerySection";
+import MealSuggestions from "../components/MealSuggestions";
+import MoodNoteModal from "../components/MoodNoteModal";
 
-import happy from '../assets/emotions/Happy.png';
-import sad from '../assets/emotions/Sad.png';
-import angry from '../assets/emotions/Angry.png';
-import stressed from '../assets/emotions/Stressed.png';
-import bored from '../assets/emotions/Bored.png';
-import energised from '../assets/emotions/Energised.png';
-import confused from '../assets/emotions/Confused.png';
-import grateful from '../assets/emotions/Grateful.png';
-
-import '../styles/Home.css';
-import spinner from '../assets/images/Group2.png';
-
-const moodImages = {
-  Happy: happy,
-  Sad: sad,
-  Angry: angry,
-  Stressed: stressed,
-  Bored: bored,
-  Energised: energised,
-  Confused: confused,
-  Grateful: grateful,
-};
+const moods = [
+  { label: "Happy", img: "/assets/moods/happy.png" },
+  { label: "Sad", img: "/assets/moods/sad.png" },
+  { label: "Angry", img: "/assets/moods/angry.png" },
+  { label: "Stressed", img: "/assets/moods/stressed.png" },
+  { label: "Bored", img: "/assets/moods/bored.png" },
+  { label: "Energised", img: "/assets/moods/energised.png" },
+  { label: "Confused", img: "/assets/moods/confused.png" },
+  { label: "Grateful", img: "/assets/moods/grateful.png" },
+];
 
 const Home = () => {
-  const [moodNote, setMoodNote] = useState('');
-  const [currentMood, setCurrentMood] = useState('');
-  const [username, setUsername] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [selectedMood, setSelectedMood] = useState(null);
+  const [showNoteModal, setShowNoteModal] = useState(false);
 
-  const token = localStorage.getItem('token');
-
+  // Auto-persist mood to backend when selected
   useEffect(() => {
-    AOS.init({ duration: 1000, once: true });
-    const storedUsername = localStorage.getItem('username');
-    if (storedUsername) setUsername(storedUsername);
-
-    const fetchTodayMood = async () => {
-      setLoading(true);
-      setError('');
-      try {
-        const res = await fetch('http://localhost:5000/api/moods/today', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const data = await res.json();
-        if (res.ok && data.mood) {
-          setCurrentMood(data.mood);
-          setMoodNote(data.note || '');
-        }
-      } catch (err) {
-        setError('Failed to load today’s mood');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (token) fetchTodayMood();
-  }, [token]);
-
-  const handleMoodSelect = async (mood) => {
-    setCurrentMood(mood);
-    setError('');
-    setLoading(true);
-
-    try {
-      const res = await fetch('http://localhost:5000/api/moods', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ mood, note: moodNote }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Failed to save mood');
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+    if (selectedMood) {
+      // TODO: connect to /api/moods POST
+      console.log("Saving mood:", selectedMood);
     }
-  };
+  }, [selectedMood]);
 
   return (
     <div className="home-container">
+      {/* Header */}
       <header className="home-header">
         <div className="header-left">
-          <h1>Mood Meals</h1>
-          <p>
-            {username ? (
-              <>Hi {username} 👋 <br /> How are you feeling today?</>
-            ) : (
-              <>How are you feeling today?</>
-            )}
-          </p>
-          {error && <p className="auth-error">{error}</p>}
+          <h1>Welcome back 👋</h1>
+          <p>How are you feeling today?</p>
         </div>
-        {currentMood && (
-          <div className="header-right">
-            {loading ? (
-              <img src={spinner} alt="Loading..." style={{ width: 36 }} />
-            ) : (
-              <img
-                key={currentMood}
-                src={moodImages[currentMood]}
-                alt={currentMood}
-                className="header-mood-image pulse"
-              />
-            )}
-          </div>
-        )}
+        <div className="header-right">
+          {selectedMood ? (
+            <img
+              src={selectedMood.img}
+              alt={selectedMood.label}
+              className="header-mood-image"
+            />
+          ) : (
+            <p style={{ color: "#777" }}>Pick a mood ↓</p>
+          )}
+        </div>
       </header>
 
-      <section className="mood-section" data-aos="fade-up">
+      {/* Mood Section */}
+      <section className="mood-section">
         <h2>Select Your Mood</h2>
         <div className="mood-grid">
-          {Object.entries(moodImages).map(([mood, img]) => (
-            <button
-              key={mood}
-              className={`mood-card ${currentMood === mood ? 'selected' : ''}`}
-              onClick={() => handleMoodSelect(mood)}
-              aria-pressed={currentMood === mood}
-              disabled={loading}
+          {moods.map((mood) => (
+            <div
+              key={mood.label}
+              className={`mood-card ${
+                selectedMood?.label === mood.label ? "selected" : ""
+              }`}
+              onClick={() => {
+                setSelectedMood(mood);
+                setShowNoteModal(true);
+              }}
             >
               <div className="mood-icon">
-                <img src={img} alt={mood} />
+                <img src={mood.img} alt={mood.label} />
               </div>
-              <span className="mood-label">{mood}</span>
-            </button>
+              <span className="mood-label">{mood.label}</span>
+            </div>
           ))}
         </div>
-
-        <MoodNoteModal onSave={setMoodNote} />
       </section>
 
+      {/* Mood Status */}
       <div className="mood-status-wrapper">
-        <MoodIndicator mood={currentMood} />
-        <StreakTracker streak={3} />
+        <MoodIndicator />
+        <StreakTracker />
       </div>
 
-      <section className="grocery-section" data-aos="fade-up" data-aos-delay="100">
-        <GrocerySection />
-      </section>
+      {/* Grocery + Meals */}
+      <GrocerySection />
+      <MealSuggestions />
 
-      <section className="meals-section" data-aos="fade-up" data-aos-delay="200">
-        <MealSuggestions currentMood={currentMood} />
-      </section>
+      {/* Floating modal for mood notes */}
+      {showNoteModal && (
+        <MoodNoteModal
+          mood={selectedMood}
+          onClose={() => setShowNoteModal(false)}
+        />
+      )}
 
-      <Footer />
+      <footer className="footer">
+        <p>© 2025 Mood Meals</p>
+      </footer>
     </div>
   );
 };
