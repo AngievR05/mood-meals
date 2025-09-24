@@ -14,11 +14,25 @@ const shadeColor = (color, percent) => {
   return `rgb(${R},${G},${B})`;
 };
 
+// Mood definitions with colors
+const moods = [
+  { name: "Happy", color: "#A0D468" },
+  { name: "Sad", color: "#5D9CEC" },
+  { name: "Angry", color: "#ED5565" },
+  { name: "Stressed", color: "#48CFAD" },
+  { name: "Bored", color: "#CCD1D9" },
+  { name: "Energised", color: "#FFCE54" },
+  { name: "Confused", color: "#FC6E51" },
+  { name: "Grateful", color: "#AC92EC" },
+];
+
 const StreakTracker = ({ currentMood }) => {
   const [streak, setStreak] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [gradient, setGradient] = useState('linear-gradient(90deg, #ffce54, #f6bb42)');
   const token = localStorage.getItem('token');
 
+  // Fetch streak from backend
   useEffect(() => {
     const fetchStreak = async () => {
       if (!token) return;
@@ -37,16 +51,22 @@ const StreakTracker = ({ currentMood }) => {
     fetchStreak();
   }, [token]);
 
-  if (loading) return <p>Loading streak...</p>;
+  // Update gradient when mood changes
+  useEffect(() => {
+    const moodObj = moods.find(m => m.name === currentMood);
+    const baseColor = moodObj?.color || '#ff9900';
+    const darkerColor = shadeColor(baseColor, -20);
 
-  // Use mood color if available, fallback to default orange
-  const baseColor = currentMood?.color || '#ff9900';
-  const darkerColor = shadeColor(baseColor, -20);
+    // Animate gradient
+    setGradient(`linear-gradient(90deg, ${baseColor}, ${darkerColor})`);
+  }, [currentMood]);
+
+  if (loading) return <p>Loading streak...</p>;
 
   return (
     <div
       className="streak-container"
-      style={{ background: `linear-gradient(90deg, ${baseColor}, ${darkerColor})` }}
+      style={{ background: gradient, transition: 'background 0.8s ease-in-out' }}
     >
       <h3>Mood Streak</h3>
       <p>You’ve tracked your mood for</p>

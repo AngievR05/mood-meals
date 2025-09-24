@@ -33,6 +33,8 @@ const moods = [
 const Home = () => {
   const [selectedMood, setSelectedMood] = useState("");
   const [note, setNote] = useState("");
+  const [todayMood, setTodayMood] = useState(null);
+  const [recentMoods, setRecentMoods] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const token = localStorage.getItem("token");
@@ -44,18 +46,42 @@ const Home = () => {
     if (contentType && contentType.includes("application/json")) {
       data = await res.json();
     }
-    if (!res.ok) {
-      throw new Error(data?.message || "Request failed");
-    }
+    if (!res.ok) throw new Error(data?.message || "Request failed");
     return data;
   };
+
+  // Load today's mood and recent moods
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!token) return;
+      setLoading(true);
+      setError("");
+      try {
+        const today = await fetchJSON("http://localhost:5000/api/moods/today", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setTodayMood(today);
+        setSelectedMood(today?.mood || "");
+
+        const recent = await fetchJSON("http://localhost:5000/api/moods", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setRecentMoods(Array.isArray(recent) ? recent : []);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [token]);
 
   const handleSaveMood = async () => {
     if (!selectedMood) return setError("Please select a mood!");
     setLoading(true);
     setError("");
     try {
-      await fetchJSON("http://localhost:5000/api/moods", {
+      const savedMood = await fetchJSON("http://localhost:5000/api/moods", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -64,8 +90,27 @@ const Home = () => {
         body: JSON.stringify({ mood: selectedMood, note }),
       });
 
+      setTodayMood(savedMood);
+      setRecentMoods((prev) => [savedMood, ...prev.filter((m) => m.id !== savedMood.id)]);
       setSelectedMood("");
       setNote("");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteMood = async (id) => {
+    if (!window.confirm("Delete this mood entry?")) return;
+    setLoading(true);
+    try {
+      await fetchJSON(`http://localhost:5000/api/moods/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setRecentMoods((prev) => prev.filter((m) => m.id !== id));
+      if (todayMood?.id === id) setTodayMood(null);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -82,10 +127,10 @@ const Home = () => {
           <p>How are you feeling today?</p>
         </div>
         <div className="header-right">
-          {selectedMood ? (
+          {selectedMood || todayMood ? (
             <img
-              src={moods.find((m) => m.name === selectedMood)?.image}
-              alt={selectedMood}
+              src={moods.find((m) => m.name === selectedMood || m.name === todayMood?.mood)?.image}
+              alt={selectedMood || todayMood?.mood}
               className="header-mood-image"
             />
           ) : (
@@ -94,7 +139,7 @@ const Home = () => {
         </div>
       </header>
 
-      {/* Mood Entry Card (replacing old mood section) */}
+      {/* Mood Entry Card */}
       <section className="mood-entry card">
         <h2>Add Your Mood Entry</h2>
         {error && <p className="auth-error">{error}</p>}
@@ -102,8 +147,8 @@ const Home = () => {
           {moods.map((mood) => (
             <button
               key={mood.name}
-              className={`mood-card ${
-                selectedMood === mood.name ? "selected" : ""
+              className={`mood-card ${selectedMood === mood.name ? "selected" : ""} ${
+                todayMood?.mood === mood.name ? "today" : ""
               }`}
               style={{ background: mood.color }}
               onClick={() => setSelectedMood(mood.name)}
@@ -130,22 +175,19 @@ const Home = () => {
           onClick={handleSaveMood}
           disabled={loading}
         >
-          {loading ? (
-            <img src={spinner} alt="Loading..." style={{ width: 24 }} />
-          ) : (
-            "Save Mood Entry"
-          )}
+          {loading ? <img src={spinner} alt="Loading..." style={{ width: 24 }} /> : "Save Mood Entry"}
         </button>
       </section>
 
       {/* Mood Status */}
       <div className="mood-status-wrapper">
-        <StreakTracker currentMood={selectedMood} />
+        <StreakTracker currentMood={selectedMood || todayMood?.mood} />
       </div>
+
 
       {/* Grocery + Meals */}
       <GrocerySection />
-      <MealSuggestions currentMood={selectedMood} />
+      <MealSuggestions currentMood={selectedMood || todayMood?.mood} />
     </div>
   );
 };
