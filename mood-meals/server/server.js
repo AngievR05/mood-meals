@@ -44,6 +44,9 @@ app.use((err, req, res, next) => {
 const path = require('path');
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+const savedMealsRoutes = require("./routes/savedMeals");
+app.use("/api/saved-meals", savedMealsRoutes);
+
 
 const DEFAULT_PORT = parseInt(process.env.PORT, 10) || 5000;
 const MAX_PORT_TRIES = 10;

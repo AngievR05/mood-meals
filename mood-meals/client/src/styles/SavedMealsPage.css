@@ -1,0 +1,61 @@
+:root {
+  --primary-blue: #5d9cec;
+  --neutral-light: #f9f9f9;
+  --white: #fff;
+  --radius-lg: 16px;
+  --shadow-sm: 0 6px 18px rgba(0,0,0,0.06);
+}
+
+.saved-meals-page {
+  padding: 2rem;
+  min-height: 100vh;
+  background: var(--neutral-light);
+  font-family: 'Segoe UI', sans-serif;
+  color: #222;
+}
+
+.saved-meals-page h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 1.2rem;
+  text-align: center;
+}
+
+.saved-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.saved-card {
+  background: rgba(255,255,255,0.95);
+  padding: 1rem 1.2rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.saved-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+}
+
+.saved-card h3 {
+  margin: 0;
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.saved-card p {
+  margin-top: 0.4rem;
+  color: #345;
+  font-size: 0.95rem;
+}
+
+.no-saved,
+.loading-text {
+  text-align: center;
+  margin-top: 2rem;
+  color: #555;
+  font-weight: 600;
+}

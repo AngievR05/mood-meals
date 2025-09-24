@@ -22,7 +22,13 @@ const MealsList = ({ role, fetchMealsTrigger, filter, currentMood }) => {
 
       if (!Array.isArray(res.data)) throw new Error("Unexpected API response");
 
-      setMeals(res.data);
+      // Map meals with "saved" property if available
+      setMeals(
+        res.data.map((meal) => ({
+          ...meal,
+          saved: meal.saved || false,
+        }))
+      );
     } catch (err) {
       console.error("Error fetching meals:", err.response || err.message || err);
       setError(err.response?.data?.message || err.message || "Failed to load meals");
@@ -49,25 +55,26 @@ const MealsList = ({ role, fetchMealsTrigger, filter, currentMood }) => {
     }
   };
 
-  const handleSaveMeal = async (mealId) => {
+  const handleToggleSave = async (mealId, isSaved) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.post(
-        `http://localhost:5000/api/meals/${mealId}/save`,
-        {},
-        {
+      if (isSaved) {
+        await axios.delete(`http://localhost:5000/api/saved-meals/${mealId}/unsave`, {
           headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      // Optimistic update
+        });
+      } else {
+        await axios.post(`http://localhost:5000/api/saved-meals/${mealId}/save`, {}, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      }
       setMeals((prev) =>
         prev.map((meal) =>
           meal.id === mealId ? { ...meal, saved: !meal.saved } : meal
         )
       );
     } catch (err) {
-      console.error("Error saving meal:", err.response || err.message || err);
-      alert(err.response?.data?.message || "Failed to save meal");
+      console.error("Error toggling save:", err.response || err.message || err);
+      alert(err.response?.data?.message || "Failed to update saved meal");
     }
   };
 
@@ -81,9 +88,7 @@ const MealsList = ({ role, fetchMealsTrigger, filter, currentMood }) => {
     if (filter === "mood" && currentMood) {
       return meal.mood?.toLowerCase() === currentMood.name.toLowerCase();
     }
-    if (filter === "saved") {
-      return meal.saved === true;
-    }
+    if (filter === "saved") return meal.saved === true;
     return true;
   });
 
@@ -114,7 +119,7 @@ const MealsList = ({ role, fetchMealsTrigger, filter, currentMood }) => {
                 </button>
                 <button
                   className={`save-btn ${meal.saved ? "saved" : ""}`}
-                  onClick={() => handleSaveMeal(meal.id)}
+                  onClick={() => handleToggleSave(meal.id, meal.saved)}
                   title={meal.saved ? "Unsave Meal" : "Save Meal"}
                 >
                   {meal.saved ? "★" : "☆"}

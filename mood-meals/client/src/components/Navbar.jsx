@@ -8,13 +8,11 @@ const Navbar = () => {
   const navigate = useNavigate();
   const [role, setRole] = useState('user');
 
-  // Update role whenever component mounts or localStorage changes
   useEffect(() => {
     const storedRole = localStorage.getItem('role') || 'user';
     setRole(storedRole);
   }, []);
 
-  // Optional: Watch localStorage for changes (if user role can change dynamically)
   useEffect(() => {
     const handleStorageChange = () => {
       const updatedRole = localStorage.getItem('role') || 'user';
@@ -39,6 +37,7 @@ const Navbar = () => {
         <li><Link to="/home">Home</Link></li>
         <li><Link to="/mood-tracker">Mood Tracker</Link></li>
         <li><Link to="/meals">My Meals</Link></li>
+        <li><Link to="/saved-meals">Saved Meals</Link></li> {/* NEW LINK */}
         <li><Link to="/friends">Friends</Link></li>
         <li><Link to="/profile">Profile</Link></li>
 
