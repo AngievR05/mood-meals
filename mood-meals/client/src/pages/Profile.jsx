@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import MoodRadialChart from '../components/MoodRadialChart';
+import StreakTracker from '../components/StreakTracker'; // new component
 import '../styles/Profile.css';
 
 import happy from "../assets/emotions/Happy.png";
@@ -133,29 +134,12 @@ const Profile = () => {
         </div>
       </div>
 
-      {/* Mood Stats */}
-      <section className="section">
+      {/* Mood Stats + StreakTracker */}
+      <section className="section mood-stats-section">
         <h2>Mood Stats</h2>
-        <p>Current Streak: {streak} days</p>
-        <MoodRadialChart data={moodStats} />
-      </section>
-
-      {/* Saved Meals */}
-      <section className="section saved-meals">
-        <h2>Saved Meals</h2>
-        <div className="meal-list">
-          {savedMeals.map(meal => (
-            <div className="meal-card" key={meal.id}>
-              <div className="meal-img">
-                <img src={meal.image_url || '/placeholder.png'} alt={meal.name} />
-              </div>
-              <div>
-                <h4>{meal.name}</h4>
-                <p>{meal.description}</p>
-                {(meal.moods || []).map(m => <span className="tag" key={m}>{m}</span>)}
-              </div>
-            </div>
-          ))}
+        <div className="mood-stats-wrapper">
+          <MoodRadialChart data={moodStats} />
+          <StreakTracker streak={streak} /> {/* Added component */}
         </div>
       </section>
 
@@ -166,6 +150,23 @@ const Profile = () => {
             <h3>Edit Profile</h3>
             <input type="text" value={editData.username} onChange={e=>setEditData({...editData, username:e.target.value})} />
             <input type="email" value={editData.email} onChange={e=>setEditData({...editData, email:e.target.value})} />
+
+            {/* Avatar selector */}
+            <div className="avatar-selector">
+              <h4>Select Avatar:</h4>
+              <div className="avatars-list">
+                {avatars.map(a => (
+                  <img
+                    key={a.name}
+                    src={a.image}
+                    alt={a.name}
+                    className={editData.avatar === a.name ? 'selected' : ''}
+                    onClick={()=>setEditData({...editData, avatar: a.name})}
+                  />
+                ))}
+              </div>
+            </div>
+
             <div className="modal-buttons">
               <button className="btn save-btn" onClick={saveProfile}>Save</button>
               <button className="btn cancel-btn" onClick={()=>setShowEditModal(false)}>Cancel</button>
