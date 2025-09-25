@@ -38,6 +38,10 @@ app.use("/api/saved-meals", savedMealsRoutes);
 app.use("/api/user-meals", userMealsRoutes);
 app.use("/api/feedback", feedbackRouter); // <--- MUST be before 404
 
+const profileRoutes = require('./routes/profile');
+app.use('/api/profile', profileRoutes);
+
+
 // 404 handler
 app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });

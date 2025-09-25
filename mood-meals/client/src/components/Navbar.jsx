@@ -1,26 +1,26 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'; 
 import { Link, useNavigate } from 'react-router-dom';
 import '../styles/Navbar.css';
 import logo from '../assets/images/Group2.png';
-import { logout } from '../utils/auth';
+import { logout, isTokenValid } from '../utils/auth';
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const [role, setRole] = useState('user');
+  const [role, setRole] = useState(localStorage.getItem('role') || '');
+  const [isLoggedIn, setIsLoggedIn] = useState(isTokenValid());
 
-  useEffect(() => {
-    const storedRole = localStorage.getItem('role') || 'user';
-    setRole(storedRole);
-  }, []);
-
+  // Update role & login status if localStorage changes
   useEffect(() => {
     const handleStorageChange = () => {
-      const updatedRole = localStorage.getItem('role') || 'user';
-      setRole(updatedRole);
+      setRole(localStorage.getItem('role') || '');
+      setIsLoggedIn(isTokenValid());
     };
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
+
+  // Hide navbar if not logged in
+  if (!isLoggedIn) return null;
 
   return (
     <nav className="navbar">
@@ -37,13 +37,8 @@ const Navbar = () => {
         <li><Link to="/home">Home</Link></li>
         <li><Link to="/mood-tracker">Mood Tracker</Link></li>
         <li><Link to="/meals">My Meals</Link></li>
-        <li><Link to="/saved-meals">Saved Meals</Link></li> {/* NEW LINK */}
         <li><Link to="/friends">Friends</Link></li>
         <li><Link to="/profile">Profile</Link></li>
-        {/* <li><Link to="/recipes">Recipes</Link></li> */}
-        {/* <li><Link to="/feedback">Feedback</Link></li> NEW LINK */}
-
-        {/* Only show Admin Panel for admins */}
         {role === 'admin' && <li><Link to="/admin">Admin Panel</Link></li>}
       </ul>
 

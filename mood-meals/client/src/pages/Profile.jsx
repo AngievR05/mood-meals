@@ -4,58 +4,124 @@ import axios from 'axios';
 import MoodRadialChart from '../components/MoodRadialChart';
 import '../styles/Profile.css';
 
+import happy from "../assets/emotions/Happy.png";
+import sad from "../assets/emotions/Sad.png";
+import angry from "../assets/emotions/Angry.png";
+import stressed from "../assets/emotions/Stressed.png";
+import bored from "../assets/emotions/Bored.png";
+import energised from "../assets/emotions/Energised.png";
+import confused from "../assets/emotions/Confused.png";
+import grateful from "../assets/emotions/Grateful.png";
+
+const avatars = [
+  { name: "Happy", image: happy },
+  { name: "Sad", image: sad },
+  { name: "Angry", image: angry },
+  { name: "Stressed", image: stressed },
+  { name: "Bored", image: bored },
+  { name: "Energised", image: energised },
+  { name: "Confused", image: confused },
+  { name: "Grateful", image: grateful },
+];
+
 const Profile = () => {
-  const [user, setUser] = useState(null);
-  const [moodStats, setMoodStats] = useState(null);
   const navigate = useNavigate();
+  const token = localStorage.getItem('token');
 
+  const [user, setUser] = useState(null);
+  const [moodStats, setMoodStats] = useState([]);
+  const [streak, setStreak] = useState(0);
+  const [savedMeals, setSavedMeals] = useState([]);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+
+  const [editData, setEditData] = useState({});
+  const [passwordData, setPasswordData] = useState({ oldPassword:'', newPassword:'', confirmPassword:'' });
+
+  // Fetch all profile data
   useEffect(() => {
+    if (!token) {
+      navigate('/');
+      return;
+    }
+
+    const config = { headers: { 'x-auth-token': token } };
+
     const fetchProfileData = async () => {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        navigate('/login');
-        return;
-      }
-
-      const config = {
-        headers: {
-          'x-auth-token': token,
-        },
-      };
-
       try {
-        const userRes = await axios.get('http://localhost:5000/api/user/profile', config);
+        // Profile
+        const userRes = await axios.get('http://localhost:5000/api/profile', config);
         setUser(userRes.data);
+        setEditData({ username: userRes.data.username, email: userRes.data.email, avatar: userRes.data.avatar || 'Happy' });
 
-        const moodStatsRes = await axios.get('http://localhost:5000/api/user/mood-stats', config);
-        setMoodStats(moodStatsRes.data);
-      } catch (error) {
-        console.error('Error fetching profile data:', error);
-        // If token is invalid or expired, redirect to login
-        if (error.response && error.response.status === 401) {
+        // Mood Stats
+        const moodRes = await axios.get('http://localhost:5000/api/profile/mood-stats', config);
+        setMoodStats(moodRes.data);
+
+        // Streak
+        const streakRes = await axios.get('http://localhost:5000/api/profile/streak', config);
+        setStreak(streakRes.data.streak);
+
+        // Saved Meals
+        const mealsRes = await axios.get('http://localhost:5000/api/profile/saved-meals', config);
+        setSavedMeals(mealsRes.data);
+      } catch (err) {
+        console.error(err);
+        if(err.response?.status === 401) {
           localStorage.removeItem('token');
-          navigate('/login');
+          localStorage.removeItem('role');
+          navigate('/');
         }
       }
     };
 
     fetchProfileData();
-  }, [navigate]);
+  }, [navigate, token]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
-    navigate('/login');
+    localStorage.removeItem('role');
+    navigate('/');
   };
 
-  if (!user || !moodStats) {
-    return <div>Loading...</div>;
-  }
+  const saveProfile = async () => {
+    try {
+      const config = { headers: { 'x-auth-token': token } };
+      await axios.put('http://localhost:5000/api/profile', editData, config);
+      setUser(prev => ({ ...prev, ...editData }));
+      setShowEditModal(false);
+    } catch(err){
+      console.error(err);
+      alert('Failed to update profile');
+    }
+  };
+
+  const changePassword = async () => {
+    if(passwordData.newPassword !== passwordData.confirmPassword){
+      alert('Passwords do not match');
+      return;
+    }
+    try{
+      const config = { headers: { 'x-auth-token': token } };
+      await axios.put('http://localhost:5000/api/profile/change-password', passwordData, config);
+      alert('Password updated successfully');
+      setShowPasswordModal(false);
+      setPasswordData({ oldPassword:'', newPassword:'', confirmPassword:'' });
+    } catch(err){
+      console.error(err);
+      alert(err.response?.data?.error || 'Failed to change password');
+    }
+  };
+
+  if(!user) return <div>Loading...</div>;
 
   return (
     <div className="profile-container">
       {/* Header */}
       <div className="profile-header">
-        <div className="profile-avatar"></div>
+        <div className="profile-avatar">
+          <img src={avatars.find(a=>a.name===user.avatar)?.image || happy} alt="avatar" />
+        </div>
         <div className="profile-info">
           <h2>{user.username}</h2>
           <span className="username">@{user.username}</span>
@@ -63,110 +129,67 @@ const Profile = () => {
         </div>
         <div className="profile-actions">
           <button className="btn logout-btn" onClick={handleLogout}>Logout</button>
-          <button className="btn edit-btn">Edit Profile</button>
+          <button className="btn edit-btn" onClick={()=>setShowEditModal(true)}>Edit Profile</button>
+          <button className="btn edit-btn" onClick={()=>setShowPasswordModal(true)}>Change Password</button>
         </div>
       </div>
 
-      {/* Mood Statistics */}
+      {/* Mood Stats */}
       <section className="section">
-        <h2>Mood Statistics</h2>
-        <p className="section-subtitle">Your mood trends at a glance.</p>
-
-        <div className="stats-cards">
-          <div className="stat-card">
-            <h4>Most Frequent Mood</h4>
-            <p className="highlight">{moodStats.mostFrequentMood}</p>
-            <span className="change">+5% from last month</span>
-          </div>
-          <div className="stat-card">
-            <h4>Longest Streak</h4>
-            <p className="highlight">{moodStats.longestStreak} Days</p>
-          </div>
-        </div>
-
-        <div className="mood-chart">
-          <p>Mood Over Time</p>
-          <MoodRadialChart data={moodStats.moodChartData || []} />
-        </div>
+        <h2>Mood Stats</h2>
+        <p>Current Streak: {streak} days</p>
+        <MoodRadialChart data={moodStats} />
       </section>
 
       {/* Saved Meals */}
       <section className="section saved-meals">
         <h2>Saved Meals</h2>
-        <p>Your favorite meals based on your moods.</p>
-        <button className="btn add-btn">Add Meal</button>
         <div className="meal-list">
-          <div className="meal-card">
-            <div className="meal-img"></div>
-            <div>
-              <h4>Spaghetti Bolognese</h4>
-              <p>Comfort food for a happy mood.</p>
-              <span className="tag">Happy</span>
-              <span className="tag">Comfort</span>
+          {savedMeals.map(meal => (
+            <div className="meal-card" key={meal.id}>
+              <div className="meal-img">
+                <img src={meal.image_url || '/placeholder.png'} alt={meal.name} />
+              </div>
+              <div>
+                <h4>{meal.name}</h4>
+                <p>{meal.description}</p>
+                {(meal.moods || []).map(m => <span className="tag" key={m}>{m}</span>)}
+              </div>
             </div>
-          </div>
-          <div className="meal-card">
-            <div className="meal-img"></div>
-            <div>
-              <h4>Vegan Salad</h4>
-              <p>Fresh and energizing for a productive mood.</p>
-              <span className="tag">Energized</span>
-              <span className="tag">Healthy</span>
-            </div>
-          </div>
+          ))}
         </div>
       </section>
 
-      {/* Grocery Preferences */}
-      <section className="section grocery-prefs">
-        <h2>Grocery Preferences</h2>
-        <p>Customize your grocery preferences for better meal planning.</p>
-        <button className="btn edit-btn">Edit Preferences</button>
-        <div className="pref-list">
-          <div className="pref-card">
-            <div className="pref-img"></div>
-            <div>
-              <h4>Vegetarian</h4>
-              <p>I prefer plant-based meals.</p>
-            </div>
-          </div>
-          <div className="pref-card">
-            <div className="pref-img"></div>
-            <div>
-              <h4>Organic</h4>
-              <p>I choose organic ingredients where possible.</p>
+      {/* Edit Profile Modal */}
+      {showEditModal && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h3>Edit Profile</h3>
+            <input type="text" value={editData.username} onChange={e=>setEditData({...editData, username:e.target.value})} />
+            <input type="email" value={editData.email} onChange={e=>setEditData({...editData, email:e.target.value})} />
+            <div className="modal-buttons">
+              <button className="btn save-btn" onClick={saveProfile}>Save</button>
+              <button className="btn cancel-btn" onClick={()=>setShowEditModal(false)}>Cancel</button>
             </div>
           </div>
         </div>
-      </section>
+      )}
 
-      {/* Mood Theme Preview */}
-      <section className="section mood-theme">
-        <h2>Mood Theme Preview</h2>
-        <p>Current theme based on your latest mood.</p>
-        <div className="theme-card">
-          <div className="theme-img"></div>
-          <div>
-            <h4>Theme Preview</h4>
-            <p>You are currently using the theme based on your mood of Happy.</p>
+      {/* Change Password Modal */}
+      {showPasswordModal && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h3>Change Password</h3>
+            <input type="password" placeholder="Old Password" value={passwordData.oldPassword} onChange={e=>setPasswordData({...passwordData, oldPassword:e.target.value})} />
+            <input type="password" placeholder="New Password" value={passwordData.newPassword} onChange={e=>setPasswordData({...passwordData, newPassword:e.target.value})} />
+            <input type="password" placeholder="Confirm New Password" value={passwordData.confirmPassword} onChange={e=>setPasswordData({...passwordData, confirmPassword:e.target.value})} />
+            <div className="modal-buttons">
+              <button className="btn save-btn" onClick={changePassword}>Save</button>
+              <button className="btn cancel-btn" onClick={()=>setShowPasswordModal(false)}>Cancel</button>
+            </div>
           </div>
         </div>
-      </section>
-
-      {/* Theme Settings */}
-      <section className="section theme-settings">
-        <h2>Theme Settings</h2>
-        <p>Choose your preferred theme.</p>
-        <button className="btn save-btn">Save Changes</button>
-        <div className="theme-options">
-          <div className="theme-option">
-            🌙 Dark Mode
-          </div>
-          <div className="theme-option">
-            ☀️ Light Mode
-          </div>
-        </div>
-      </section>
+      )}
     </div>
   );
 };

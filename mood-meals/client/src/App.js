@@ -23,67 +23,73 @@ import Recipes from "./pages/Recipes";
 import SavedMealsPage from "./pages/SavedMealsPage";
 import FeedbackPage from "./pages/FeedbackPage";
 
+// Wrapper for protected pages with Navbar, Footer, and FloatingFeedbackButton
+const Layout = ({ children }) => (
+  <>
+    <Navbar />
+    {children}
+    <Footer />
+    <FloatingFeedbackButton />
+  </>
+);
+
 function App() {
   return (
     <Router>
-      {/* Floating feedback button available on all pages */}
-      <FloatingFeedbackButton />
-
       <Routes>
-        {/* Public Routes */}
+        {/* Public Routes - no navbar/footer/feedback */}
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
         {/* Protected Routes */}
         <Route path="/home" element={
           <ProtectedRoute>
-            <Navbar /><Home /><Footer />
+            <Layout><Home /></Layout>
           </ProtectedRoute>
         } />
         <Route path="/suggestions" element={
           <ProtectedRoute>
-            <Navbar /><MealSuggestions /><Footer />
+            <Layout><MealSuggestions /></Layout>
           </ProtectedRoute>
         } />
         <Route path="/meals" element={
           <ProtectedRoute>
-            <Navbar /><MealsDashboard /><Footer />
+            <Layout><MealsDashboard /></Layout>
           </ProtectedRoute>
         } />
         <Route path="/friends" element={
           <ProtectedRoute>
-            <Navbar /><Friends /><Footer />
+            <Layout><Friends /></Layout>
           </ProtectedRoute>
         } />
         <Route path="/recipes" element={
           <ProtectedRoute>
-            <Navbar /><Recipes /><Footer />
+            <Layout><Recipes /></Layout>
           </ProtectedRoute>
         } />
         <Route path="/recipes/:mealId" element={
           <ProtectedRoute>
-            <Navbar /><RecipePage /><Footer />
+            <Layout><RecipePage /></Layout>
           </ProtectedRoute>
         } />
         <Route path="/mood-tracker" element={
           <ProtectedRoute>
-            <Navbar /><MoodTracker /><Footer />
+            <Layout><MoodTracker /></Layout>
           </ProtectedRoute>
         } />
         <Route path="/profile" element={
           <ProtectedRoute>
-            <Navbar /><Profile /><Footer />
+            <Layout><Profile /></Layout>
           </ProtectedRoute>
         } />
         <Route path="/saved-meals" element={
           <ProtectedRoute>
-            <Navbar /><SavedMealsPage /><Footer />
+            <Layout><SavedMealsPage /></Layout>
           </ProtectedRoute>
         } />
-        {/* Feedback Page */}
         <Route path="/feedback" element={
           <ProtectedRoute>
-            <Navbar /><FeedbackPage /><Footer />
+            <Layout><FeedbackPage /></Layout>
           </ProtectedRoute>
         } />
 
@@ -91,21 +97,21 @@ function App() {
         <Route path="/admin" element={
           <ProtectedRoute>
             <AdminRoute>
-              <Navbar /><AdminPanel /><Footer />
+              <Layout><AdminPanel /></Layout>
             </AdminRoute>
           </ProtectedRoute>
         } />
         <Route path="/admin/add-meal" element={
           <ProtectedRoute>
             <AdminRoute>
-              <Navbar /><AddMealPage /><Footer />
+              <Layout><AddMealPage /></Layout>
             </AdminRoute>
           </ProtectedRoute>
         } />
         <Route path="/admin/edit-meal/:id" element={
           <ProtectedRoute>
             <AdminRoute>
-              <Navbar /><EditMealPage /><Footer />
+              <Layout><EditMealPage /></Layout>
             </AdminRoute>
           </ProtectedRoute>
         } />
