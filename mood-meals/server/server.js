@@ -38,6 +38,10 @@ app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
+const userMealsRoutes = require("./routes/userMeals");
+app.use("/api/user-meals", userMealsRoutes);
+
+
 // Global error handler
 app.use((err, req, res, next) => {
   console.error(err);
