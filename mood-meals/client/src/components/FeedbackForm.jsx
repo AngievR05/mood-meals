@@ -2,16 +2,13 @@ import React, { useState } from "react";
 import axios from "axios";
 import "../styles/FeedbackForm.css";
 
+const API_URL = "http://localhost:5000/api/feedback";
+
 const FeedbackForm = ({ onSuccess }) => {
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
-  const [attachments, setAttachments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
-  const handleFileChange = (e) => {
-    setAttachments([...e.target.files]);
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,21 +16,22 @@ const FeedbackForm = ({ onSuccess }) => {
     setError("");
 
     try {
-      const formData = new FormData();
-      formData.append("subject", subject);
-      formData.append("message", message);
-      attachments.forEach((file) => formData.append("attachment", file));
-
-      await axios.post("/api/feedback", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+      await axios.post(
+        API_URL,
+        {
+          subject,
+          message,
+          attachments: [], // no uploads for now
         },
-      });
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
 
       setSubject("");
       setMessage("");
-      setAttachments([]);
       if (onSuccess) onSuccess();
     } catch (err) {
       console.error(err.response?.data || err);
@@ -59,7 +57,6 @@ const FeedbackForm = ({ onSuccess }) => {
         onChange={(e) => setMessage(e.target.value)}
         required
       />
-      <input type="file" multiple onChange={handleFileChange} />
       {error && <p className="error">{error}</p>}
       <button type="submit" disabled={loading}>
         {loading ? "Sending..." : "Submit Feedback"}

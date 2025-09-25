@@ -1,14 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react"; 
 import FeedbackForm from "../components/FeedbackForm";
 import axios from "axios";
 import "../styles/FeedbackForm.css";
+
+const API_URL = "http://localhost:5000/api/feedback";
 
 const FeedbackPage = () => {
   const [pastFeedback, setPastFeedback] = useState([]);
 
   const fetchPastFeedback = async () => {
     try {
-      const res = await axios.get("/api/feedback/mine", {
+      const res = await axios.get(API_URL, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       setPastFeedback(res.data);
