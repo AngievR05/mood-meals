@@ -41,7 +41,7 @@ const Navbar = () => {
         <li><Link to="/friends">Friends</Link></li>
         <li><Link to="/profile">Profile</Link></li>
         {/* <li><Link to="/recipes">Recipes</Link></li> */}
-        <li><Link to="/feedback">Feedback</Link></li> {/* NEW LINK */}
+        {/* <li><Link to="/feedback">Feedback</Link></li> NEW LINK */}
 
         {/* Only show Admin Panel for admins */}
         {role === 'admin' && <li><Link to="/admin">Admin Panel</Link></li>}
