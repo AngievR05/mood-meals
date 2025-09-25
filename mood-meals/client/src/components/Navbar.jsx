@@ -40,6 +40,7 @@ const Navbar = () => {
         <li><Link to="/saved-meals">Saved Meals</Link></li> {/* NEW LINK */}
         <li><Link to="/friends">Friends</Link></li>
         <li><Link to="/profile">Profile</Link></li>
+        <li><Link to="/recipes">Recipes</Link></li>
 
         {/* Only show Admin Panel for admins */}
         {role === 'admin' && <li><Link to="/admin">Admin Panel</Link></li>}

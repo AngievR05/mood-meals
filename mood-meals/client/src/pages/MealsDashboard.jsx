@@ -121,7 +121,13 @@ const MealsDashboard = () => {
 
       <GrocerySection />
 
-      <MealsList role={role} fetchMealsTrigger={fetchTrigger} filter={activeFilter} currentMood={currentMood} />
+      <MealsList
+  role={role}
+  fetchMealsTrigger={fetchTrigger}
+  filter={activeFilter}
+  currentMood={currentMood}
+  showViewAllButton={true} // <-- enables the button
+/>
 
       <section className="suggestions-section">
         <MealSuggestions mood={currentMood} />

@@ -15,10 +15,10 @@ import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 import MoodTracker from './pages/MoodTracker';
 import Profile from './pages/Profile';
-import AdminPanel from './pages/AdminPanel'; // your admin page
+import AdminPanel from './pages/AdminPanel';
 import AddMealPage from "./pages/AddMealPage";
 import EditMealPage from "./pages/EditMealPage";
-import RecipesPage from "./pages/RecipesPage";
+import Recipes from "./pages/Recipes";
 import SavedMealsPage from "./pages/SavedMealsPage";
 
 function App() {
@@ -30,40 +30,20 @@ function App() {
         <Route path="/register" element={<Register />} />
 
         {/* Protected Routes */}
-        <Route
-          path="/*"
-          element={
-            <ProtectedRoute>
-              <>
-                <Navbar />
-                <Routes>
-                  <Route path="home" element={<Home />} />
-                  <Route path="suggestions" element={<MealSuggestions />} />
-                  <Route path="meals" element={<MealsDashboard />} />
-                  <Route path="friends" element={<Friends />} />
-                  <Route path="recipes/:mealName" element={<RecipePage />} />
-                  <Route path="mood-tracker" element={<MoodTracker />} />
-                  <Route path="profile" element={<Profile />} />
-                  <Route path="/admin/add-meal" element={<AddMealPage />} />
-                  <Route path="/admin/edit-meal/:id" element={<EditMealPage />} />
-                  <Route path="/recipes" element={<RecipesPage />} />
-                  <Route path="/saved-meals" element={<SavedMealsPage />} />
+        <Route path="/home" element={<ProtectedRoute><Navbar /><Home /><Footer /></ProtectedRoute>} />
+        <Route path="/suggestions" element={<ProtectedRoute><Navbar /><MealSuggestions /><Footer /></ProtectedRoute>} />
+        <Route path="/meals" element={<ProtectedRoute><Navbar /><MealsDashboard /><Footer /></ProtectedRoute>} />
+        <Route path="/friends" element={<ProtectedRoute><Navbar /><Friends /><Footer /></ProtectedRoute>} />
+        <Route path="/recipes" element={<ProtectedRoute><Navbar /><Recipes /><Footer /></ProtectedRoute>} />
+        <Route path="/recipes/:mealId" element={<ProtectedRoute><Navbar /><RecipePage /><Footer /></ProtectedRoute>} />
+        <Route path="/mood-tracker" element={<ProtectedRoute><Navbar /><MoodTracker /><Footer /></ProtectedRoute>} />
+        <Route path="/profile" element={<ProtectedRoute><Navbar /><Profile /><Footer /></ProtectedRoute>} />
+        <Route path="/saved-meals" element={<ProtectedRoute><Navbar /><SavedMealsPage /><Footer /></ProtectedRoute>} />
 
-                  {/* Admin-only route */}
-                  <Route
-                    path="admin"
-                    element={
-                      <AdminRoute>
-                        <AdminPanel />
-                      </AdminRoute>
-                    }
-                  />
-                </Routes>
-                <Footer />
-              </>
-            </ProtectedRoute>
-          }
-        />
+        {/* Admin Routes */}
+        <Route path="/admin" element={<ProtectedRoute><AdminRoute><Navbar /><AdminPanel /><Footer /></AdminRoute></ProtectedRoute>} />
+        <Route path="/admin/add-meal" element={<ProtectedRoute><AdminRoute><Navbar /><AddMealPage /><Footer /></AdminRoute></ProtectedRoute>} />
+        <Route path="/admin/edit-meal/:id" element={<ProtectedRoute><AdminRoute><Navbar /><EditMealPage /><Footer /></AdminRoute></ProtectedRoute>} />
       </Routes>
     </Router>
   );

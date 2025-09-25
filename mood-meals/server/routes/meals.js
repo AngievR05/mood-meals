@@ -2,25 +2,23 @@ const express = require("express");
 const router = express.Router();
 const { pool } = require("../config/db");
 const { verifyToken, verifyAdmin } = require("../middleware/auth");
+const multer = require("multer");
+const path = require("path");
 
-const multer = require('multer');
-const path = require('path');
-
-// Set up multer storage
+// ---------------- MULTER SETUP ---------------- //
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, 'uploads/'),
+  destination: (req, file, cb) => cb(null, "uploads/"),
   filename: (req, file, cb) => cb(null, Date.now() + path.extname(file.originalname)),
 });
 const upload = multer({ storage });
 
-// Upload endpoint (admin-only)
-router.post('/upload', verifyToken, verifyAdmin, upload.single('image'), (req, res) => {
-  if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
+// ---------------- UPLOAD IMAGE ---------------- //
+router.post("/upload", verifyToken, verifyAdmin, upload.single("image"), (req, res) => {
+  if (!req.file) return res.status(400).json({ message: "No file uploaded" });
   res.json({ imageUrl: `http://localhost:5000/uploads/${req.file.filename}` });
 });
 
-
-// CREATE new meal (admin-only)
+// ---------------- CREATE MEAL ---------------- //
 router.post("/", verifyToken, verifyAdmin, async (req, res) => {
   try {
     const { name, description, ingredients, mood, image_url, steps } = req.body;
@@ -35,7 +33,7 @@ router.post("/", verifyToken, verifyAdmin, async (req, res) => {
   }
 });
 
-// UPDATE meal (admin-only)
+// ---------------- UPDATE MEAL ---------------- //
 router.put("/:id", verifyToken, verifyAdmin, async (req, res) => {
   try {
     const { id } = req.params;
@@ -51,7 +49,7 @@ router.put("/:id", verifyToken, verifyAdmin, async (req, res) => {
   }
 });
 
-// DELETE meal (admin-only)
+// ---------------- DELETE MEAL ---------------- //
 router.delete("/:id", verifyToken, verifyAdmin, async (req, res) => {
   try {
     const { id } = req.params;
@@ -63,14 +61,14 @@ router.delete("/:id", verifyToken, verifyAdmin, async (req, res) => {
   }
 });
 
-// GET all meals (any logged-in user)
+// ---------------- GET ALL MEALS ---------------- //
 router.get("/", verifyToken, async (req, res) => {
   try {
     const [rows] = await pool.query("SELECT * FROM meals");
-    const meals = rows.map(row => ({
+    const meals = rows.map((row) => ({
       ...row,
       ingredients: JSON.parse(row.ingredients),
-      steps: row.steps ? JSON.parse(row.steps) : []
+      steps: row.steps ? JSON.parse(row.steps) : [],
     }));
     res.json(meals);
   } catch (err) {
@@ -79,14 +77,14 @@ router.get("/", verifyToken, async (req, res) => {
   }
 });
 
-// GET meals by mood (any logged-in user)
+// ---------------- GET MEALS BY MOOD ---------------- //
 router.get("/mood/:mood", verifyToken, async (req, res) => {
   try {
     const [rows] = await pool.query("SELECT * FROM meals WHERE mood = ?", [req.params.mood]);
-    const meals = rows.map(row => ({
+    const meals = rows.map((row) => ({
       ...row,
       ingredients: JSON.parse(row.ingredients),
-      steps: row.steps ? JSON.parse(row.steps) : []
+      steps: row.steps ? JSON.parse(row.steps) : [],
     }));
     res.json(meals);
   } catch (err) {
@@ -95,17 +93,17 @@ router.get("/mood/:mood", verifyToken, async (req, res) => {
   }
 });
 
-// GET meal by ID (any logged-in user)
+// ---------------- GET MEAL BY ID ---------------- //
+// Make sure this comes AFTER /mood/:mood to avoid route conflicts
 router.get("/:id", verifyToken, async (req, res) => {
   try {
     const [rows] = await pool.query("SELECT * FROM meals WHERE id = ?", [req.params.id]);
-    if (rows.length === 0)
-      return res.status(404).json({ message: "Meal not found" });
+    if (rows.length === 0) return res.status(404).json({ message: "Meal not found" });
 
     const meal = {
       ...rows[0],
       ingredients: JSON.parse(rows[0].ingredients),
-      steps: rows[0].steps ? JSON.parse(rows[0].steps) : []
+      steps: rows[0].steps ? JSON.parse(rows[0].steps) : [],
     };
 
     res.json(meal);

@@ -1,0 +1,138 @@
+:root {
+  --primary-blue: #5d9cec;
+  --secondary-blue: #4a89dc;
+  --neutral-light: #f9f9f9;
+  --text-dark: #0d2633;
+  --text-muted: #345;
+  --white: #fff;
+  --radius-md: 12px;
+  --shadow-sm: 0 6px 18px rgba(0, 0, 0, 0.06);
+  --shadow-hover: 0 16px 40px rgba(0, 0, 0, 0.08);
+}
+
+/* Container */
+.recipes-page {
+  padding: 2rem 1.6rem;
+  background: linear-gradient(180deg, #eaf6ff, #dfefff);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Heading */
+.recipes-page h1 {
+  font-size: 1.6rem;
+  margin-bottom: 1rem;
+  color: var(--text-dark);
+}
+
+/* Mood filter dropdown */
+.recipes-filter {
+  margin-bottom: 1.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.95rem;
+  color: var(--text-dark);
+}
+
+.recipes-filter select {
+  padding: 0.4rem 0.8rem;
+  border-radius: var(--radius-md);
+  border: 1px solid #ccc;
+  font-size: 0.95rem;
+}
+
+/* Grid */
+.recipes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.2rem;
+}
+
+/* Card */
+.recipe-card {
+  background: var(--white);
+  padding: 1.2rem;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.recipe-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-hover);
+}
+
+.recipe-card h3 {
+  margin: 0;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.recipe-card p {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin: 0.6rem 0 1rem 0;
+  flex-grow: 1;
+}
+
+/* Button */
+.recipe-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  background: var(--primary-blue);
+  color: var(--white);
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.recipe-btn:hover {
+  background: var(--secondary-blue);
+}
+
+/* Empty state */
+.no-meals {
+  text-align: center;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  margin-top: 1.2rem;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 1rem 2rem;
+  max-width: 600px;
+  width: 90%;
+  border-radius: 12px;
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.close-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  font-size: 1.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
