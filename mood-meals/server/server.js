@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
+const path = require('path');
 
 const { pool } = require('./config/db');
 const authRoutes = require('./routes/auth');
@@ -10,6 +11,7 @@ const moodsRoutes = require('./routes/moods');
 const mealsRoutes = require('./routes/meals');
 const groceriesRouter = require('./routes/groceries');
 const recommendationsRoutes = require('./routes/recommendations');
+const savedMealsRoutes = require("./routes/savedMeals");
 
 const app = express();
 app.use(helmet());
@@ -26,6 +28,10 @@ app.use('/api/moods', moodsRoutes);
 app.use('/api/meals', mealsRoutes);
 app.use('/api/groceries', groceriesRouter);
 app.use('/api/recommendations', recommendationsRoutes);
+app.use("/api/saved-meals", savedMealsRoutes);
+
+// Serve uploaded images
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // 404 handler
 app.use((req, res) => {
@@ -39,14 +45,6 @@ app.use((err, req, res, next) => {
     error: err.message || 'Internal Server Error',
   });
 });
-
-// Serve uploaded images
-const path = require('path');
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-const savedMealsRoutes = require("./routes/savedMeals");
-app.use("/api/saved-meals", savedMealsRoutes);
-
 
 const DEFAULT_PORT = parseInt(process.env.PORT, 10) || 5000;
 const MAX_PORT_TRIES = 10;
