@@ -38,33 +38,34 @@ const Profile = () => {
   const [editData, setEditData] = useState({});
   const [passwordData, setPasswordData] = useState({ oldPassword:'', newPassword:'', confirmPassword:'' });
 
-  // Fetch all profile data
+  // Axios config with Bearer token
+  const authConfig = { headers: { Authorization: `Bearer ${token}` } };
+
   useEffect(() => {
     if (!token) {
       navigate('/');
       return;
     }
 
-    const config = { headers: { 'x-auth-token': token } };
-
     const fetchProfileData = async () => {
       try {
         // Profile
-        const userRes = await axios.get('http://localhost:5000/api/profile', config);
+        const userRes = await axios.get('http://localhost:5000/api/profile', authConfig);
         setUser(userRes.data);
         setEditData({ username: userRes.data.username, email: userRes.data.email, avatar: userRes.data.avatar || 'Happy' });
 
         // Mood Stats
-        const moodRes = await axios.get('http://localhost:5000/api/profile/mood-stats', config);
+        const moodRes = await axios.get('http://localhost:5000/api/profile/mood-stats', authConfig);
         setMoodStats(moodRes.data);
 
         // Streak
-        const streakRes = await axios.get('http://localhost:5000/api/profile/streak', config);
+        const streakRes = await axios.get('http://localhost:5000/api/profile/streak', authConfig);
         setStreak(streakRes.data.streak);
 
         // Saved Meals
-        const mealsRes = await axios.get('http://localhost:5000/api/profile/saved-meals', config);
+        const mealsRes = await axios.get('http://localhost:5000/api/profile/saved-meals', authConfig);
         setSavedMeals(mealsRes.data);
+
       } catch (err) {
         console.error(err);
         if(err.response?.status === 401) {
@@ -86,8 +87,7 @@ const Profile = () => {
 
   const saveProfile = async () => {
     try {
-      const config = { headers: { 'x-auth-token': token } };
-      await axios.put('http://localhost:5000/api/profile', editData, config);
+      await axios.put('http://localhost:5000/api/profile', editData, authConfig);
       setUser(prev => ({ ...prev, ...editData }));
       setShowEditModal(false);
     } catch(err){
@@ -102,8 +102,7 @@ const Profile = () => {
       return;
     }
     try{
-      const config = { headers: { 'x-auth-token': token } };
-      await axios.put('http://localhost:5000/api/profile/change-password', passwordData, config);
+      await axios.put('http://localhost:5000/api/profile/change-password', passwordData, authConfig);
       alert('Password updated successfully');
       setShowPasswordModal(false);
       setPasswordData({ oldPassword:'', newPassword:'', confirmPassword:'' });

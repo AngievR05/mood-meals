@@ -4,9 +4,11 @@ import { isTokenValid } from '../utils/auth';
 
 const ProtectedRoute = ({ children }) => {
   const tokenValid = isTokenValid();
+  console.log('ProtectedRoute: tokenValid =', tokenValid); // <-- add this
+
   if (!tokenValid) {
-    localStorage.removeItem('token');  // clear invalid token
-    localStorage.removeItem('role');   // clear stored role
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
     return <Navigate to="/" replace />; // redirect to login
   }
   return children;
