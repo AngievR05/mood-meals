@@ -2,30 +2,160 @@
   --primary-blue: #5d9cec;
   --secondary-blue: #4a89dc;
   --white: #f0f4ff;
-  --radius-lg: 20px;
-  --shadow-lg: 0 10px 30px rgba(74,137,220,0.35);
+  --radius-lg: 18px;
+  --shadow-lg: 0 10px 30px rgba(74, 137, 220, 0.25);
+  --shadow-hover: 0 8px 24px rgba(74, 137, 220, 0.35);
+  --text-light: #eaf4ff;
+  --text-medium: #cfe3ff;
+  --text-muted: #dbeeff;
 }
 
+/* Main container */
 .recipe-page {
-  max-width: 1100px;
-  margin: 2.2rem auto;
+  max-width: 1000px;
+  margin: 2rem auto;
   padding: 2rem;
-  background: linear-gradient(135deg,#5d9cec 0%, #4a89dc 100%);
+  background: linear-gradient(145deg, #5d9cec 0%, #4a89dc 100%);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
   color: var(--white);
-  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255,255,255,0.12);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  position: relative;
 }
 
-.recipe-page h1 { font-size:2.6rem; text-align:center; margin-bottom:.6rem; color:#eaf4ff; font-weight:900; text-shadow: 1px 1px 6px rgba(0,0,0,0.25); letter-spacing: .6px;}
+/* Close / Back button */
+.back-btn {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--white);
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
 
-.recipe-description { font-size:1.05rem; color: #dbeeff; text-align:center; margin:0 auto 1.4rem; max-width:680px; font-style:italic; line-height:1.45; }
+.back-btn:hover {
+  background: rgba(255, 255, 255, 0.35);
+  transform: translateY(-2px);
+}
 
-.recipe-page h2 { font-size:1.25rem; margin-top:1.6rem; margin-bottom:.8rem; color:#cfe3ff; border-bottom: 3px solid rgba(255,255,255,0.12); padding-bottom:.4rem; font-weight:700; }
+/* Title */
+.recipe-page h1 {
+  font-size: 2.4rem;
+  text-align: center;
+  margin-bottom: 0.8rem;
+  color: var(--white);
+  font-weight: 900;
+  letter-spacing: 0.6px;
+}
 
-.recipe-list { padding-left:1.4rem; line-height:1.8; color:#e6f0ff; font-weight:600; }
-.recipe-list li { margin-bottom:.6rem; position:relative; padding-left:1.1rem; }
-.recipe-list li::before { position:absolute; left:0; top:0; color:#d1e8ff; font-size:1.2rem; user-select:none; content: '•'; }
-.recipe-list li:hover { color:#fff; text-shadow: 0 0 6px rgba(255,255,255,0.08); cursor:default; }
+/* Recipe image */
+.recipe-image {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 1.4rem auto;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Description */
+.recipe-description {
+  font-size: 1.05rem;
+  color: var(--text-light);
+  text-align: center;
+  margin: 1rem auto 1.6rem;
+  max-width: 700px;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+/* Section headings */
+.recipe-page h2 {
+  font-size: 1.3rem;
+  margin-top: 1.8rem;
+  margin-bottom: 1rem;
+  color: var(--text-medium);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.15);
+  padding-bottom: 0.4rem;
+  font-weight: 700;
+}
+
+/* Ingredients (unordered list) */
+.recipe-list ul {
+  list-style: none; /* remove default bullets */
+  padding-left: 1.6rem;
+  line-height: 1.8;
+  color: var(--text-light);
+  font-weight: 600;
+}
+
+.recipe-list ul li {
+  margin-bottom: 0.7rem;
+  position: relative;
+  padding-left: 1.2rem;
+  transition: color 0.2s ease, text-shadow 0.2s ease;
+}
+
+.recipe-list ul li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  user-select: none;
+}
+
+.recipe-list ul li:hover {
+  color: var(--white);
+  text-shadow: 0 0 6px rgba(255, 255, 255, 0.12);
+  cursor: default;
+}
+
+/* Steps (ordered list) */
+.recipe-list ol {
+  counter-reset: step-counter;
+  list-style: none;
+  padding-left: 1.6rem;
+}
+
+.recipe-list ol li {
+  counter-increment: step-counter;
+  position: relative;
+  margin-bottom: 0.7rem;
+  padding-left: 1.8rem;
+}
+
+.recipe-list ol li::before {
+  content: counter(step-counter) ". ";
+  position: absolute;
+  left: 0;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+/* Loading / Error */
+.recipe-loading,
+.error-title,
+.error-msg {
+  text-align: center;
+  margin-top: 2rem;
+  color: var(--text-light);
+}
+
+.error-title {
+  font-size: 2rem;
+  font-weight: 900;
+  margin-bottom: 0.5rem;
+}
+
+.error-msg {
+  font-size: 1rem;
+}

@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
 import Slider from "react-slick";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 import "../styles/MealSuggestions.css";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import RecipePage from "./RecipePage";
 
 const MealSuggestions = ({ currentMood }) => {
   const [meals, setMeals] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const navigate = useNavigate();
+  const [selectedMealId, setSelectedMealId] = useState(null);
 
   useEffect(() => {
     const fetchMealsByMood = async () => {
@@ -42,8 +42,12 @@ const MealSuggestions = ({ currentMood }) => {
     fetchMealsByMood();
   }, [currentMood]);
 
-  const openRecipe = (meal) => {
-    navigate(`/recipes/${encodeURIComponent(meal.name)}`);
+  const openRecipe = (mealId) => {
+    setSelectedMealId(mealId);
+  };
+
+  const closeRecipeModal = () => {
+    setSelectedMealId(null);
   };
 
   const settings = {
@@ -86,12 +90,21 @@ const MealSuggestions = ({ currentMood }) => {
               loading="lazy"
             />
             <p className="meal-name">{meal.name}</p>
-            <button className="view-recipe-btn" onClick={() => openRecipe(meal)}>
+            <button className="view-recipe-btn" onClick={() => openRecipe(meal.id)}>
               View Recipe
             </button>
           </div>
         ))}
       </Slider>
+
+      {/* Recipe modal */}
+      {selectedMealId && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <RecipePage mealId={selectedMealId} onClose={closeRecipeModal} />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -128,10 +128,10 @@ const MealsDashboard = () => {
   currentMood={currentMood}
   showViewAllButton={true} // <-- enables the button
 />
-
+{/* 
       <section className="suggestions-section">
         <MealSuggestions mood={currentMood} />
-      </section>
+      </section> */}
     </div>
   );
 };
