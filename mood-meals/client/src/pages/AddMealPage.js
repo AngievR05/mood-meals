@@ -18,6 +18,8 @@ const AddMealPage = () => {
     steps: [""],
   });
   const [imageFile, setImageFile] = useState(null);
+  const [preview, setPreview] = useState(null);
+  const [uploading, setUploading] = useState(false);
 
   const handleChange = (e) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -33,31 +35,46 @@ const AddMealPage = () => {
   const removeStep = (index) => setFormData(prev => ({ ...prev, steps: prev.steps.filter((_, i) => i !== index) }));
 
   const handleImageChange = (e) => {
-    if (e.target.files[0]) setImageFile(e.target.files[0]);
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      setPreview(URL.createObjectURL(file));
+    }
   };
 
   const uploadImage = async () => {
-    if (!imageFile) return "";
+    if (!imageFile) return formData.image_url || "";
+    setUploading(true);
+
     const data = new FormData();
     data.append("image", imageFile);
+
     try {
       const res = await fetch("http://localhost:5000/api/meals/upload", {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {
+          Authorization: `Bearer ${token}`, // only auth header
+        },
         body: data,
       });
+
       const result = await res.json();
       if (!res.ok) throw new Error(result.message || "Upload failed");
+      setPreview(result.imageUrl); // automatically display uploaded image
       return result.imageUrl;
     } catch (err) {
       toast.error(err.message);
       return "";
+    } finally {
+      setUploading(false);
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const uploadedUrl = await uploadImage();
+
     const body = {
       name: formData.name,
       description: formData.description,
@@ -75,6 +92,7 @@ const AddMealPage = () => {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Error saving meal");
+
       toast.success("Meal added successfully!");
       navigate("/admin");
     } catch (err) {
@@ -89,12 +107,13 @@ const AddMealPage = () => {
         <input type="text" name="name" placeholder="Meal Name" value={formData.name} onChange={handleChange} required />
         <textarea name="description" placeholder="Description" value={formData.description} onChange={handleChange} required />
         <input type="text" name="ingredients" placeholder="Ingredients (comma separated)" value={formData.ingredients} onChange={handleChange} required />
+
         <select name="mood" value={formData.mood} onChange={handleChange}>
           {moods.map(m => <option key={m} value={m}>{m}</option>)}
         </select>
 
         <input type="file" accept="image/*" onChange={handleImageChange} />
-        {formData.image_url && <img src={formData.image_url} alt="Preview" className="image-preview" />}
+        {preview && <img src={preview} alt="Preview" className="image-preview" />}
 
         <h3>Steps</h3>
         {formData.steps.map((step, idx) => (
@@ -106,7 +125,9 @@ const AddMealPage = () => {
         <button type="button" className="add-step-btn" onClick={addStep}>+ Add Step</button>
 
         <div className="modal-buttons">
-          <button type="submit" className="primary-btn">Add Meal</button>
+          <button type="submit" className="primary-btn" disabled={uploading}>
+            {uploading ? "Uploading..." : "Add Meal"}
+          </button>
           <button type="button" className="secondary-btn" onClick={() => navigate("/admin")}>Cancel</button>
         </div>
       </form>

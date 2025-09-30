@@ -5,7 +5,6 @@ import { toast } from "react-toastify";
 
 const moods = ["Happy", "Sad", "Angry", "Stressed", "Bored", "Energised", "Confused", "Grateful"];
 
-
 const EditMealPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -19,13 +18,19 @@ const EditMealPage = () => {
     image_url: "",
     steps: [""],
   });
-  const [imageFile, setImageFile] = useState(null);
-  const [loading, setLoading] = useState(true);
 
+  const [imageFile, setImageFile] = useState(null);
+  const [preview, setPreview] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [uploading, setUploading] = useState(false);
+
+  // Fetch meal data on mount
   useEffect(() => {
     const fetchMeal = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/meals/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+        const res = await fetch(`http://localhost:5000/api/meals/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         if (!res.ok) throw new Error("Failed to fetch meal");
         const meal = await res.json();
         setFormData({
@@ -36,10 +41,13 @@ const EditMealPage = () => {
           image_url: meal.image_url,
           steps: meal.steps || [""],
         });
+        setPreview(meal.image_url);
       } catch (err) {
         toast.error(err.message);
         navigate("/admin");
-      } finally { setLoading(false); }
+      } finally {
+        setLoading(false);
+      }
     };
     fetchMeal();
   }, [id, token, navigate]);
@@ -52,23 +60,43 @@ const EditMealPage = () => {
   };
   const addStep = () => setFormData(prev => ({ ...prev, steps: [...prev.steps, ""] }));
   const removeStep = (index) => setFormData(prev => ({ ...prev, steps: prev.steps.filter((_, i) => i !== index) }));
-  const handleImageChange = (e) => { if (e.target.files[0]) setImageFile(e.target.files[0]); };
 
+  // Handle file input & preview
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      setPreview(URL.createObjectURL(file));
+    }
+  };
+
+  // Upload image to server
   const uploadImage = async () => {
     if (!imageFile) return formData.image_url;
+    setUploading(true);
+
     const data = new FormData();
     data.append("image", imageFile);
+
     try {
-      const res = await fetch("http://localhost:5000/api/meals/upload", { method: "POST", headers: { Authorization: `Bearer ${token}` }, body: data });
+      const res = await fetch("http://localhost:5000/api/meals/upload", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: data,
+      });
       const result = await res.json();
       if (!res.ok) throw new Error(result.message || "Upload failed");
+      setPreview(result.imageUrl); // display uploaded image automatically
       return result.imageUrl;
     } catch (err) {
       toast.error(err.message);
       return formData.image_url;
+    } finally {
+      setUploading(false);
     }
   };
 
+  // Submit updated meal
   const handleSubmit = async (e) => {
     e.preventDefault();
     const uploadedUrl = await uploadImage();
@@ -82,7 +110,11 @@ const EditMealPage = () => {
     };
 
     try {
-      const res = await fetch(`http://localhost:5000/api/meals/${id}`, { method: "PUT", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify(body) });
+      const res = await fetch(`http://localhost:5000/api/meals/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify(body),
+      });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Error updating meal");
       toast.success("Meal updated successfully!");
@@ -106,7 +138,7 @@ const EditMealPage = () => {
         </select>
 
         <input type="file" accept="image/*" onChange={handleImageChange} />
-        {formData.image_url && <img src={formData.image_url} alt="Preview" className="image-preview" />}
+        {preview && <img src={preview} alt="Preview" className="image-preview" />}
 
         <h3>Steps</h3>
         {formData.steps.map((step, idx) => (
@@ -118,7 +150,9 @@ const EditMealPage = () => {
         <button type="button" className="add-step-btn" onClick={addStep}>+ Add Step</button>
 
         <div className="modal-buttons">
-          <button type="submit" className="primary-btn">Update Meal</button>
+          <button type="submit" className="primary-btn" disabled={uploading}>
+            {uploading ? "Uploading..." : "Update Meal"}
+          </button>
           <button type="button" className="secondary-btn" onClick={() => navigate("/admin")}>Cancel</button>
         </div>
       </form>

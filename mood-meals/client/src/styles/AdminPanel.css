@@ -1,8 +1,8 @@
-/* AdminPanel.css */
+/* Admin Panel Container */
 .admin-panel {
   max-width: 960px;
   margin: 2rem auto;
-  padding: 1.5rem;
+  padding: 2rem;
   background: #fefefe;
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.07);
@@ -12,77 +12,88 @@
 
 .admin-panel h1 {
   font-size: 2rem;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
   text-align: center;
   color: #4a89dc;
 }
 
+/* Tabs and Controls */
 .admin-controls {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
   gap: 1rem;
   margin-bottom: 1rem;
-}
-
-.admin-controls select {
-  padding: 0.5rem;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 1rem;
-}
-
-.primary-btn,
-.edit-btn,
-.delete-btn,
-.resolve-btn {
-  cursor: pointer;
-  border: none;
-  border-radius: 8px;
-  padding: 0.5rem 1rem;
-  font-weight: 600;
-  transition: all 0.2s ease;
+  flex-wrap: wrap;
 }
 
 .primary-btn {
   background: #5d9cec;
   color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1.25rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .primary-btn:hover {
   background: #4a89dc;
 }
 
+.primary-btn:disabled {
+  background: #aac4f5;
+  cursor: not-allowed;
+}
+
 .primary-btn.active-tab {
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  background: #4a89dc;
 }
 
-.edit-btn {
-  background: #f0ad4e;
-  color: #fff;
-  margin-right: 0.5rem;
+.secondary-btn {
+  background: #e0e0e0;
+  color: #333;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1.25rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.edit-btn:hover {
-  background: #ec971f;
+.secondary-btn:hover {
+  background: #d5d5d5;
 }
 
-.delete-btn {
-  background: #d9534f;
-  color: #fff;
+/* Forms */
+.admin-panel form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
-.delete-btn:hover {
-  background: #c9302c;
+.admin-panel input[type="text"],
+.admin-panel input[type="file"],
+.admin-panel textarea,
+.admin-panel select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  font-family: 'Inter', sans-serif;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.resolve-btn {
-  background: #5cb85c;
-  color: #fff;
+.admin-panel input:focus,
+.admin-panel textarea:focus,
+.admin-panel select:focus {
+  outline: none;
+  border-color: #5d9cec;
+  box-shadow: 0 0 5px rgba(93, 156, 236, 0.4);
 }
 
-.resolve-btn:hover {
-  background: #4cae4c;
+textarea {
+  resize: vertical;
+  min-height: 80px;
 }
 
 /* Tables */
@@ -113,17 +124,120 @@
   background: #f0f4ff;
 }
 
+/* Action Buttons in Tables */
+.edit-btn {
+  background: #5d9cec;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.edit-btn:hover {
+  background: #4a89dc;
+}
+
+.delete-btn {
+  background: #e74c3c;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.delete-btn:hover {
+  background: #c0392b;
+}
+
+.resolve-btn {
+  background: #2ecc71;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.resolve-btn:hover {
+  background: #27ae60;
+}
+
+/* Image preview */
+.image-preview {
+  max-width: 300px;
+  max-height: 200px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-top: 0.5rem;
+  border: 1px solid #ccc;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* Steps section in forms */
+.step-input {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.step-input input {
+  flex: 1;
+}
+
+.delete-step-btn {
+  background: #d9534f;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.delete-step-btn:hover {
+  background: #c9302c;
+}
+
+.add-step-btn {
+  background: #5cb85c;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  align-self: flex-start;
+  transition: background 0.2s ease;
+}
+
+.add-step-btn:hover {
+  background: #4cae4c;
+}
+
+/* Modal Buttons */
+.modal-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
-  .admin-controls {
+  .step-input {
     flex-direction: column;
     align-items: stretch;
   }
 
-  .meals-table th,
-  .meals-table td,
-  .feedback-table th,
-  .feedback-table td {
-    padding: 0.5rem;
+  .modal-buttons {
+    flex-direction: column;
+  }
+
+  .admin-panel {
+    padding: 1rem;
   }
 }

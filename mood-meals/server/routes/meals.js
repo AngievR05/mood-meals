@@ -4,111 +4,136 @@ const { pool } = require("../config/db");
 const { verifyToken, verifyAdmin } = require("../middleware/auth");
 const multer = require("multer");
 const path = require("path");
+const fs = require("fs");
 
-// ---------------- MULTER SETUP ---------------- //
+// ------------------ UPLOAD SETUP ------------------
+const uploadDir = path.join(__dirname, "../uploads");
+if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
+
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, "uploads/"),
+  destination: (req, file, cb) => cb(null, uploadDir),
   filename: (req, file, cb) => cb(null, Date.now() + path.extname(file.originalname)),
 });
-const upload = multer({ storage });
 
-// ---------------- UPLOAD IMAGE ---------------- //
-router.post("/upload", verifyToken, verifyAdmin, upload.single("image"), (req, res) => {
-  if (!req.file) return res.status(400).json({ message: "No file uploaded" });
-  res.json({ imageUrl: `http://localhost:5000/uploads/${req.file.filename}` });
+const upload = multer({
+  storage,
+  fileFilter: (req, file, cb) => {
+    if (!file.mimetype.startsWith("image/")) {
+      return cb(new Error("Only image files are allowed!"));
+    }
+    cb(null, true);
+  },
 });
 
-// ---------------- CREATE MEAL ---------------- //
+// Helper to safely parse JSON
+const safeParseJSON = (json, defaultValue = []) => {
+  try {
+    return JSON.parse(json);
+  } catch {
+    return defaultValue;
+  }
+};
+
+// ------------------ ROUTES ------------------
+
+// Upload meal image
+router.post("/upload", verifyToken, verifyAdmin, upload.single("image"), (req, res) => {
+  if (!req.file) return res.status(400).json({ message: "No file uploaded" });
+  const fullUrl = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
+  res.json({ imageUrl: fullUrl });
+});
+
+// Create a new meal
 router.post("/", verifyToken, verifyAdmin, async (req, res) => {
   try {
     const { name, description, ingredients, mood, image_url, steps } = req.body;
-    await pool.query(
-      "INSERT INTO meals (name, description, ingredients, mood, image_url, steps) VALUES (?, ?, ?, ?, ?, ?)",
+    const [result] = await pool.query(
+      `INSERT INTO meals 
+       (name, description, ingredients, mood, image_url, steps, created_at) 
+       VALUES (?, ?, ?, ?, ?, ?, NOW())`,
       [name, description, JSON.stringify(ingredients), mood, image_url, JSON.stringify(steps || [])]
     );
-    res.status(201).json({ message: "Meal added successfully" });
+    res.status(201).json({ message: "Meal added successfully", mealId: result.insertId });
   } catch (err) {
-    console.error("Error adding meal:", err);
+    console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 });
 
-// ---------------- UPDATE MEAL ---------------- //
+// Update a meal
 router.put("/:id", verifyToken, verifyAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     const { name, description, ingredients, mood, image_url, steps } = req.body;
     await pool.query(
-      "UPDATE meals SET name = ?, description = ?, ingredients = ?, mood = ?, image_url = ?, steps = ? WHERE id = ?",
+      `UPDATE meals SET 
+         name = ?, description = ?, ingredients = ?, mood = ?, image_url = ?, steps = ? 
+       WHERE id = ?`,
       [name, description, JSON.stringify(ingredients), mood, image_url, JSON.stringify(steps || []), id]
     );
     res.json({ message: "Meal updated successfully" });
   } catch (err) {
-    console.error("Error updating meal:", err);
+    console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 });
 
-// ---------------- DELETE MEAL ---------------- //
+// Delete a meal
 router.delete("/:id", verifyToken, verifyAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     await pool.query("DELETE FROM meals WHERE id = ?", [id]);
     res.json({ message: "Meal deleted successfully" });
   } catch (err) {
-    console.error("Error deleting meal:", err);
+    console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 });
 
-// ---------------- GET ALL MEALS ---------------- //
-router.get("/", verifyToken, async (req, res) => {
-  try {
-    const [rows] = await pool.query("SELECT * FROM meals");
-    const meals = rows.map((row) => ({
-      ...row,
-      ingredients: JSON.parse(row.ingredients),
-      steps: row.steps ? JSON.parse(row.steps) : [],
-    }));
-    res.json(meals);
-  } catch (err) {
-    console.error("Error fetching meals:", err);
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
-// ---------------- GET MEALS BY MOOD ---------------- //
-router.get("/mood/:mood", verifyToken, async (req, res) => {
-  try {
-    const [rows] = await pool.query("SELECT * FROM meals WHERE mood = ?", [req.params.mood]);
-    const meals = rows.map((row) => ({
-      ...row,
-      ingredients: JSON.parse(row.ingredients),
-      steps: row.steps ? JSON.parse(row.steps) : [],
-    }));
-    res.json(meals);
-  } catch (err) {
-    console.error("Error fetching meals by mood:", err);
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
-// ---------------- GET MEAL BY ID ---------------- //
-// Make sure this comes AFTER /mood/:mood to avoid route conflicts
+// Get meal by ID
 router.get("/:id", verifyToken, async (req, res) => {
   try {
     const [rows] = await pool.query("SELECT * FROM meals WHERE id = ?", [req.params.id]);
-    if (rows.length === 0) return res.status(404).json({ message: "Meal not found" });
-
-    const meal = {
-      ...rows[0],
-      ingredients: JSON.parse(rows[0].ingredients),
-      steps: rows[0].steps ? JSON.parse(rows[0].steps) : [],
-    };
-
+    if (!rows.length) return res.status(404).json({ message: "Meal not found" });
+    const meal = rows[0];
+    meal.ingredients = safeParseJSON(meal.ingredients);
+    meal.steps = safeParseJSON(meal.steps);
     res.json(meal);
   } catch (err) {
-    console.error("Error fetching meal:", err);
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Get all meals
+router.get("/", verifyToken, async (req, res) => {
+  try {
+    const [rows] = await pool.query("SELECT * FROM meals ORDER BY created_at DESC");
+    const meals = rows.map((r) => ({
+      ...r,
+      ingredients: safeParseJSON(r.ingredients),
+      steps: safeParseJSON(r.steps),
+    }));
+    res.json(meals);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Get meals by mood (case-insensitive, filtered in SQL)
+router.get("/mood/:mood", verifyToken, async (req, res) => {
+  try {
+    const moodParam = req.params.mood.toLowerCase();
+    const [rows] = await pool.query("SELECT * FROM meals WHERE LOWER(mood) = ? ORDER BY created_at DESC", [moodParam]);
+    const meals = rows.map(r => ({
+      ...r,
+      ingredients: safeParseJSON(r.ingredients),
+      steps: safeParseJSON(r.steps),
+    }));
+    res.json(meals);
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 });
