@@ -1,33 +1,24 @@
 const express = require('express');
-const {
-  getUser,
-  updateUser,
-  changePassword,
-  getStreak,
-  getSavedMeals,
-  getMoodStats,
-} = require('../controllers/userController');
-
-const { verifyToken } = require('../middleware/auth');
-
 const router = express.Router();
+const { verifyToken } = require('../middleware/auth');
+const profileController = require('../controllers/profileController');
 
-// Profile info
-router.get('/', verifyToken, getUser);
+// PROFILE
+router.get('/', verifyToken, profileController.getProfile);
+router.put('/', verifyToken, profileController.updateProfile);
+router.put('/change-password', verifyToken, profileController.changePassword);
 
-// Update profile info
-router.put('/', verifyToken, updateUser);
+// STATS
+router.get('/streak', verifyToken, profileController.getStreak);
+router.get('/saved-meals', verifyToken, profileController.getSavedMeals);
+router.get('/mood-entries', verifyToken, profileController.getMoodEntries);
+router.get('/current-mood', verifyToken, profileController.getCurrentMood);
+router.get('/grocery-count', verifyToken, profileController.getGroceryCount);
+router.get('/meal-stats', verifyToken, profileController.getMealStats);
+router.get('/preferences', verifyToken, profileController.getPreferences);
+router.put('/preferences', verifyToken, profileController.updatePreferences);
+router.get('/journal', verifyToken, profileController.getJournal);
+router.post('/journal', verifyToken, profileController.addJournal);
 
-// Change password
-router.put('/change-password', verifyToken, changePassword);
-
-// Mood streak
-router.get('/streak', verifyToken, getStreak);
-
-// Saved meals
-router.get('/saved-meals', verifyToken, getSavedMeals);
-
-// Mood stats for chart
-router.get('/mood-stats', verifyToken, getMoodStats);
 
 module.exports = router;
