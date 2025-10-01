@@ -13,7 +13,6 @@ const Friends = () => {
   const [snackbar, setSnackbar] = useState({ message: "", type: "" });
 
   const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
-  const userId = parseInt(localStorage.getItem("userId"));
 
   const showSnackbar = (message, type = "success") => {
     setSnackbar({ message, type });
@@ -26,11 +25,11 @@ const Friends = () => {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
 
-      // Enhance lists with last moods / last meals
       const enhance = list => list.map(f => ({
         ...f,
         last_moods: f.latest_mood ? [{ mood: f.latest_mood, notes: f.mood_time }] : [],
-        last_meals: f.last_meal ? [{ meal_name: f.last_meal }] : []
+        last_meals: f.last_meal ? [{ meal_name: f.last_meal }] : [],
+        encouragements: f.encouragements || []
       }));
 
       setFriends({
@@ -45,7 +44,7 @@ const Friends = () => {
   };
 
   const addFriend = async () => {
-    if (!newFriend.trim()) return showSnackbar("Please enter a username or email", "error");
+    if (!newFriend.trim()) return showSnackbar("Enter username or email", "error");
     try {
       const res = await axios.post(
         `${backendUrl}/api/friends/add`,
@@ -56,7 +55,6 @@ const Friends = () => {
       setNewFriend("");
       fetchFriends();
     } catch (err) {
-      console.error(err);
       showSnackbar(err.response?.data?.error || "Error sending friend request", "error");
     }
   };
@@ -80,14 +78,13 @@ const Friends = () => {
       showSnackbar(res.data.message);
       fetchFriends();
     } catch (err) {
-      console.error(err);
       showSnackbar(err.response?.data?.error || `Error ${action} friend`, "error");
     }
   };
 
   const sendEncouragement = async (friendId) => {
     const message = encourageMsgs[friendId];
-    if (!message.trim()) return showSnackbar("Enter a message first", "error");
+    if (!message?.trim()) return showSnackbar("Enter a message", "error");
     try {
       const res = await axios.post(
         `${backendUrl}/api/friends/encourage`,
@@ -96,14 +93,13 @@ const Friends = () => {
       );
       showSnackbar(res.data.message);
       setEncourageMsgs(prev => ({ ...prev, [friendId]: "" }));
+      fetchFriends();
     } catch (err) {
-      console.error(err);
       showSnackbar(err.response?.data?.error || "Error sending encouragement", "error");
     }
   };
 
   useEffect(() => { fetchFriends(); }, []);
-
   const { pendingReceived, pendingSent, accepted } = friends;
 
   return (
@@ -113,19 +109,21 @@ const Friends = () => {
         <div className={`snackbar show ${snackbar.type}`}>{snackbar.message}</div>
       )}
 
-      {/* Add Friend Section */}
+      {/* Add Friend */}
       <section className="connect-section card">
         <h2>Connect with Friends</h2>
-        <input
-          type="text"
-          placeholder="Add by username or email"
-          value={newFriend}
-          onChange={e => setNewFriend(e.target.value)}
-        />
-        <button onClick={addFriend}>Send Request</button>
+        <div className="connect-inputs">
+          <input
+            type="text"
+            placeholder="Add by username or email"
+            value={newFriend}
+            onChange={e => setNewFriend(e.target.value)}
+          />
+          <button onClick={addFriend}>Send Request</button>
+        </div>
       </section>
 
-      {/* Pending Requests Received */}
+      {/* Pending Received */}
       {pendingReceived.length > 0 && (
         <section className="pending-section">
           <h2>Pending Requests</h2>
@@ -141,7 +139,7 @@ const Friends = () => {
         </section>
       )}
 
-      {/* Pending Requests Sent */}
+      {/* Pending Sent */}
       {pendingSent.length > 0 && (
         <section className="pending-section">
           <h2>Sent Requests</h2>
@@ -165,28 +163,32 @@ const Friends = () => {
                 <button onClick={() => updateFriend("remove", f.friendship_id, f.friend_id)}>Remove</button>
               </div>
 
-<div className="feed-section">
-  {f.last_moods.slice(0, 3).map((m, idx) => (
-    <div key={idx} className="feed-item mood">
-      {m.mood} {m.notes ? `(${new Date(m.notes).toLocaleDateString()})` : ''}
-    </div>
-  ))}
-  {f.last_meals.slice(0, 3).map((m, idx) => (
-    <div key={idx} className="feed-item meal">🍽 {m.meal_name}</div>
-  ))}
+              {/* Feed grid */}
+              <div className="feed-section grid">
+                {f.last_moods.map((m, idx) => (
+                  <div key={idx} className="feed-item mood">
+                    {m.mood} {m.notes && `(${new Date(m.notes).toLocaleDateString()})`}
+                  </div>
+                ))}
+                {f.last_meals.map((m, idx) => (
+                  <div key={idx} className="feed-item meal">🍽 {m.meal_name}</div>
+                ))}
+                {f.encouragements.map((enc, idx) => (
+                  <div key={idx} className="feed-item encouragement-item">
+                    💌 {enc.message} ({new Date(enc.created_at).toLocaleDateString()})
+                  </div>
+                ))}
+              </div>
 
-  {/* All encouragements from this friend */}
-  {f.encouragements.length > 0 && (
-    <div className="feed-item encouragements">
-      {f.encouragements.map((enc, idx) => (
-        <div key={idx} className="encouragement-item">
-          💌 {enc.message} ({new Date(enc.created_at).toLocaleDateString()})
-        </div>
-      ))}
-    </div>
-  )}
-</div>
-
+              {/* Send encouragement */}
+              <div className="encourage-section">
+                <input
+                  placeholder="Send encouragement..."
+                  value={encourageMsgs[f.friend_id] || ""}
+                  onChange={e => setEncourageMsgs(prev => ({ ...prev, [f.friend_id]: e.target.value }))}
+                />
+                <button onClick={() => sendEncouragement(f.friend_id)}>Send</button>
+              </div>
             </div>
           ))}
         </section>
