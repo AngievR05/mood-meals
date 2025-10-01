@@ -3,7 +3,7 @@ const router = express.Router();
 const { pool } = require("../config/db");
 const { verifyToken } = require("../middleware/auth");
 
-// GET all friends + pending requests, separated
+// GET all friends + pending requests, separated, with all encouragements
 router.get("/", verifyToken, async (req, res) => {
   const userId = req.user.id;
 
@@ -69,13 +69,39 @@ router.get("/", verifyToken, async (req, res) => {
       [userId, userId, userId, userId]
     );
 
-    res.json({ pendingReceived, pendingSent, accepted });
+    // 4️⃣ Fetch all encouragements received by the user
+    const [allEncouragements] = await pool.query(
+      `
+      SELECT sender_id, receiver_id, message, created_at
+      FROM friend_encouragements
+      WHERE receiver_id = ?
+      ORDER BY created_at DESC
+      `,
+      [userId]
+    );
+
+    // Map encouragements by sender_id (friend)
+    const encouragementMap = {};
+    allEncouragements.forEach(enc => {
+      if (!encouragementMap[enc.sender_id]) encouragementMap[enc.sender_id] = [];
+      encouragementMap[enc.sender_id].push({
+        message: enc.message,
+        created_at: enc.created_at
+      });
+    });
+
+    // Attach encouragements array to each accepted friend
+    const acceptedWithEncouragements = accepted.map(f => ({
+      ...f,
+      encouragements: encouragementMap[f.friend_id] || []
+    }));
+
+    res.json({ pendingReceived, pendingSent, accepted: acceptedWithEncouragements });
   } catch (err) {
     console.error("Error fetching friends:", err);
     res.status(500).json({ error: "Error fetching friends" });
   }
 });
-
 
 // SEND friend request
 router.post("/add", verifyToken, async (req, res) => {

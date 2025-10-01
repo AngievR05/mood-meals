@@ -165,26 +165,28 @@ const Friends = () => {
                 <button onClick={() => updateFriend("remove", f.friendship_id, f.friend_id)}>Remove</button>
               </div>
 
-              <div className="feed-section">
-                {f.last_moods.slice(0, 3).map((m, idx) => (
-                  <div key={idx} className="feed-item mood">
-                    {m.mood} {m.notes ? `(${new Date(m.notes).toLocaleDateString()})` : ''}
-                  </div>
-                ))}
-                {f.last_meals.slice(0, 3).map((m, idx) => (
-                  <div key={idx} className="feed-item meal">🍽 {m.meal_name}</div>
-                ))}
-              </div>
+<div className="feed-section">
+  {f.last_moods.slice(0, 3).map((m, idx) => (
+    <div key={idx} className="feed-item mood">
+      {m.mood} {m.notes ? `(${new Date(m.notes).toLocaleDateString()})` : ''}
+    </div>
+  ))}
+  {f.last_meals.slice(0, 3).map((m, idx) => (
+    <div key={idx} className="feed-item meal">🍽 {m.meal_name}</div>
+  ))}
 
-              <div className="encourage-section">
-                <input
-                  type="text"
-                  value={encourageMsgs[f.friend_id] || ""}
-                  onChange={e => setEncourageMsgs(prev => ({ ...prev, [f.friend_id]: e.target.value }))}
-                  placeholder="Send encouragement..."
-                />
-                <button onClick={() => sendEncouragement(f.friend_id)}>Send</button>
-              </div>
+  {/* All encouragements from this friend */}
+  {f.encouragements.length > 0 && (
+    <div className="feed-item encouragements">
+      {f.encouragements.map((enc, idx) => (
+        <div key={idx} className="encouragement-item">
+          💌 {enc.message} ({new Date(enc.created_at).toLocaleDateString()})
+        </div>
+      ))}
+    </div>
+  )}
+</div>
+
             </div>
           ))}
         </section>
