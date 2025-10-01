@@ -1,12 +1,15 @@
 :root {
   --accent-yellow: #ffce54;
   --accent-green: #8fd694;
+  --accent-blue: #5d9cec;
   --neutral-light: #f9f9f9;
   --neutral-dark: #333;
   --white: #fff;
   --radius-md: 12px;
   --shadow-sm: 0 4px 12px rgba(0,0,0,0.06);
   --shadow-md: 0 10px 30px rgba(0,0,0,0.06);
+  --transition-fast: 0.2s ease;
+  --transition-medium: 0.35s ease;
 }
 
 /* Page base */
@@ -16,19 +19,23 @@
   min-height: 100vh;
   padding: 2rem;
   color: var(--neutral-dark);
+  animation: fadeIn 0.6s ease forwards;
 }
 
 /* Connect / Add Friend Section */
 .connect-section {
-  background: linear-gradient(90deg, #ffeaa7, var(--accent-yellow));
-  color: #222;
+  background: linear-gradient(90deg, #dfffa7, var(--accent-green));
+  color: #ffffff;
   text-align: center;
   padding: 2rem 1.5rem;
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
   margin-bottom: 2rem;
+  transform: translateY(-20px);
+  opacity: 0;
+  animation: slideDownFade 0.5s forwards;
+  animation-delay: 0.1s;
 }
-
 .connect-section h2 { font-size: 1.6rem; margin: 0; font-weight: 700; }
 .connect-section input {
   margin-top: 1rem;
@@ -36,12 +43,12 @@
   border-radius: 10px;
   border: 1px solid rgba(0,0,0,0.06);
   width: 240px;
-  transition: box-shadow .2s ease, transform .15s ease;
+  transition: box-shadow .25s ease, transform .2s ease;
 }
 .connect-section input:focus {
   outline: none;
-  box-shadow: 0 6px 22px rgba(255,206,84,0.18);
-  transform: translateY(-1px);
+  box-shadow: 0 8px 28px rgba(255,206,84,0.22);
+  transform: translateY(-2px) scale(1.02);
 }
 .connect-section button {
   margin-left: 0.6rem;
@@ -49,14 +56,15 @@
   border: none;
   border-radius: 10px;
   font-weight: 700;
-  background: var(--neutral-dark);
+  background: var(--accent-blue);
   color: var(--white);
   cursor: pointer;
-  transition: transform .12s ease, opacity .12s ease;
+  transition: transform .2s ease, opacity .2s ease, box-shadow .2s ease;
 }
 .connect-section button:hover {
-  transform: translateY(-2px);
+  transform: translateY(-3px) scale(1.03);
   opacity: 0.95;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.12);
 }
 
 /* Friend Card */
@@ -66,13 +74,18 @@
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
   margin-bottom: 1rem;
-  transition: transform .14s ease, box-shadow .14s ease;
+  transition: transform .3s ease, box-shadow .3s ease;
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
+  position: relative;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 0.5s forwards;
 }
 .friend-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-6px);
   box-shadow: var(--shadow-md);
 }
 .friend-header {
@@ -84,6 +97,7 @@
   font-weight: 700;
   font-size: 1.1rem;
   color: var(--neutral-dark);
+  position: relative;
 }
 .friend-card button {
   background: #f77a7a;
@@ -93,8 +107,13 @@
   border-radius: 8px;
   cursor: pointer;
   font-weight: 700;
+  transition: transform .15s ease, box-shadow .15s ease;
 }
-.friend-card button:hover { opacity: 0.9; transform: translateY(-1px); }
+.friend-card button:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
 
 /* Feed Section */
 .feed-section {
@@ -109,6 +128,9 @@
   display: flex;
   align-items: center;
   gap: 0.4rem;
+  opacity: 0;
+  transform: translateY(6px);
+  animation: fadeInUp 0.4s forwards;
 }
 .feed-item.mood {
   background: var(--accent-yellow);
@@ -139,12 +161,21 @@
   display: flex;
   gap: 0.5rem;
   margin-top: 0.5rem;
+  opacity: 0;
+  animation: fadeIn 0.5s forwards;
+  animation-delay: 0.3s;
 }
 .encourage-section input {
   flex: 1;
   padding: 0.5rem 0.7rem;
   border-radius: 10px;
   border: 1px solid #eee;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.encourage-section input:focus {
+  outline: none;
+  transform: scale(1.02);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
 }
 .encourage-section button {
   padding: 0.5rem 0.8rem;
@@ -154,8 +185,13 @@
   border: none;
   font-weight: 700;
   cursor: pointer;
+  transition: transform .15s ease, box-shadow .15s ease;
 }
-.encourage-section button:hover { opacity: 0.9; }
+.encourage-section button:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+  opacity: 0.95;
+}
 
 /* Snackbar Notifications */
 .snackbar {
@@ -175,34 +211,58 @@
   box-shadow: var(--shadow-md);
   transition: transform 0.35s cubic-bezier(0.68, -0.55, 0.265, 1.55), opacity 0.35s ease;
 }
-
 .snackbar.show {
   transform: translateX(-50%) translateY(0);
   opacity: 1;
   pointer-events: auto;
 }
+.snackbar.success { background: var(--accent-green); }
+.snackbar.error { background: #f77a7a; }
 
-.snackbar.success {
-  background: var(--accent-green);
-}
-
-.snackbar.error {
-  background: #f77a7a;
-}
-
+/* Encouragement list */
 .encouragements {
-  max-height: 100px;
+  max-height: 120px;
   overflow-y: auto;
   margin-top: 5px;
-  padding: 5px;
-  border-left: 3px solid #5d9cec;
+  padding: 5px 8px;
+  border-left: 3px solid var(--accent-blue);
+  animation: fadeIn 0.6s ease forwards;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent-blue) #eee;
 }
-
+.encouragements::-webkit-scrollbar {
+  width: 6px;
+}
+.encouragements::-webkit-scrollbar-thumb {
+  background-color: var(--accent-blue);
+  border-radius: 3px;
+}
 .encouragement-item {
   font-size: 0.85rem;
-  margin-bottom: 3px;
+  margin-bottom: 4px;
+  padding: 2px 4px;
+  border-radius: 6px;
+  background: #f5f5f5;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+.encouragement-item:hover {
+  transform: translateX(2px);
+  background: #e1f5fe;
 }
 
+/* Animations */
+@keyframes fadeInUp {
+  0% { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+@keyframes slideDownFade {
+  0% { opacity: 0; transform: translateY(-20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
 
 /* Responsive */
 @media (max-width: 600px) {
