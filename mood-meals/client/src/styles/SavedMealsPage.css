@@ -4,8 +4,11 @@
   --white: #fff;
   --radius-lg: 16px;
   --shadow-sm: 0 6px 18px rgba(0,0,0,0.06);
+  --badge-bg: #e0e7ff;
+  --badge-color: #3b49df;
 }
 
+/* --- Page Container --- */
 .saved-meals-page {
   padding: 2rem;
   min-height: 100vh;
@@ -17,22 +20,55 @@
 .saved-meals-page h1 {
   font-size: 2rem;
   font-weight: 800;
-  margin-bottom: 1.2rem;
+  margin-bottom: 1.5rem;
   text-align: center;
 }
 
+/* --- Mood Filter Dropdown --- */
+.filter-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  margin-bottom: 1.5rem;
+}
+
+.filter-container label {
+  font-weight: 600;
+  color: #333;
+}
+
+.filter-container select {
+  padding: 0.4rem 0.6rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid #ccc;
+  background: var(--white);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-container select:hover {
+  border-color: var(--primary-blue);
+}
+
+/* --- Grid --- */
 .saved-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 1rem;
 }
 
+/* --- Card --- */
 .saved-card {
   background: rgba(255,255,255,0.95);
   padding: 1rem 1.2rem;
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .saved-card:hover {
@@ -47,15 +83,81 @@
 }
 
 .saved-card p {
-  margin-top: 0.4rem;
+  margin: 0.5rem 0 1rem;
   color: #345;
   font-size: 0.95rem;
 }
 
+/* --- Mood Badge --- */
+.mood-badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: var(--badge-bg);
+  color: var(--badge-color);
+  margin-bottom: 0.6rem;
+  text-transform: capitalize;
+}
+
+/* --- Card Buttons --- */
+.saved-actions {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: flex-end;
+  margin-top: auto;
+}
+
+.recipe-btn {
+  background: var(--primary-blue);
+  color: #fff;
+  border: none;
+  padding: 0.5rem 0.8rem;
+  border-radius: var(--radius-lg);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.recipe-btn:hover {
+  background: #4a89dc;
+}
+
+.save-btn.saved {
+  background: #ffcc00;
+  color: #222;
+  border: none;
+  padding: 0.45rem 0.7rem;
+  border-radius: var(--radius-lg);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.save-btn.saved:hover {
+  background: #e6b800;
+}
+
+/* --- Empty / Loading / Error States --- */
 .no-saved,
-.loading-text {
+.loading-text,
+.error-text {
   text-align: center;
   margin-top: 2rem;
   color: #555;
   font-weight: 600;
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+  .saved-meals-page {
+    padding: 1.2rem;
+  }
+
+  .filter-container {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
 }

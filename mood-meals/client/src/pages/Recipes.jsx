@@ -10,50 +10,37 @@ const Recipes = () => {
   const [selectedMealId, setSelectedMealId] = useState(null);
   const [moods, setMoods] = useState([]);
   const [moodFilter, setMoodFilter] = useState("all");
-  const [savedMeals, setSavedMeals] = useState([]); // IDs of saved meals
+  const [savedMeals, setSavedMeals] = useState([]);
   const [showSavedOnly, setShowSavedOnly] = useState(false);
 
   const token = localStorage.getItem("token");
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
 
-  // Fetch saved meals for user
+  // Fetch saved meals
   useEffect(() => {
     const fetchSaved = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/user-meals", {
+        const res = await axios.get(`${BACKEND_URL}/api/saved-meals`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setSavedMeals(res.data.map((m) => m.meal_id));
+        setSavedMeals(res.data.map((m) => m.meal_id || m.id));
       } catch (err) {
         console.error(err);
       }
     };
     fetchSaved();
-  }, [token]);
+  }, [token, BACKEND_URL]);
 
-  // Fetch all meals (with optional mood filter)
+  // Fetch meals with mood filter
   useEffect(() => {
     const fetchMeals = async () => {
       setLoading(true);
       try {
-        const url =
-          moodFilter === "all"
-            ? "http://localhost:5000/api/meals"
-            : `http://localhost:5000/api/meals/mood/${moodFilter}`;
-        const res = await axios.get(url, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        const mealsWithSaved = res.data.map((meal) => ({
-          ...meal,
-          saved: savedMeals.includes(meal.id),
-        }));
-
+        const url = moodFilter === "all" ? `${BACKEND_URL}/api/meals` : `${BACKEND_URL}/api/meals/mood/${moodFilter}`;
+        const res = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } });
+        const mealsWithSaved = res.data.map((meal) => ({ ...meal, saved: savedMeals.includes(meal.id) }));
         setMeals(mealsWithSaved);
-
-        const uniqueMoods = [
-          ...new Set(res.data.map((m) => m.mood || "Uncategorized")),
-        ];
-        setMoods(uniqueMoods);
+        setMoods([...new Set(res.data.map((m) => m.mood || "Uncategorized"))]);
       } catch (err) {
         console.error(err);
         setMeals([]);
@@ -62,76 +49,40 @@ const Recipes = () => {
       }
     };
     fetchMeals();
-  }, [moodFilter, token, savedMeals]);
+  }, [moodFilter, token, savedMeals, BACKEND_URL]);
 
-  const handleMoodChange = (e) => setMoodFilter(e.target.value);
-  const handleViewRecipe = (mealId) => setSelectedMealId(mealId);
-  const handleCloseModal = () => setSelectedMealId(null);
-
-  const toggleSaveMeal = async (mealId) => {
-    try {
-      await axios.post(
-        `http://localhost:5000/api/user-meals/${mealId}/toggle`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      setSavedMeals((prev) =>
-        prev.includes(mealId)
-          ? prev.filter((id) => id !== mealId)
-          : [...prev, mealId]
-      );
-    } catch (err) {
-      console.error(err);
-    }
+  const handleToggleSave = (mealId, currentSaved) => {
+    setMeals((prev) => prev.map((m) => (m.id === mealId ? { ...m, saved: !currentSaved } : m)));
+    setSavedMeals((prev) => currentSaved ? prev.filter((id) => id !== mealId) : [...prev, mealId]);
   };
 
-  const displayedMeals = showSavedOnly
-    ? meals.filter((m) => savedMeals.includes(m.id))
-    : meals;
+  const displayedMeals = showSavedOnly ? meals.filter((m) => savedMeals.includes(m.id)) : meals;
 
   return (
     <div className="recipes-page">
       <h1>
-        All Recipes {moodFilter !== "all" ? `for ${moodFilter}` : ""}
-        {showSavedOnly ? " (Saved)" : ""}
+        All Recipes {moodFilter !== "all" ? `for ${moodFilter}` : ""} {showSavedOnly ? "(Saved)" : ""}
       </h1>
 
       <div className="recipes-filter">
         <label htmlFor="mood">Filter by Mood: </label>
-        <select id="mood" value={moodFilter} onChange={handleMoodChange}>
+        <select id="mood" value={moodFilter} onChange={(e) => setMoodFilter(e.target.value)}>
           <option value="all">All</option>
-          {moods.map((m) => (
-            <option key={m} value={m}>
-              {m}
-            </option>
-          ))}
+          {moods.map((m) => <option key={m} value={m}>{m}</option>)}
         </select>
 
         <label>
-          <input
-            type="checkbox"
-            checked={showSavedOnly}
-            onChange={() => setShowSavedOnly(!showSavedOnly)}
-          />{" "}
+          <input type="checkbox" checked={showSavedOnly} onChange={() => setShowSavedOnly(!showSavedOnly)} />
           Show Saved Only
         </label>
       </div>
 
-      {loading ? (
-        <p className="no-meals">Loading recipes...</p>
-      ) : (
-        <MealsList
-          meals={displayedMeals}
-          onViewRecipe={handleViewRecipe}
-          onToggleSave={toggleSaveMeal}
-        />
-      )}
+      {loading ? <p className="no-meals">Loading recipes...</p> : <MealsList meals={displayedMeals} onToggleSave={handleToggleSave} />}
 
       {selectedMealId && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <RecipePage mealId={selectedMealId} onClose={handleCloseModal} />
+            <RecipePage mealId={selectedMealId} onClose={() => setSelectedMealId(null)} />
           </div>
         </div>
       )}

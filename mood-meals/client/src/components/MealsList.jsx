@@ -16,12 +16,14 @@ const MealsList = ({
   const [loading, setLoading] = useState(true);
   const [selectedMealId, setSelectedMealId] = useState(null);
   const token = localStorage.getItem("token");
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
 
+  // Fetch all meals from backend
   useEffect(() => {
     const fetchMeals = async () => {
       setLoading(true);
       try {
-        const res = await axios.get("/api/meals", {
+        const res = await axios.get(`${BACKEND_URL}/api/meals`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setMeals(res.data);
@@ -32,18 +34,18 @@ const MealsList = ({
         setLoading(false);
       }
     };
-
     fetchMeals();
-  }, [token]);
+  }, [token, BACKEND_URL]);
 
-  // Apply filters, search, sort
+  // Filter and sort meals
   const filteredMeals = meals
     .filter((m) => {
-      if (filter === "mood" && currentMood) return m.mood.toLowerCase() === currentMood.name.toLowerCase();
+      if (filter === "mood" && currentMood)
+        return m.mood?.toLowerCase() === currentMood.name?.toLowerCase();
       if (filter === "saved") return m.saved;
       return true;
     })
-    .filter((m) => m.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    .filter((m) => m.name?.toLowerCase().includes(searchQuery.toLowerCase()))
     .sort((a, b) => {
       if (sortOption === "name") return a.name.localeCompare(b.name);
       if (sortOption === "mood") return (a.mood || "").localeCompare(b.mood || "");
@@ -51,20 +53,25 @@ const MealsList = ({
       return 0;
     });
 
+  // Toggle saved state
   const toggleSave = async (mealId) => {
     try {
       const meal = meals.find((m) => m.id === mealId);
       if (!meal) return;
 
       const newSavedState = !meal.saved;
-      setMeals((prev) => prev.map((m) => (m.id === mealId ? { ...m, saved: newSavedState } : m)));
 
-      // Sync with backend
-      if (newSavedState) {
-        await axios.post(`/api/userMeals/save/${mealId}`, {}, { headers: { Authorization: `Bearer ${token}` } });
-      } else {
-        await axios.delete(`/api/userMeals/remove/${mealId}`, { headers: { Authorization: `Bearer ${token}` } });
-      }
+      // Optimistic UI update
+      setMeals((prev) =>
+        prev.map((m) => (m.id === mealId ? { ...m, saved: newSavedState } : m))
+      );
+
+      // Backend call to toggle
+      await axios.post(
+        `${BACKEND_URL}/api/saved-meals/${mealId}/toggle`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
       if (onToggleSave) onToggleSave(mealId, newSavedState);
     } catch (err) {
@@ -78,33 +85,63 @@ const MealsList = ({
   return (
     <section className="meals-section">
       <div className="meals-grid">
-        {filteredMeals.map((meal) => (
-          <div className="meal-card" key={meal.id}>
-            <div className="meal-header">
-              <h3>{meal.name}</h3>
-              {meal.mood && <span className={`mood-badge ${meal.mood.toLowerCase()}`}>{meal.mood}</span>}
+        {filteredMeals.map((meal) => {
+          const imageSrc = meal.image_url?.startsWith("http")
+            ? meal.image_url
+            : `${BACKEND_URL}${meal.image_url}`;
+
+          return (
+            <div className="meal-card" key={meal.id}>
+              {meal.image_url && (
+                <div className="meal-image-wrapper">
+                  <img src={imageSrc} alt={meal.name} className="meal-image" />
+                </div>
+              )}
+
+              <div className="meal-header">
+                <h3>{meal.name}</h3>
+                {meal.mood && (
+                  <span className={`mood-badge ${meal.mood.toLowerCase()}`}>
+                    {meal.mood}
+                  </span>
+                )}
+              </div>
+
+              <p className="meal-description">{meal.description}</p>
+
+              <div className="meal-card-actions">
+                <button
+                  className="recipe-btn"
+                  onClick={() => setSelectedMealId(meal.id)}
+                >
+                  View Recipe
+                </button>
+                {/* <button
+                  className={`save-btn ${meal.saved ? "saved" : ""}`}
+                  onClick={() => toggleSave(meal.id)}
+                  title={meal.saved ? "Unsave Meal" : "Save Meal"}
+                >
+                  {meal.saved ? "★" : "☆"}
+                </button> */}
+              </div>
             </div>
-            <p>{meal.description}</p>
-            <div className="meal-card-actions">
-              <button className="recipe-btn" onClick={() => setSelectedMealId(meal.id)}>
-                View Recipe
-              </button>
-              <button
-                className={`save-btn ${meal.saved ? "saved" : ""}`}
-                onClick={() => toggleSave(meal.id)}
-                title={meal.saved ? "Unsave Meal" : "Save Meal"}
-              >
-                {meal.saved ? "★" : "☆"}
-              </button>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {selectedMealId && (
-        <div className="modal-overlay" onClick={() => setSelectedMealId(null)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <RecipePage mealId={selectedMealId} onClose={() => setSelectedMealId(null)} />
+        <div
+          className="modal-overlay"
+          onClick={() => setSelectedMealId(null)}
+        >
+          <div
+            className="modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <RecipePage
+              mealId={selectedMealId}
+              onClose={() => setSelectedMealId(null)}
+            />
           </div>
         </div>
       )}

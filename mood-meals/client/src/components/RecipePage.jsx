@@ -1,28 +1,27 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "../styles/RecipePage.css";
 
 const RecipePage = ({ mealId, onClose }) => {
   const [recipe, setRecipe] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [saved, setSaved] = useState(false);
-  const [checkedIngredients, setCheckedIngredients] = useState([]);
 
   const token = localStorage.getItem("token");
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
 
   useEffect(() => {
     if (!mealId) return;
 
     const fetchMeal = async () => {
       setLoading(true);
-      setError("");
       try {
-        const res = await axios.get(`http://localhost:5000/api/meals/${mealId}`, {
+        const res = await axios.get(`${BACKEND_URL}/api/meals/${mealId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const meal = res.data;
 
+        // Ensure ingredients & steps are arrays
         meal.ingredients = Array.isArray(meal.ingredients)
           ? meal.ingredients
           : JSON.parse(meal.ingredients || "[]");
@@ -31,28 +30,38 @@ const RecipePage = ({ mealId, onClose }) => {
           : JSON.parse(meal.steps || "[]");
 
         setRecipe(meal);
-        setSaved(meal.saved || false);
-        setCheckedIngredients([]);
+
+        // Check if meal is saved by user
+        const savedRes = await axios.get(`${BACKEND_URL}/api/saved-meals`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const isSaved = savedRes.data.some(m => m.meal_id === meal.id || m.id === meal.id);
+        setSaved(isSaved);
       } catch (err) {
-        setError(err.response?.data?.message || "Error fetching recipe");
+        console.error("Error fetching recipe:", err);
       } finally {
         setLoading(false);
       }
     };
 
     fetchMeal();
-  }, [mealId, token]);
+  }, [mealId, token, BACKEND_URL]);
 
   const toggleSave = async () => {
+    if (!recipe) return;
+
     try {
       if (!saved) {
-        await axios.post(`/api/userMeals/save/${mealId}`, {}, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        await axios.post(
+          `${BACKEND_URL}/api/saved-meals/${recipe.id}/save`,
+          {},
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
       } else {
-        await axios.delete(`/api/userMeals/remove/${mealId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        await axios.delete(
+          `${BACKEND_URL}/api/saved-meals/${recipe.id}/unsave`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
       }
       setSaved(!saved);
     } catch (err) {
@@ -60,68 +69,43 @@ const RecipePage = ({ mealId, onClose }) => {
     }
   };
 
-  const handleCheckIngredient = (idx) => {
-    setCheckedIngredients((prev) =>
-      prev.includes(idx) ? prev.filter((i) => i !== idx) : [...prev, idx]
-    );
-  };
-
-  if (!mealId) return null;
   if (loading) return <p className="recipe-loading">Loading recipe...</p>;
-  if (error)
-    return (
-      <div className="recipe-page">
-        <h1 className="error-title">Recipe not found</h1>
-        <p className="error-msg">{error}</p>
-        <button onClick={onClose} className="back-btn">
-          ← Close
-        </button>
-      </div>
-    );
+  if (!recipe) return <p className="no-meals">Recipe not found</p>;
+
+  const imageSrc = recipe.image_url?.startsWith("http")
+    ? recipe.image_url
+    : `${BACKEND_URL}${recipe.image_url}`;
 
   return (
     <div className="recipe-page">
-      <button onClick={onClose} className="back-btn">
-        ← Close
-      </button>
+      <button onClick={onClose} className="back-btn">← Close</button>
 
       <div className="recipe-header">
         <h1>{recipe.name}</h1>
-        {recipe.mood && <span className={`mood-badge ${recipe.mood.toLowerCase()}`}>{recipe.mood}</span>}
+        {recipe.mood && (
+          <span className={`mood-badge ${recipe.mood.toLowerCase()}`}>
+            {recipe.mood}
+          </span>
+        )}
         <button className={`save-btn floating ${saved ? "saved" : ""}`} onClick={toggleSave}>
           {saved ? "★ Saved" : "☆ Save"}
         </button>
       </div>
 
-      {recipe.image_url && (
-        <img src={recipe.image_url} alt={recipe.name} className="recipe-image" />
-      )}
-
+      {recipe.image_url && <img src={imageSrc} alt={recipe.name} className="recipe-image" />}
       <p className="recipe-description">{recipe.description}</p>
 
       <h2>📝 Ingredients</h2>
       <ul className="recipe-list ingredients-list">
-        {recipe.ingredients.map((item, idx) => (
-          <li
-            key={idx}
-            onClick={() => handleCheckIngredient(idx)}
-            className={checkedIngredients.includes(idx) ? "checked" : ""}
-          >
-            {item}
-          </li>
-        ))}
+        {recipe.ingredients.map((item, idx) => <li key={idx}>{item}</li>)}
       </ul>
 
       <h2>👨‍🍳 Steps</h2>
       {recipe.steps.length > 0 ? (
         <ol className="recipe-list steps-list">
-          {recipe.steps.map((step, idx) => (
-            <li key={idx}>{step}</li>
-          ))}
+          {recipe.steps.map((step, idx) => <li key={idx}>{step}</li>)}
         </ol>
-      ) : (
-        <p>No steps provided for this recipe.</p>
-      )}
+      ) : <p>No steps provided.</p>}
     </div>
   );
 };
