@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';  
+import React, { useState, useEffect } from 'react';   
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import MoodRadialChart from '../components/MoodRadialChart';
@@ -49,6 +49,7 @@ const Profile = () => {
 
   const authConfig = { headers: { Authorization: `Bearer ${token}` } };
 
+  // Count moods and sort by frequency
   const getTopEmotions = (entries) => {
     const counts = {};
     entries.forEach(e => {
@@ -110,12 +111,14 @@ const Profile = () => {
     fetchProfile();
   }, [navigate, token]);
 
+  // Logout
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('role');
     navigate('/');
   };
 
+  // Save edited profile
   const saveProfile = async () => {
     try {
       await axios.put('http://localhost:5000/api/profile', editData, authConfig);
@@ -124,6 +127,7 @@ const Profile = () => {
     } catch(err){ console.error(err); alert('Failed to update profile'); }
   };
 
+  // Change password
   const changePassword = async () => {
     if(passwordData.newPassword !== passwordData.confirmPassword){
       alert('Passwords do not match');
@@ -137,6 +141,7 @@ const Profile = () => {
     } catch(err){ console.error(err); alert(err.response?.data?.error || 'Failed to change password'); }
   };
 
+  // Remove saved meal
   const handleRemoveSavedMeal = async (mealId) => {
     if(!window.confirm('Remove this saved meal?')) return;
     try {
@@ -169,7 +174,6 @@ const Profile = () => {
   const mealVarietyBadge = mealStats.variety;
   const mealStreakBadge = mealStats.streak;
 
-  // Simple monthDates for last 30 days
   const monthDates = Array.from({ length: 30 }, (_, i) => {
     const d = new Date();
     d.setDate(d.getDate() - i);
@@ -180,6 +184,7 @@ const Profile = () => {
 
   return (
     <div className="profile-container">
+
       {/* Header */}
       <div className="profile-header">
         <div className="profile-avatar">
@@ -202,6 +207,7 @@ const Profile = () => {
       <section className="section top-row">
         <div className="current-mood-card">
           <h3>Current Mood</h3>
+          <p>See what your latest logged mood is and any note you added.</p>
           {currentMood ? (
             <div className="current-mood-bubble" title={`Logged on ${currentMood.date || currentMood.created_at || ''}`}>
               <img src={avatars.find(a=>a.name===currentMood.mood)?.image || avatars[0].image} alt={currentMood.mood} />
@@ -215,14 +221,16 @@ const Profile = () => {
 
         <div className="streak-card">
           <h3>Mood Streak</h3>
+          <p>Track how many consecutive days you’ve logged moods.</p>
           <StreakTracker streak={streak} />
         </div>
 
         <div className="meal-badges">
           <h3>Meal Stats</h3>
+          <p>Quick glance at your meal variety and streak badges.</p>
           <div className="badges">
-            <div className="badge">{mealVarietyBadge}</div>
-            <div className="badge">{mealStreakBadge}</div>
+            <div className="badge">Variety: {mealVarietyBadge}</div>
+            <div className="badge">Streak: {mealStreakBadge}</div>
           </div>
         </div>
       </section>
@@ -230,6 +238,7 @@ const Profile = () => {
       {/* Mood Overview */}
       <section className="section mood-stats-section">
         <h2>Mood Overview</h2>
+        <p>A visual summary of your moods over time and top emotions.</p>
         <div className="mood-stats-wrapper">
           <div className="chart-column">
             <MoodRadialChart data={moodStats} />
@@ -248,7 +257,8 @@ const Profile = () => {
           </div>
 
           <div className="calendar-column">
-            <h4>Last 30 days</h4>
+            <h4>Last 30 Days</h4>
+            <p>Click a day to see the mood entry for that date.</p>
             <div className="mood-calendar">
               {monthDates.map(d => (
                 <div key={d.date} className={`mood-day ${d.mood ? 'has-mood' : 'empty'}`} title={`${d.date} ${d.mood || ''}`} onClick={()=>{ if(d.mood) navigate(`/mood/${d.date}`); }}>
@@ -256,20 +266,14 @@ const Profile = () => {
                 </div>
               ))}
             </div>
-            <div className="calendar-legend"><small>Click a day to view entry</small></div>
           </div>
         </div>
       </section>
 
       {/* Saved Meals */}
       <section className="section saved-meals-section">
-        <div className="section-header">
-          <h2>Saved Meals</h2>
-          <div className="shortcuts">
-            <button className="btn" onClick={()=>navigate('/grocery')}>Grocery List ({groceryCount})</button>
-            <button className="btn" onClick={()=>navigate('/meals')}>Browse Meals</button>
-          </div>
-        </div>
+        <h2>Saved Meals</h2>
+        <p>Your favorite meals and quick access to recipes.</p>
         <div className="saved-meals-list">
           {savedMeals.length ? savedMeals.map(m => (
             <div key={m.id} className="saved-meal-card">
@@ -290,6 +294,7 @@ const Profile = () => {
       {/* Preferences */}
       <section className="section prefs-section">
         <h2>Personalization & Goals</h2>
+        <p>Set your diet and mood tracking goals to improve recommendations.</p>
         <div className="prefs-grid">
           <div className="pref-card">
             <h4>Dietary Preference</h4>
@@ -318,11 +323,8 @@ const Profile = () => {
 
       {/* Journal */}
       <section className="section journal-section">
-        <div className="section-header">
-          <h2>Journal</h2>
-          <div><button className="btn" onClick={()=>navigate('/journal')}>Open Journal</button></div>
-        </div>
-
+        <h2>Journal</h2>
+        <p>Write quick notes or reflections to track your mood journey.</p>
         <div className="journal-input">
           <textarea placeholder="Write a quick note…" value={newJournalText} onChange={e=>setNewJournalText(e.target.value)} rows={3} />
           <div className="journal-controls"><button className="btn save-btn" onClick={addJournalEntry}>Add</button></div>
@@ -337,45 +339,6 @@ const Profile = () => {
           )) : <div className="empty">No journal notes yet.</div>}
         </div>
       </section>
-
-      {/* Edit Modal */}
-      {showEditModal && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <h3>Edit Profile</h3>
-            <input type="text" value={editData.username} onChange={e=>setEditData({...editData, username:e.target.value})} />
-            <input type="email" value={editData.email} onChange={e=>setEditData({...editData, email:e.target.value})} />
-            <div className="avatar-selector">
-              <h4>Select Avatar:</h4>
-              <div className="avatars-list">
-                {avatars.map(a => (
-                  <img key={a.name} src={a.image} alt={a.name} className={editData.avatar === a.name ? 'selected' : ''} onClick={()=>setEditData({...editData, avatar: a.name})} />
-                ))}
-              </div>
-            </div>
-            <div className="modal-buttons">
-              <button className="btn save-btn" onClick={saveProfile}>Save</button>
-              <button className="btn cancel-btn" onClick={()=>setShowEditModal(false)}>Cancel</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Password Modal */}
-      {showPasswordModal && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <h3>Change Password</h3>
-            <input type="password" placeholder="Old Password" value={passwordData.oldPassword} onChange={e=>setPasswordData({...passwordData, oldPassword:e.target.value})} />
-            <input type="password" placeholder="New Password" value={passwordData.newPassword} onChange={e=>setPasswordData({...passwordData, newPassword:e.target.value})} />
-            <input type="password" placeholder="Confirm New Password" value={passwordData.confirmPassword} onChange={e=>setPasswordData({...passwordData, confirmPassword:e.target.value})} />
-            <div className="modal-buttons">
-              <button className="btn save-btn" onClick={changePassword}>Change</button>
-              <button className="btn cancel-btn" onClick={()=>setShowPasswordModal(false)}>Cancel</button>
-            </div>
-          </div>
-        </div>
-      )}
 
     </div>
   );
