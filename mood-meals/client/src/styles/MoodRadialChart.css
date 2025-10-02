@@ -10,8 +10,8 @@
 
 .mood-chart {
   width: 100%;
-  max-width: 400px;
-  height: 320px;
+  max-width: 250px;
+  height: 200px;
 }
 
 .mood-radial-chart-container h2 {

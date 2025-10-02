@@ -116,13 +116,6 @@ const MealsList = ({
                 >
                   View Recipe
                 </button>
-                {/* <button
-                  className={`save-btn ${meal.saved ? "saved" : ""}`}
-                  onClick={() => toggleSave(meal.id)}
-                  title={meal.saved ? "Unsave Meal" : "Save Meal"}
-                >
-                  {meal.saved ? "★" : "☆"}
-                </button> */}
               </div>
             </div>
           );
