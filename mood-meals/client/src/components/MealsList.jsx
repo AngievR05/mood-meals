@@ -11,19 +11,19 @@ const MealsList = ({
   currentMood = null,
   showViewAllButton = false,
   onToggleSave,
+  backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000",
 }) => {
   const [meals, setMeals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedMealId, setSelectedMealId] = useState(null);
   const token = localStorage.getItem("token");
-  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
 
-  // Fetch all meals from backend
+  // Fetch meals from backend
   useEffect(() => {
     const fetchMeals = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`${BACKEND_URL}/api/meals`, {
+        const res = await axios.get(`${backendUrl}/api/meals`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setMeals(res.data);
@@ -35,13 +35,12 @@ const MealsList = ({
       }
     };
     fetchMeals();
-  }, [token, BACKEND_URL]);
+  }, [token, backendUrl]);
 
-  // Filter and sort meals
+  // Filter & sort
   const filteredMeals = meals
     .filter((m) => {
-      if (filter === "mood" && currentMood)
-        return m.mood?.toLowerCase() === currentMood.name?.toLowerCase();
+      if (filter === "mood") return currentMood ? m.mood?.toLowerCase() === currentMood.name?.toLowerCase() : true;
       if (filter === "saved") return m.saved;
       return true;
     })
@@ -53,27 +52,24 @@ const MealsList = ({
       return 0;
     });
 
-  // Toggle saved state
+  // Toggle save
   const toggleSave = async (mealId) => {
     try {
       const meal = meals.find((m) => m.id === mealId);
       if (!meal) return;
 
-      const newSavedState = !meal.saved;
-
-      // Optimistic UI update
+      const newSaved = !meal.saved;
       setMeals((prev) =>
-        prev.map((m) => (m.id === mealId ? { ...m, saved: newSavedState } : m))
+        prev.map((m) => (m.id === mealId ? { ...m, saved: newSaved } : m))
       );
 
-      // Backend call to toggle
       await axios.post(
-        `${BACKEND_URL}/api/saved-meals/${mealId}/toggle`,
+        `${backendUrl}/api/saved-meals/${mealId}/toggle`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      if (onToggleSave) onToggleSave(mealId, newSavedState);
+      if (onToggleSave) onToggleSave(mealId, newSaved);
     } catch (err) {
       console.error("Error toggling save:", err);
     }
@@ -88,7 +84,7 @@ const MealsList = ({
         {filteredMeals.map((meal) => {
           const imageSrc = meal.image_url?.startsWith("http")
             ? meal.image_url
-            : `${BACKEND_URL}${meal.image_url}`;
+            : `${backendUrl}${meal.image_url}`;
 
           return (
             <div className="meal-card" key={meal.id}>
@@ -110,12 +106,10 @@ const MealsList = ({
               <p className="meal-description">{meal.description}</p>
 
               <div className="meal-card-actions">
-                <button
-                  className="recipe-btn"
-                  onClick={() => setSelectedMealId(meal.id)}
-                >
+                <button className="recipe-btn" onClick={() => setSelectedMealId(meal.id)}>
                   View Recipe
                 </button>
+                
               </div>
             </div>
           );
@@ -123,18 +117,9 @@ const MealsList = ({
       </div>
 
       {selectedMealId && (
-        <div
-          className="modal-overlay"
-          onClick={() => setSelectedMealId(null)}
-        >
-          <div
-            className="modal-content"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <RecipePage
-              mealId={selectedMealId}
-              onClose={() => setSelectedMealId(null)}
-            />
+        <div className="modal-overlay" onClick={() => setSelectedMealId(null)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <RecipePage mealId={selectedMealId} onClose={() => setSelectedMealId(null)} />
           </div>
         </div>
       )}

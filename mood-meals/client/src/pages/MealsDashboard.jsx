@@ -27,27 +27,29 @@ const moodColors = {
   Grateful: "#4a89dc",
 };
 
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
+
 const MealsDashboard = () => {
   const navigate = useNavigate();
   const [role] = useState(localStorage.getItem("role") || "user");
   const [currentMood, setCurrentMood] = useState(null);
   const [activeFilter, setActiveFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortOption, setSortOption] = useState("name");
   const [headerGradient, setHeaderGradient] = useState(
     "linear-gradient(90deg, var(--primary-blue), var(--secondary-blue))"
   );
 
-  // Fetch current mood
+  // Fetch current mood async
   useEffect(() => {
     const fetchMood = async () => {
       try {
-        const res = await fetch("/api/moods/current", { headers: { "Content-Type": "application/json" } });
+        const res = await fetch(`${BACKEND_URL}/api/moods/current`, { headers: { "Content-Type": "application/json" } });
         if (!res.ok) throw new Error("Mood not found");
         const data = await res.json();
         const moodObj = typeof data.mood === "string"
           ? { name: data.mood, emoji: data.emoji || "", color: moodColors[data.mood] }
           : data.mood;
+
         if (moodObj?.name) {
           setCurrentMood(moodObj);
           localStorage.setItem("currentMood", JSON.stringify(moodObj));
@@ -67,53 +69,60 @@ const MealsDashboard = () => {
   const clearFilters = () => {
     setActiveFilter("all");
     setSearchQuery("");
-    setSortOption("name");
   };
 
   return (
     <div className="meals-dashboard">
       <section className="dashboard-header" style={{ background: headerGradient }}>
-        <h1>My Meals Dashboard</h1>
-        {currentMood ? (
-          <p>
-            Current Mood: <strong>{currentMood.name}</strong>{" "}
-            {currentMood.emoji && <span>{currentMood.emoji}</span>}
-          </p>
-        ) : (
-          <p>Manage your groceries and find meals that match your mood.</p>
-        )}
-        {role === "admin" && (
-          <button className="primary-btn" onClick={handleAddMealClick}>+ Add Meal</button>
-        )}
+        <div className="header-top">
+          <h1>My Meals Dashboard</h1>
+          {role === "admin" && (
+            <button className="primary-btn" onClick={handleAddMealClick}>+ Add Meal</button>
+          )}
+        </div>
 
-        {/* Filters & Search */}
-        <div className="filter-search-container">
-          <div className="filter-buttons">
-            <button className={activeFilter === "all" ? "active" : ""} onClick={() => setActiveFilter("all")}>All Meals</button>
-            <button className={activeFilter === "mood" ? "active" : ""} onClick={() => setActiveFilter("mood")}>By Mood</button>
-            <button className={activeFilter === "saved" ? "active" : ""} onClick={() => setActiveFilter("saved")}>Saved Meals</button>
-            <button className="clear-btn" onClick={clearFilters}>Clear Filters</button>
-          </div>
+        {/* Current mood & search */}
+        <div className="header-middle">
+          {currentMood ? (
+            <div className="current-mood">
+              <strong>{currentMood.name}</strong> {currentMood.emoji && <span>{currentMood.emoji}</span>}
+              <button className="refresh-btn" onClick={handleChangeMood} title="Change Mood">🔄</button>
+            </div>
+          ) : (
+            <p>Manage your groceries and find meals that match your mood.</p>
+          )}
           <input
             type="text"
-            placeholder="Search meals..."
+            placeholder="Search meals by name..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="search-input"
           />
-          <select value={sortOption} onChange={(e) => setSortOption(e.target.value)} className="sort-select">
-            <option value="name">Sort by Name</option>
-            <option value="mood">Sort by Mood</option>
-            <option value="recent">Sort by Recent</option>
-          </select>
+        </div>
+
+        {/* Filters */}
+        <div className="header-filters">
+          <button
+            className={activeFilter === "all" ? "active" : ""}
+            onClick={() => setActiveFilter("all")}
+          >
+            All Meals
+          </button>
+          <button
+            className={activeFilter === "mood" ? "active" : ""}
+            onClick={() => setActiveFilter("mood")}
+          >
+            By Mood
+          </button>
+          <button
+            className={activeFilter === "saved" ? "active" : ""}
+            onClick={() => setActiveFilter("saved")}
+          >
+            Saved Meals
+          </button>
+          <button className="clear-btn" onClick={clearFilters}>Clear</button>
         </div>
       </section>
-
-      {currentMood && (
-        <MoodBanner mood={currentMood.name} emoji={currentMood.emoji} color={currentMood.color || moodColors[currentMood.name]}>
-          <button className="secondary-btn" onClick={handleChangeMood}>Change Mood</button>
-        </MoodBanner>
-      )}
 
       <GrocerySection />
 
@@ -121,9 +130,9 @@ const MealsDashboard = () => {
         role={role}
         filter={activeFilter}
         searchQuery={searchQuery}
-        sortOption={sortOption}
         currentMood={currentMood}
         showViewAllButton={true}
+        backendUrl={BACKEND_URL}
       />
 
       {currentMood && (

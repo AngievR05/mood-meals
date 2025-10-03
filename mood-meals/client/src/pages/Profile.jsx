@@ -4,6 +4,9 @@ import axios from 'axios';
 import MoodRadialChart from '../components/MoodRadialChart';
 import StreakTracker from '../components/StreakTracker';
 import '../styles/Profile.css';
+import '../styles/Home.css'; // For consistent streak card styling
+import '../styles/design-system.css';
+import '../styles/utils.css';
 
 import happy from "../assets/emotions/Happy.png";
 import sad from "../assets/emotions/Sad.png";
@@ -49,7 +52,6 @@ const Profile = () => {
 
   const authConfig = { headers: { Authorization: `Bearer ${token}` } };
 
-  // Count moods and sort by frequency
   const getTopEmotions = (entries) => {
     const counts = {};
     entries.forEach(e => {
@@ -111,14 +113,12 @@ const Profile = () => {
     fetchProfile();
   }, [navigate, token]);
 
-  // Logout
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('role');
     navigate('/');
   };
 
-  // Save edited profile
   const saveProfile = async () => {
     try {
       await axios.put('http://localhost:5000/api/profile', editData, authConfig);
@@ -127,7 +127,6 @@ const Profile = () => {
     } catch(err){ console.error(err); alert('Failed to update profile'); }
   };
 
-  // Change password
   const changePassword = async () => {
     if(passwordData.newPassword !== passwordData.confirmPassword){
       alert('Passwords do not match');
@@ -141,7 +140,6 @@ const Profile = () => {
     } catch(err){ console.error(err); alert(err.response?.data?.error || 'Failed to change password'); }
   };
 
-  // Remove saved meal
   const handleRemoveSavedMeal = async (mealId) => {
     if(!window.confirm('Remove this saved meal?')) return;
     try {
@@ -171,8 +169,6 @@ const Profile = () => {
   if(!user || loading) return <div className="loading">Loading profile…</div>;
 
   const topEmotions = getTopEmotions(moodStats).slice(0,4);
-  const mealVarietyBadge = mealStats.variety;
-  const mealStreakBadge = mealStats.streak;
 
   const monthDates = Array.from({ length: 30 }, (_, i) => {
     const d = new Date();
@@ -203,42 +199,16 @@ const Profile = () => {
         </div>
       </div>
 
-      {/* Top row */}
-      <section className="section top-row">
-        <div className="current-mood-card">
-          <h3>Current Mood</h3>
-          <p>See what your latest logged mood is and any note you added.</p>
-          {currentMood ? (
-            <div className="current-mood-bubble" title={`Logged on ${currentMood.date || currentMood.created_at || ''}`}>
-              <img src={avatars.find(a=>a.name===currentMood.mood)?.image || avatars[0].image} alt={currentMood.mood} />
-              <div>
-                <div className="mood-name">{currentMood.mood}</div>
-                <div className="mood-note">{currentMood.note || ''}</div>
-              </div>
-            </div>
-          ) : <div className="no-current">No mood logged recently</div>}
-        </div>
-
-        <div className="streak-card">
-          <h3>Mood Streak</h3>
-          <p>Track how many consecutive days you’ve logged moods.</p>
-          <StreakTracker streak={streak} />
-        </div>
-
-        <div className="meal-badges">
-          <h3>Meal Stats</h3>
-          <p>Quick glance at your meal variety and streak badges.</p>
-          <div className="badges">
-            <div className="badge">Variety: {mealVarietyBadge}</div>
-            <div className="badge">Streak: {mealStreakBadge}</div>
-          </div>
+      {/* Top Row: Streak tracker aligned like Home page */}
+      <section className="streak-grocery-wrapper">
+        <div className="streak-wrapper">
+          <StreakTracker currentMood={currentMood?.mood} />
         </div>
       </section>
 
-      {/* Mood Overview */}
+      {/* Mood Overview + Calendar */}
       <section className="section mood-stats-section">
         <h2>Mood Overview</h2>
-        <p>A visual summary of your moods over time and top emotions.</p>
         <div className="mood-stats-wrapper">
           <div className="chart-column">
             <MoodRadialChart data={moodStats} />
@@ -255,10 +225,8 @@ const Profile = () => {
               </ul>
             </div>
           </div>
-
           <div className="calendar-column">
             <h4>Last 30 Days</h4>
-            <p>Click a day to see the mood entry for that date.</p>
             <div className="mood-calendar">
               {monthDates.map(d => (
                 <div key={d.date} className={`mood-day ${d.mood ? 'has-mood' : 'empty'}`} title={`${d.date} ${d.mood || ''}`} onClick={()=>{ if(d.mood) navigate(`/mood/${d.date}`); }}>
@@ -273,7 +241,6 @@ const Profile = () => {
       {/* Saved Meals */}
       <section className="section saved-meals-section">
         <h2>Saved Meals</h2>
-        <p>Your favorite meals and quick access to recipes.</p>
         <div className="saved-meals-list">
           {savedMeals.length ? savedMeals.map(m => (
             <div key={m.id} className="saved-meal-card">

@@ -17,103 +17,42 @@
   box-shadow: var(--shadow-sm);
 }
 
-.recipe-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1rem;
-}
-
-.recipe-header h1 {
+.recipes-page h1 {
   font-size: 1.6rem;
-  margin: 0;
+  margin-bottom: 1.5rem;
   color: var(--text-dark);
 }
 
-.mood-badge {
-  margin-left: 0.6rem;
+.recipes-filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
 }
 
-.recipe-image {
-  width: 100%;
-  border-radius: var(--radius-md);
-  margin: 1rem 0;
-  object-fit: cover;
-  max-height: 320px;
-  box-shadow: var(--shadow-sm);
+.recipes-filter label {
+  font-weight: 600;
+  color: var(--text-dark);
 }
 
-.recipe-description {
-  font-size: 0.95rem;
-  color: var(--text-muted);
-  margin-bottom: 1rem;
-  line-height: 1.5;
-}
-
-.recipe-list {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 1.5rem 0;
-}
-
-.recipe-list li {
-  padding: 0.45rem 0.75rem;
+.recipes-filter select {
+  padding: 0.35rem 0.6rem;
   border-radius: 8px;
-  margin-bottom: 0.4rem;
-  background: var(--neutral-light);
-  cursor: pointer;
-  transition: background 0.2s ease;
+  border: 1px solid #ccc;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border 0.2s ease;
 }
 
-.recipe-list li.checked {
-  text-decoration: line-through;
-  background: #d0f0fd;
-  color: var(--text-dark);
+.recipes-filter select:focus {
+  border-color: var(--primary-blue);
 }
 
-.steps-list li {
-  margin-bottom: 0.6rem;
-  padding-left: 0.5rem;
-}
-
-.save-btn.floating {
-  background: var(--primary-blue);
-  color: var(--white);
-  border-radius: 12px;
-  padding: 7px;
-  border: none;
-  font-weight: 600;
-  font-size: 15px;
-  cursor: pointer;
-  transition: background 0.2s ease, transform 0.15s ease;
-}
-
-.save-btn.floating.saved {
-  background: gold;
-  color: var(--white);
-}
-
-.save-btn.floating:hover {
-  transform: scale(1.05);
-  background: var(--primary-blue);
-  color: var(--white);
-}
-
-.back-btn {
-  margin-bottom: 1rem;
-  background: var(--secondary-blue);
-  color: var(--white);
-  border: none;
-  padding: 0.45rem 0.9rem;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: background 0.2s ease;
-}
-
-.back-btn:hover {
-  background: var(--primary-blue);
-  transform: scale(1.05);
+.no-meals {
+  font-size: 1rem;
+  color: var(--text-muted);
+  margin-top: 1.5rem;
 }
 
 /* Modal fallback */
@@ -131,7 +70,7 @@
 }
 
 .modal-content {
-  background: #fff;
+  background: var(--white);
   padding: 1.5rem 2.5rem;
   max-width: 640px;
   width: 95%;

@@ -10,22 +10,23 @@
   --shadow-hover: 0 16px 40px rgba(0, 0, 0, 0.08);
 
   /* Mood colors */
-  --happy: #ffd166;
-  --sad: #118ab2;
-  --angry: #ef476f;
-  --stressed: #ef8354;
-  --bored: #bdb2ff;
-  --energised: #06d6a0;
-  --confused: #73a2b9;
-  --grateful: #f4a261;
+  --happy: #A0D468;
+  --sad: #5D9CEC;
+  --angry: #ED5565;
+  --stressed: #48CFAD;
+  --bored: #CCD1D9;
+  --energised: #FFCE54;
+  --confused: #FC6E51;
+  --grateful: #AC92EC;
 }
 
-/* Section styling */
+/* Section container */
 .meals-section {
   background: linear-gradient(180deg, #eaf6ff, #dfefff);
   padding: 2rem 1rem;
   color: var(--text-dark);
   border-radius: var(--radius-md);
+  margin-top: 1.5rem;
 }
 
 /* Grid layout */
@@ -35,7 +36,7 @@
   gap: 1.2rem;
 }
 
-/* Card styling */
+/* Meal card styling */
 .meal-card {
   background: var(--white);
   padding: 1.2rem;
@@ -52,6 +53,7 @@
   box-shadow: var(--shadow-hover);
 }
 
+/* Meal image */
 .meal-image-wrapper {
   width: 100%;
   padding-top: 56%;
@@ -69,19 +71,26 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.25s ease;
 }
 
-.meal-card h3 {
-  margin: 0 0 0.4rem 0;
+.meal-image-wrapper img:hover {
+  transform: scale(1.05);
+}
+
+/* Meal header */
+.meal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.4rem;
+}
+
+.meal-header h3 {
+  margin: 0;
   font-weight: 700;
   font-size: 1.1rem;
-}
-
-.meal-card p {
-  font-size: 0.9rem;
-  color: var(--text-muted);
-  margin: 0.6rem 0 1rem 0;
-  line-height: 1.4;
+  flex: 1;
 }
 
 /* Mood badge */
@@ -105,7 +114,15 @@
 .mood-badge.confused { background: var(--confused); }
 .mood-badge.grateful { background: var(--grateful); }
 
-/* Action buttons */
+/* Description */
+.meal-description {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin: 0.6rem 0 1rem 0;
+  line-height: 1.4;
+}
+
+/* Card actions */
 .meal-card-actions {
   display: flex;
   align-items: center;
@@ -122,7 +139,7 @@
   border: none;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: background 0.2s ease, transform 0.15s ease;
 }
 
 .recipe-btn:hover {
@@ -131,28 +148,27 @@
 }
 
 .save-btn {
-  font-size: 1.6rem;
+  font-size: 15px;
   background: none;
   border: none;
-  border-radius: 5px;
-  padding-left: 5px;
-  padding-right: 5px;
-  padding-bottom: 5px;
+  border-radius: 25px;
+  padding: 8px 10px;
   cursor: pointer;
   color: #bbb;
   transition: color 0.2s ease, transform 0.15s ease;
 }
 
 .save-btn:hover {
-  color: var(--text-dark);
+  color: var(--white);
   transform: scale(1.05);
+  background-color: var(--secondary-blue);
 }
 
 .save-btn.saved {
   color: gold;
 }
 
-/* Modal */
+/* Modal overlay */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -166,13 +182,34 @@
   z-index: 1000;
 }
 
+/* Modal content */
 .modal-content {
-  background: white;
+  background: var(--white);
   padding: 1.2rem 2rem;
   max-width: 600px;
   width: 90%;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   position: relative;
   max-height: 90vh;
   overflow-y: auto;
+}
+
+/* No meals text */
+.no-meals {
+  text-align: center;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin: 2rem 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .meals-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .meal-card-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
 }
