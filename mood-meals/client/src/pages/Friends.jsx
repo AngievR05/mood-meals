@@ -11,6 +11,7 @@ const Friends = () => {
   const [newFriend, setNewFriend] = useState("");
   const [encourageMsgs, setEncourageMsgs] = useState({});
   const [snackbar, setSnackbar] = useState({ message: "", type: "" });
+  const [activeTab, setActiveTab] = useState("pending"); // pending | accepted
 
   const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
 
@@ -82,6 +83,16 @@ const Friends = () => {
     }
   };
 
+  const batchAction = async (action) => {
+    const targets = friends.pendingReceived.map(f => f.friendship_id);
+    try {
+      await Promise.all(targets.map(id => updateFriend(action, id)));
+      showSnackbar(`All ${action}ed successfully`);
+    } catch {
+      showSnackbar(`Error performing batch ${action}`, "error");
+    }
+  };
+
   const sendEncouragement = async (friendId) => {
     const message = encourageMsgs[friendId];
     if (!message?.trim()) return showSnackbar("Enter a message", "error");
@@ -102,13 +113,13 @@ const Friends = () => {
   useEffect(() => { fetchFriends(); }, []);
   const { pendingReceived, pendingSent, accepted } = friends;
 
+  const stats = {
+    total: accepted.length,
+    streaks: accepted.filter(f => f.last_moods.length > 0).length
+  };
+
   return (
     <div className="friends-page">
-
-      {snackbar.message && (
-        <div className={`snackbar show ${snackbar.type}`}>{snackbar.message}</div>
-      )}
-
       {/* Add Friend */}
       <section className="connect-section card">
         <h2>Connect with Friends</h2>
@@ -122,11 +133,36 @@ const Friends = () => {
           <button onClick={addFriend}>Send Request</button>
         </div>
       </section>
+      
+      {/* Snackbar / Toast */}
+      {snackbar.message && (
+        <div className={`snackbar show ${snackbar.type}`}>{snackbar.message}</div>
+      )}
+
+      {/* Tabs */}
+      <div className="tabs">
+        <button className={activeTab === "pending" ? "active" : ""} onClick={() => setActiveTab("pending")}>Pending</button>
+        <button className={activeTab === "accepted" ? "active" : ""} onClick={() => setActiveTab("accepted")}>Friends</button>
+      </div>
+
+      {/* Stats */}
+      {activeTab === "accepted" && (
+        <div className="friend-stats card">
+          <span>Total Friends: {stats.total}</span>
+          <span>Active Mood Streaks: {stats.streaks}</span>
+        </div>
+      )}
+
+
 
       {/* Pending Received */}
-      {pendingReceived.length > 0 && (
+      {activeTab === "pending" && pendingReceived.length > 0 && (
         <section className="pending-section">
           <h2>Pending Requests</h2>
+          <div className="batch-actions">
+            <button onClick={() => batchAction("accept")}>Accept All</button>
+            <button onClick={() => batchAction("reject")}>Reject All</button>
+          </div>
           {pendingReceived.map(f => (
             <div key={f.friendship_id} className="friend-card">
               <span className="friend-name">{f.username}</span>
@@ -140,7 +176,7 @@ const Friends = () => {
       )}
 
       {/* Pending Sent */}
-      {pendingSent.length > 0 && (
+      {activeTab === "pending" && pendingSent.length > 0 && (
         <section className="pending-section">
           <h2>Sent Requests</h2>
           {pendingSent.map(f => (
@@ -153,9 +189,8 @@ const Friends = () => {
       )}
 
       {/* Accepted Friends */}
-      {accepted.length > 0 && (
+      {activeTab === "accepted" && accepted.length > 0 && (
         <section className="accepted-section">
-          <h2>Your Friends</h2>
           {accepted.map(f => (
             <div key={f.friendship_id} className="friend-card">
               <div className="friend-header">
@@ -163,7 +198,7 @@ const Friends = () => {
                 <button onClick={() => updateFriend("remove", f.friendship_id, f.friend_id)}>Remove</button>
               </div>
 
-              {/* Feed grid */}
+              {/* Feed */}
               <div className="feed-section grid">
                 {f.last_moods.map((m, idx) => (
                   <div key={idx} className="feed-item mood">
@@ -180,7 +215,7 @@ const Friends = () => {
                 ))}
               </div>
 
-              {/* Send encouragement */}
+              {/* Encourage */}
               <div className="encourage-section">
                 <input
                   placeholder="Send encouragement..."

@@ -2,131 +2,191 @@
   --accent-yellow: #ffce54;
   --accent-green: #8fd694;
   --accent-blue: #5d9cec;
+  --accent-red: #f77a7a;
   --neutral-light: #f9f9f9;
   --neutral-dark: #333;
   --white: #fff;
-  --radius-md: 12px;
-  --shadow-sm: 0 4px 12px rgba(0,0,0,0.06);
-  --shadow-md: 0 10px 30px rgba(0,0,0,0.06);
+  --radius-md: 14px;
+  --shadow-sm: 0 6px 20px rgba(0,0,0,0.08);
+  --shadow-md: 0 12px 36px rgba(0,0,0,0.12);
+  --shadow-glow: 0 0 12px rgba(93,156,236,0.5);
   --transition-fast: 0.2s ease;
   --transition-medium: 0.35s ease;
+  --transition-slow: 0.5s ease;
 }
 
-/* Base */
+/* Base Page */
 .friends-page {
   font-family: 'Segoe UI', sans-serif;
-  background: #d7d7d7;
+  background: linear-gradient(145deg, #e2e2e2, #d0d0d0);
   min-height: 100vh;
   padding: 2rem;
   color: var(--neutral-dark);
   animation: fadeIn 0.6s ease forwards;
 }
 
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 0.8rem;
+  margin-bottom: 1.5rem;
+}
+.tabs button {
+  padding: 0.6rem 1.2rem;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  background: var(--white);
+  cursor: pointer;
+  font-weight: 700;
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-sm);
+}
+.tabs button.active {
+  border-image: linear-gradient(45deg, var(--accent-blue), var(--accent-green)) 1;
+  box-shadow: var(--shadow-glow);
+    border-radius: var(--radius-md);
+  border: 1px solid transparent;
+}
+.tabs button:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: var(--shadow-glow);
+}
+
 /* Add Friend Section */
 .connect-section {
-  background: #48CFAD;
-  color: #fff;
+  background: linear-gradient(135deg, #48CFAD, #3EBE99);
+  color: var(--white);
   text-align: center;
   padding: 2rem 1.5rem;
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-md);
   margin-bottom: 2rem;
   transform: translateY(-20px);
   opacity: 0;
   animation: slideDownFade 0.5s forwards;
   animation-delay: 0.1s;
 }
-.connect-section h2 { font-size: 1.6rem; margin: 0; font-weight: 700; }
+.connect-section h2 {
+  font-size: 1.7rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  letter-spacing: 0.5px;
+}
+.connect-inputs {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
 .connect-section input {
-  margin-top: 1rem;
-  padding: 0.6rem 1rem;
-  border-radius: 10px;
-  border: 1px solid rgba(0,0,0,0.06);
+  padding: 0.7rem 1.2rem;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(0,0,0,0.08);
   width: 240px;
-  transition: box-shadow .25s ease, transform .2s ease;
+  transition: all var(--transition-medium);
 }
 .connect-section input:focus {
   outline: none;
-  box-shadow: 0 8px 28px rgba(255,206,84,0.22);
-  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 28px rgba(255,206,84,0.25);
+  transform: translateY(-2px) scale(1.03);
 }
 .connect-section button {
-  margin-left: 0.6rem;
-  padding: 0.6rem 1rem;
+  padding: 0.7rem 1.2rem;
   border: none;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   font-weight: 700;
   background: var(--accent-blue);
   cursor: pointer;
-  transition: transform .2s ease, opacity .2s ease, box-shadow .2s ease;
-  color: var(--neutral-light);
+  color: var(--white);
+  transition: all var(--transition-fast);
 }
 .connect-section button:hover {
-  transform: translateY(-3px) scale(1.03);
+  transform: translateY(-3px) scale(1.05);
   opacity: 0.95;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+  box-shadow: 0 8px 28px rgba(93,156,236,0.25);
 }
 
-/* Friend Card */
-.friend-card {
+/* Friend Stats Card */
+.friend-stats {
   background: var(--white);
-  padding: 1rem 1.2rem;
+  padding: 1rem 1.5rem;
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
-  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+/* Friend Cards */
+.friend-card {
+  background: var(--white);
+  padding: 1.2rem 1.5rem;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 1.2rem;
   display: flex;
   flex-direction: column;
-  gap: 0.8rem;
+  gap: 1rem;
   position: relative;
   overflow: hidden;
   opacity: 0;
   transform: translateY(20px);
   animation: fadeInUp 0.5s forwards;
+  transition: all var(--transition-medium);
 }
 .friend-card:hover {
   transform: translateY(-6px);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-md), var(--shadow-glow);
+  background: linear-gradient(145deg, #fff, #f7f7f7);
 }
 .friend-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
-.friend-name { font-weight: 700; font-size: 1.1rem; color: var(--neutral-dark); }
+.friend-name {
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--neutral-dark);
+}
 .friend-card button {
-  background: #f77a7a;
-  border: none;
-  color: #fff;
-  padding: 0.4rem 0.8rem;
-  border-radius: 8px;
+  padding: 0.5rem 0.9rem;
+  border-radius: var(--radius-md);
   cursor: pointer;
   font-weight: 700;
-  transition: transform .15s ease, box-shadow .15s ease;
+  transition: all var(--transition-fast);
+  border: 1px solid transparent;
 }
 .friend-card button:hover {
-  opacity: 0.9;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: var(--shadow-glow);
 }
+.friend-card button.accept { background: var(--accent-green); color: var(--white); }
+.friend-card button.reject { background: var(--accent-red); color: var(--white); }
+.friend-card button.remove { background: var(--accent-red); color: var(--white); }
 
-/* Feed Section - Grid Layout */
+/* Feed Section */
 .feed-section.grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 0.6rem;
-  margin-top: 0.6rem;
+  gap: 0.8rem;
+  margin-top: 0.8rem;
 }
 .feed-item {
-  padding: 0.5rem 0.7rem;
+  padding: 0.6rem 0.9rem;
   border-radius: 20px;
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   display: flex;
   align-items: center;
+  gap: 0.5rem;
   justify-content: flex-start;
-  gap: 0.4rem;
-  transition: transform .15s ease;
+  transition: all var(--transition-fast);
 }
-.feed-item:hover { transform: translateY(-2px); }
+.feed-item:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: var(--shadow-sm);
+}
 .feed-item.mood { background: var(--accent-yellow); color: #222; }
 .feed-item.meal { background: var(--accent-green); color: #222; }
 .feed-item.encouragement-item { background: #e3f2fd; color: #222; }
@@ -134,38 +194,59 @@
 /* Encourage Section */
 .encourage-section {
   display: flex;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
+  gap: 0.6rem;
+  margin-top: 0.6rem;
   opacity: 0;
   animation: fadeIn 0.5s forwards;
   animation-delay: 0.3s;
 }
 .encourage-section input {
   flex: 1;
-  padding: 0.5rem 0.7rem;
-  border-radius: 10px;
-  border: 1px solid #eee;
-  transition: transform .2s ease, box-shadow .2s ease;
+  padding: 0.6rem 0.9rem;
+  border-radius: var(--radius-md);
+  border: 1px solid #ddd;
+  transition: all var(--transition-fast);
 }
 .encourage-section input:focus {
   outline: none;
-  transform: scale(1.02);
-  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  transform: scale(1.03);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.1);
 }
 .encourage-section button {
-  padding: 0.5rem 0.8rem;
-  border-radius: 10px;
-  background: var(--neutral-dark);
+  padding: 0.55rem 1rem;
+  border-radius: var(--radius-md);
+  background: var(--accent-blue);
   color: var(--white);
   border: none;
   font-weight: 700;
   cursor: pointer;
-  transition: transform .15s ease, box-shadow .15s ease;
+  transition: all var(--transition-fast);
 }
 .encourage-section button:hover {
   transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+  box-shadow: var(--shadow-glow);
   opacity: 0.95;
+}
+
+/* Batch Action Buttons */
+.batch-actions {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 0.8rem;
+}
+.batch-actions button {
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  transition: all var(--transition-fast);
+  background: var(--accent-blue);
+  color: var(--white);
+}
+.batch-actions button:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: var(--shadow-glow);
 }
 
 /* Snackbar */
@@ -174,11 +255,11 @@
   bottom: 2rem;
   left: 50%;
   transform: translateX(-50%) translateY(100%);
-  padding: 0.8rem 1.4rem;
+  padding: 0.9rem 1.6rem;
   border-radius: var(--radius-md);
   color: #fff;
   font-weight: 600;
-  min-width: 200px;
+  min-width: 220px;
   text-align: center;
   z-index: 999;
   opacity: 0;
@@ -186,9 +267,13 @@
   box-shadow: var(--shadow-md);
   transition: transform 0.35s cubic-bezier(0.68,-0.55,0.265,1.55), opacity .35s ease;
 }
-.snackbar.show { transform: translateX(-50%) translateY(0); opacity: 1; pointer-events: auto; }
+.snackbar.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
 .snackbar.success { background: var(--accent-green); }
-.snackbar.error { background: #f77a7a; }
+.snackbar.error { background: var(--accent-red); }
 
 /* Animations */
 @keyframes fadeInUp { 0% {opacity:0; transform:translateY(8px);} 100% {opacity:1; transform:translateY(0);} }
@@ -198,11 +283,13 @@
 /* Responsive */
 @media(max-width:600px){
   .connect-section input{width:100%; max-width:320px;}
-  .friend-card{padding:0.8rem 1rem;}
+  .friend-card{padding:1rem 1.2rem;}
   .feed-section.grid{grid-template-columns:1fr;}
-  .feed-item{font-size:0.8rem; padding:0.4rem 0.6rem;}
+  .feed-item{font-size:0.82rem; padding:0.5rem 0.7rem;}
+  .batch-actions{flex-direction: column; gap:0.4rem;}
+  .connect-inputs{flex-direction: column; gap:0.6rem;}
 }
 @media(max-width:400px){
   .connect-section{padding:1.5rem 1rem;}
-  .connect-section h2{font-size:1.4rem;}
+  .connect-section h2{font-size:1.5rem;}
 }
