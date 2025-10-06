@@ -44,7 +44,7 @@ const Navbar = () => {
       </ul>
 
       <div className="navbar-actions">
-        <input type="text" placeholder="Search..." className="form-input" />
+        {/* <input type="text" placeholder="Search..." className="form-input" /> */}
         <button className="logout-button" onClick={() => logout(navigate)}>Logout</button>
       </div>
     </nav>
