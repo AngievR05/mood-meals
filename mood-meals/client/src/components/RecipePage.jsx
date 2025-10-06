@@ -19,7 +19,7 @@ const RecipePage = ({ mealId, onClose }) => {
         const res = await axios.get(`${BACKEND_URL}/api/meals/${mealId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        const meal = res.data;
+        const meal = res.data || {};
 
         // Ensure ingredients & steps are arrays
         meal.ingredients = Array.isArray(meal.ingredients)
@@ -35,7 +35,9 @@ const RecipePage = ({ mealId, onClose }) => {
         const savedRes = await axios.get(`${BACKEND_URL}/api/saved-meals`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        const isSaved = savedRes.data.some(m => m.meal_id === meal.id || m.id === meal.id);
+        const isSaved = Array.isArray(savedRes.data)
+          ? savedRes.data.some((m) => m.meal_id === meal.id || m.id === meal.id)
+          : false;
         setSaved(isSaved);
       } catch (err) {
         console.error("Error fetching recipe:", err);
@@ -52,16 +54,13 @@ const RecipePage = ({ mealId, onClose }) => {
 
     try {
       if (!saved) {
-        await axios.post(
-          `${BACKEND_URL}/api/saved-meals/${recipe.id}/save`,
-          {},
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        await axios.post(`${BACKEND_URL}/api/saved-meals/${recipe.id}/save`, {}, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
       } else {
-        await axios.delete(
-          `${BACKEND_URL}/api/saved-meals/${recipe.id}/unsave`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        await axios.delete(`${BACKEND_URL}/api/saved-meals/${recipe.id}/unsave`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
       }
       setSaved(!saved);
     } catch (err) {
@@ -74,17 +73,19 @@ const RecipePage = ({ mealId, onClose }) => {
 
   const imageSrc = recipe.image_url?.startsWith("http")
     ? recipe.image_url
-    : `${BACKEND_URL}${recipe.image_url}`;
+    : `${BACKEND_URL}${recipe.image_url || "/default-meal.png"}`;
+
+  const moodName = typeof recipe.mood === "string" ? recipe.mood : "";
 
   return (
     <div className="recipe-page">
       <button onClick={onClose} className="back-btn">← Close</button>
 
       <div className="recipe-header">
-        <h1>{recipe.name}</h1>
-        {recipe.mood && (
-          <span className={`mood-badge ${recipe.mood.toLowerCase()}`}>
-            {recipe.mood}
+        <h1>{recipe.name || "Untitled Meal"}</h1>
+        {moodName && (
+          <span className={`mood-badge ${moodName.toLowerCase()}`}>
+            {moodName}
           </span>
         )}
         <button className={`save-btn floating ${saved ? "saved" : ""}`} onClick={toggleSave}>
@@ -93,19 +94,25 @@ const RecipePage = ({ mealId, onClose }) => {
       </div>
 
       {recipe.image_url && <img src={imageSrc} alt={recipe.name} className="recipe-image" />}
-      <p className="recipe-description">{recipe.description}</p>
+      <p className="recipe-description">{recipe.description || "No description available."}</p>
 
       <h2>📝 Ingredients</h2>
       <ul className="recipe-list ingredients-list">
-        {recipe.ingredients.map((item, idx) => <li key={idx}>{item}</li>)}
+        {Array.isArray(recipe.ingredients) && recipe.ingredients.length > 0 ? (
+          recipe.ingredients.map((item, idx) => <li key={idx}>{item}</li>)
+        ) : (
+          <li>No ingredients provided.</li>
+        )}
       </ul>
 
       <h2>👨‍🍳 Steps</h2>
-      {recipe.steps.length > 0 ? (
+      {Array.isArray(recipe.steps) && recipe.steps.length > 0 ? (
         <ol className="recipe-list steps-list">
           {recipe.steps.map((step, idx) => <li key={idx}>{step}</li>)}
         </ol>
-      ) : <p>No steps provided.</p>}
+      ) : (
+        <p>No steps provided.</p>
+      )}
     </div>
   );
 };

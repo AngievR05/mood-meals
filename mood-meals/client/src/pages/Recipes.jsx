@@ -12,96 +12,85 @@ const Recipes = () => {
   const [selectedMealId, setSelectedMealId] = useState(null);
   const [moods, setMoods] = useState([]);
   const [moodFilter, setMoodFilter] = useState("all");
-  const [savedMeals, setSavedMeals] = useState([]);
 
   const token = localStorage.getItem("token");
-  const BACKEND_URL =
-    process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
 
-  // Fetch saved meals
+  // Fetch meals and saved meals together
   useEffect(() => {
-    const fetchSaved = async () => {
-      try {
-        const res = await axios.get(`${BACKEND_URL}/api/saved-meals`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setSavedMeals(res.data.map((m) => m.meal_id || m.id));
-      } catch (err) {
-        console.error("Error fetching saved meals:", err);
-      }
-    };
-    fetchSaved();
-  }, [token, BACKEND_URL]);
-
-  // Fetch all meals
-  useEffect(() => {
-    const fetchMeals = async () => {
+    const fetchData = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`${BACKEND_URL}/api/meals`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const [mealsRes, savedRes] = await Promise.all([
+          axios.get(`${BACKEND_URL}/api/meals`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          axios.get(`${BACKEND_URL}/api/saved-meals`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+        ]);
 
-        const mealsWithSaved = res.data.map((meal) => ({
+        const mealsData = Array.isArray(mealsRes.data) ? mealsRes.data : [];
+        const savedIds = Array.isArray(savedRes.data)
+          ? savedRes.data.map((m) => m.meal_id || m.id)
+          : [];
+
+        // Add saved flag safely
+        const mealsWithSaved = mealsData.map((meal) => ({
           ...meal,
-          saved: savedMeals.includes(meal.id),
+          saved: savedIds.includes(meal.id),
+          mood: typeof meal.mood === "string" ? meal.mood : "Uncategorized",
         }));
 
         setAllMeals(mealsWithSaved);
+        setMeals(mealsWithSaved);
 
-        // Build unique mood list
+        // Build unique moods
         const uniqueMoods = [
-          ...new Set(
-            res.data.map(
-              (m) =>
-                m.mood?.charAt(0).toUpperCase() +
-                  m.mood?.slice(1).toLowerCase() || "Uncategorized"
-            )
-          ),
+          ...new Set(mealsWithSaved.map((m) =>
+            m.mood.charAt(0).toUpperCase() + m.mood.slice(1).toLowerCase()
+          )),
         ];
         setMoods(uniqueMoods);
       } catch (err) {
         console.error("Error fetching meals:", err);
         setAllMeals([]);
+        setMeals([]);
+        setMoods([]);
       } finally {
         setLoading(false);
       }
     };
-    fetchMeals();
-  }, [token, BACKEND_URL, savedMeals]);
+
+    fetchData();
+  }, [token, BACKEND_URL]);
 
   // Apply mood filter
   useEffect(() => {
-    let filtered = [...allMeals];
-
-    if (moodFilter !== "all") {
-      filtered = filtered.filter(
-        (meal) =>
-          meal.mood &&
-          meal.mood.toLowerCase() === moodFilter.toLowerCase()
+    if (moodFilter.toLowerCase() === "all") {
+      setMeals(allMeals);
+    } else {
+      const filtered = allMeals.filter(
+        (meal) => meal.mood.toLowerCase() === moodFilter.toLowerCase()
       );
+      setMeals(filtered);
     }
-
-    setMeals(filtered);
   }, [moodFilter, allMeals]);
 
   // Toggle saved state
   const handleToggleSave = (mealId, currentSaved) => {
     setAllMeals((prev) =>
-      prev.map((m) =>
-        m.id === mealId ? { ...m, saved: !currentSaved } : m
-      )
+      prev.map((m) => (m.id === mealId ? { ...m, saved: !currentSaved } : m))
     );
-    setSavedMeals((prev) =>
-      currentSaved ? prev.filter((id) => id !== mealId) : [...prev, mealId]
+    setMeals((prev) =>
+      prev.map((m) => (m.id === mealId ? { ...m, saved: !currentSaved } : m))
     );
   };
 
   return (
     <div className="recipes-page">
       <h1>
-        Recipes{" "}
-        {moodFilter !== "all" ? `for ${moodFilter}` : "for All Moods"}
+        Recipes {moodFilter !== "all" ? `for ${moodFilter}` : "for All Moods"}
       </h1>
 
       <div className="recipes-filter">
@@ -124,7 +113,7 @@ const Recipes = () => {
         <p className="no-meals">Loading recipes...</p>
       ) : meals.length > 0 ? (
         <MealsList
-          meals={meals} // Pass filtered meals directly
+          meals={meals}
           onToggleSave={handleToggleSave}
           onViewRecipe={(id) => setSelectedMealId(id)}
         />
@@ -133,18 +122,9 @@ const Recipes = () => {
       )}
 
       {selectedMealId && (
-        <div
-          className="modal-overlay"
-          onClick={() => setSelectedMealId(null)}
-        >
-          <div
-            className="modal-content"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <RecipePage
-              mealId={selectedMealId}
-              onClose={() => setSelectedMealId(null)}
-            />
+        <div className="modal-overlay" onClick={() => setSelectedMealId(null)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <RecipePage mealId={selectedMealId} onClose={() => setSelectedMealId(null)} />
           </div>
         </div>
       )}

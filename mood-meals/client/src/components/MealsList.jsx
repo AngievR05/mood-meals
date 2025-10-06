@@ -18,7 +18,7 @@ const MealsList = ({
   const [selectedMealId, setSelectedMealId] = useState(null);
   const token = localStorage.getItem("token");
 
-  // Fetch meals from backend
+  // Fetch meals
   useEffect(() => {
     const fetchMeals = async () => {
       setLoading(true);
@@ -26,7 +26,11 @@ const MealsList = ({
         const res = await axios.get(`${backendUrl}/api/meals`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setMeals(res.data);
+        // Ensure meal.mood is always a string
+        const mealsData = Array.isArray(res.data)
+          ? res.data.map((m) => ({ ...m, mood: typeof m.mood === "string" ? m.mood : "Uncategorized" }))
+          : [];
+        setMeals(mealsData);
       } catch (err) {
         console.error("Failed to fetch meals:", err);
         setMeals([]);
@@ -37,22 +41,32 @@ const MealsList = ({
     fetchMeals();
   }, [token, backendUrl]);
 
-  // Filter & sort
+  // Filter & sort safely
   const filteredMeals = meals
     .filter((m) => {
-      if (filter === "mood") return currentMood ? m.mood?.toLowerCase() === currentMood.name?.toLowerCase() : true;
-      if (filter === "saved") return m.saved;
+      // Mood filter
+      if (filter === "mood" && currentMood) {
+        const mealMood = typeof m.mood === "string" ? m.mood.toLowerCase() : "";
+        const currentMoodName =
+          typeof currentMood === "string"
+            ? currentMood.toLowerCase()
+            : currentMood?.name?.toLowerCase() || "";
+        return mealMood === currentMoodName;
+      }
+      // Saved filter
+      if (filter === "saved") return !!m.saved;
       return true;
     })
-    .filter((m) => m.name?.toLowerCase().includes(searchQuery.toLowerCase()))
+    .filter((m) =>
+      m.name?.toLowerCase().includes(searchQuery?.toLowerCase() || "")
+    )
     .sort((a, b) => {
-      if (sortOption === "name") return a.name.localeCompare(b.name);
+      if (sortOption === "name") return (a.name || "").localeCompare(b.name || "");
       if (sortOption === "mood") return (a.mood || "").localeCompare(b.mood || "");
       if (sortOption === "recent") return new Date(b.created_at) - new Date(a.created_at);
       return 0;
     });
 
-  // Toggle save
   const toggleSave = async (mealId) => {
     try {
       const meal = meals.find((m) => m.id === mealId);
@@ -63,11 +77,9 @@ const MealsList = ({
         prev.map((m) => (m.id === mealId ? { ...m, saved: newSaved } : m))
       );
 
-      await axios.post(
-        `${backendUrl}/api/saved-meals/${mealId}/toggle`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await axios.post(`${backendUrl}/api/saved-meals/${mealId}/toggle`, {}, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       if (onToggleSave) onToggleSave(mealId, newSaved);
     } catch (err) {
@@ -82,23 +94,24 @@ const MealsList = ({
     <section className="meals-section">
       <div className="meals-grid">
         {filteredMeals.map((meal) => {
-          const imageSrc = meal.image_url?.startsWith("http")
-            ? meal.image_url
-            : `${backendUrl}${meal.image_url}`;
+          const imageSrc =
+            meal.image_url?.startsWith("http")
+              ? meal.image_url
+              : `${backendUrl}${meal.image_url || "/default-meal.png"}`;
+
+          const mealMood = typeof meal.mood === "string" ? meal.mood : "Uncategorized";
 
           return (
             <div className="meal-card" key={meal.id}>
-              {meal.image_url && (
-                <div className="meal-image-wrapper">
-                  <img src={imageSrc} alt={meal.name} className="meal-image" />
-                </div>
-              )}
+              <div className="meal-image-wrapper">
+                <img src={imageSrc} alt={meal.name || "Meal"} className="meal-image" />
+              </div>
 
               <div className="meal-header">
                 <h3>{meal.name}</h3>
-                {meal.mood && (
-                  <span className={`mood-badge ${meal.mood.toLowerCase()}`}>
-                    {meal.mood}
+                {mealMood && (
+                  <span className={`mood-badge ${mealMood.toLowerCase().replace(/\s+/g, "-")}`}>
+                    {mealMood}
                   </span>
                 )}
               </div>
@@ -106,10 +119,20 @@ const MealsList = ({
               <p className="meal-description">{meal.description}</p>
 
               <div className="meal-card-actions">
-                <button className="recipe-btn" onClick={() => setSelectedMealId(meal.id)}>
+                <button
+                  className="recipe-btn"
+                  onClick={() => setSelectedMealId(meal.id)}
+                >
                   View Recipe
                 </button>
-                
+                {onToggleSave && (
+                  <button
+                    className={`save-btn ${meal.saved ? "saved" : ""}`}
+                    onClick={() => toggleSave(meal.id)}
+                  >
+                    {meal.saved ? "★" : "☆"}
+                  </button>
+                )}
               </div>
             </div>
           );

@@ -37,6 +37,7 @@ const Home = () => {
   const [recentMoods, setRecentMoods] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [mealFilterResetKey, setMealFilterResetKey] = useState(0); // triggers MealSuggestions reset
   const token = localStorage.getItem("token");
 
   const fetchJSON = async (url, options) => {
@@ -75,6 +76,11 @@ const Home = () => {
     };
     fetchData();
   }, [token]);
+
+  // Reset MealSuggestions filterMode whenever mood changes
+  useEffect(() => {
+    setMealFilterResetKey((prev) => prev + 1);
+  }, [selectedMood, todayMood?.mood]);
 
   const handleSaveMood = async () => {
     if (!selectedMood) return setError("Please select a mood!");
@@ -170,27 +176,26 @@ const Home = () => {
           disabled={loading}
         />
 
-        <button
-          className="btn btn-primary"
-          onClick={handleSaveMood}
-          disabled={loading}
-        >
+        <button className="btn btn-primary" onClick={handleSaveMood} disabled={loading}>
           {loading ? <img src={spinner} alt="Loading..." style={{ width: 24 }} /> : "Save Mood Entry"}
         </button>
       </section>
 
-{/* Streak + Grocery Section */}
-<section className="streak-grocery-wrapper">
-  <div className="streak-wrapper">
-    <StreakTracker currentMood={selectedMood || todayMood?.mood} />
-  </div>
-  <div className="grocery-wrapper">
-    <GrocerySection />
-  </div>
-</section>
+      {/* Streak + Grocery Section */}
+      <section className="streak-grocery-wrapper">
+        <div className="streak-wrapper">
+          <StreakTracker currentMood={selectedMood || todayMood?.mood} />
+        </div>
+        <div className="grocery-wrapper">
+          <GrocerySection />
+        </div>
+      </section>
 
-
-      <MealSuggestions currentMood={selectedMood || todayMood?.mood} />
+      {/* Meal Suggestions */}
+      <MealSuggestions
+        key={mealFilterResetKey} // forces re-render to reset filterMode
+        currentMood={selectedMood || todayMood?.mood}
+      />
     </div>
   );
 };

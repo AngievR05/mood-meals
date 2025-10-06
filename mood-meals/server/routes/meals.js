@@ -1,4 +1,3 @@
-// routes/meals.js
 const express = require("express");
 const router = express.Router();
 const { pool } = require("../config/db");
@@ -18,7 +17,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max
+  limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     const allowed = ["image/jpeg", "image/png", "image/webp"];
     if (!allowed.includes(file.mimetype)) return cb(new Error("Only JPEG, PNG, or WEBP allowed"));
@@ -37,9 +36,11 @@ router.post("/", verifyToken, verifyAdmin, async (req, res) => {
     const { name, description, ingredients, mood, image_url, steps } = req.body;
     if (!name || !mood) return res.status(400).json({ message: "Name and mood are required" });
 
+    const moodArray = Array.isArray(mood) ? mood.map(m => m.trim()) : [mood.trim()];
+
     await pool.query(
       "INSERT INTO meals (name, description, ingredients, mood, image_url, steps) VALUES (?, ?, ?, ?, ?, ?)",
-      [name.trim(), description || null, JSON.stringify(ingredients || []), mood, image_url || null, JSON.stringify(steps || [])]
+      [name.trim(), description || null, JSON.stringify(ingredients || []), JSON.stringify(moodArray), image_url || null, JSON.stringify(steps || [])]
     );
 
     res.status(201).json({ message: "✅ Meal added successfully" });
@@ -57,9 +58,11 @@ router.put("/:id", verifyToken, verifyAdmin, async (req, res) => {
 
     if (!name || !mood) return res.status(400).json({ message: "Name and mood are required" });
 
+    const moodArray = Array.isArray(mood) ? mood.map(m => m.trim()) : [mood.trim()];
+
     const [result] = await pool.query(
       "UPDATE meals SET name = ?, description = ?, ingredients = ?, mood = ?, image_url = ?, steps = ? WHERE id = ?",
-      [name.trim(), description || null, JSON.stringify(ingredients || []), mood, image_url || null, JSON.stringify(steps || []), id]
+      [name.trim(), description || null, JSON.stringify(ingredients || []), JSON.stringify(moodArray), image_url || null, JSON.stringify(steps || []), id]
     );
 
     if (result.affectedRows === 0) return res.status(404).json({ message: "Meal not found" });
@@ -92,6 +95,7 @@ router.get("/:id", verifyToken, async (req, res) => {
     const meal = rows[0];
     meal.ingredients = safeParseJSON(meal.ingredients);
     meal.steps = safeParseJSON(meal.steps);
+    meal.mood = safeParseJSON(meal.mood);
     res.json(meal);
   } catch (err) {
     console.error(err);
@@ -103,7 +107,12 @@ router.get("/:id", verifyToken, async (req, res) => {
 router.get("/", verifyToken, async (req, res) => {
   try {
     const [rows] = await pool.query("SELECT * FROM meals ORDER BY created_at DESC");
-    const meals = rows.map(r => ({ ...r, ingredients: safeParseJSON(r.ingredients), steps: safeParseJSON(r.steps) }));
+    const meals = rows.map(r => ({
+      ...r,
+      ingredients: safeParseJSON(r.ingredients),
+      steps: safeParseJSON(r.steps),
+      mood: safeParseJSON(r.mood)
+    }));
     res.json(meals);
   } catch (err) {
     console.error(err);
@@ -116,10 +125,15 @@ router.get("/mood/:mood", verifyToken, async (req, res) => {
   try {
     const moodParam = req.params.mood.toLowerCase();
     const [rows] = await pool.query(
-      "SELECT * FROM meals WHERE LOWER(mood) = ? ORDER BY created_at DESC",
-      [moodParam]
+      "SELECT * FROM meals WHERE JSON_CONTAINS(LOWER(mood), ?) ORDER BY created_at DESC",
+      [`"${moodParam}"`]
     );
-    const meals = rows.map(r => ({ ...r, ingredients: safeParseJSON(r.ingredients), steps: safeParseJSON(r.steps) }));
+    const meals = rows.map(r => ({
+      ...r,
+      ingredients: safeParseJSON(r.ingredients),
+      steps: safeParseJSON(r.steps),
+      mood: safeParseJSON(r.mood)
+    }));
     res.json(meals);
   } catch (err) {
     console.error(err);
