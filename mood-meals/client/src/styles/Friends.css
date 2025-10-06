@@ -172,6 +172,7 @@
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 0.8rem;
   margin-top: 0.8rem;
+  margin-right: 5rem;
 }
 .feed-item {
   padding: 0.6rem 0.9rem;
@@ -221,6 +222,7 @@
   font-weight: 700;
   cursor: pointer;
   transition: all var(--transition-fast);
+  margin-right: 5rem;
 }
 .encourage-section button:hover {
   transform: translateY(-2px) scale(1.05);

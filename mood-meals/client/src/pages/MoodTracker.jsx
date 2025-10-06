@@ -151,10 +151,10 @@ const MoodTracker = () => {
       <section className="tracker-header card">
         <h1>Your Mood Tracker</h1>
         <p>Track your emotions, reflect, and watch your Mood Jar fill up.</p>
-        <div className="streak-inline">
+        {/* <div className="streak-inline">
           <h3>🔥 Current Streak:</h3>
           <span className="streak-days">{streak} {streak === 1 ? 'day' : 'days'}</span>
-        </div>
+        </div> */}
       </section>
 
       <section className="mood-entry card">
