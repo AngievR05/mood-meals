@@ -21,16 +21,12 @@ const AddMealPage = () => {
   const [preview, setPreview] = useState(null);
   const [uploading, setUploading] = useState(false);
 
-  const handleChange = (e) => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
-  };
-
+  const handleChange = (e) => setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   const handleStepChange = (index, value) => {
     const newSteps = [...formData.steps];
     newSteps[index] = value;
     setFormData(prev => ({ ...prev, steps: newSteps }));
   };
-
   const addStep = () => setFormData(prev => ({ ...prev, steps: [...prev.steps, ""] }));
   const removeStep = (index) => setFormData(prev => ({ ...prev, steps: prev.steps.filter((_, i) => i !== index) }));
 
@@ -52,16 +48,13 @@ const AddMealPage = () => {
     try {
       const res = await fetch("http://localhost:5000/api/meals/upload", {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`, // only auth header
-        },
+        headers: { Authorization: `Bearer ${token}` },
         body: data,
       });
-
       const result = await res.json();
       if (!res.ok) throw new Error(result.message || "Upload failed");
-      setPreview(result.imageUrl); // automatically display uploaded image
-      return result.imageUrl;
+      setPreview(result.url);
+      return result.url;
     } catch (err) {
       toast.error(err.message);
       return "";
@@ -74,7 +67,6 @@ const AddMealPage = () => {
     e.preventDefault();
 
     const uploadedUrl = await uploadImage();
-
     const body = {
       name: formData.name,
       description: formData.description,

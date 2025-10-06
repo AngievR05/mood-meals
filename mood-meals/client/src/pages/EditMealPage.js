@@ -18,13 +18,11 @@ const EditMealPage = () => {
     image_url: "",
     steps: [""],
   });
-
   const [imageFile, setImageFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
 
-  // Fetch meal data on mount
   useEffect(() => {
     const fetchMeal = async () => {
       try {
@@ -61,7 +59,6 @@ const EditMealPage = () => {
   const addStep = () => setFormData(prev => ({ ...prev, steps: [...prev.steps, ""] }));
   const removeStep = (index) => setFormData(prev => ({ ...prev, steps: prev.steps.filter((_, i) => i !== index) }));
 
-  // Handle file input & preview
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -70,7 +67,6 @@ const EditMealPage = () => {
     }
   };
 
-  // Upload image to server
   const uploadImage = async () => {
     if (!imageFile) return formData.image_url;
     setUploading(true);
@@ -86,8 +82,8 @@ const EditMealPage = () => {
       });
       const result = await res.json();
       if (!res.ok) throw new Error(result.message || "Upload failed");
-      setPreview(result.imageUrl); // display uploaded image automatically
-      return result.imageUrl;
+      setPreview(result.url);
+      return result.url;
     } catch (err) {
       toast.error(err.message);
       return formData.image_url;
@@ -96,7 +92,6 @@ const EditMealPage = () => {
     }
   };
 
-  // Submit updated meal
   const handleSubmit = async (e) => {
     e.preventDefault();
     const uploadedUrl = await uploadImage();
