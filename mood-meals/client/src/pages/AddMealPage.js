@@ -65,8 +65,8 @@ const AddMealPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const uploadedUrl = await uploadImage();
+
     const body = {
       name: formData.name,
       description: formData.description,
@@ -99,7 +99,6 @@ const AddMealPage = () => {
         <input type="text" name="name" placeholder="Meal Name" value={formData.name} onChange={handleChange} required />
         <textarea name="description" placeholder="Description" value={formData.description} onChange={handleChange} required />
         <input type="text" name="ingredients" placeholder="Ingredients (comma separated)" value={formData.ingredients} onChange={handleChange} required />
-
         <select name="mood" value={formData.mood} onChange={handleChange}>
           {moods.map(m => <option key={m} value={m}>{m}</option>)}
         </select>

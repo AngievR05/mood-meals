@@ -95,6 +95,7 @@ const EditMealPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const uploadedUrl = await uploadImage();
+
     const body = {
       name: formData.name,
       description: formData.description,

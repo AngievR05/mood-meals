@@ -30,17 +30,23 @@ const safeParseJSON = (json, defaultValue = []) => {
   try { return JSON.parse(json); } catch { return defaultValue; }
 };
 
-// -------------------- CREATE MEAL (ADMIN ONLY) --------------------
+// Always return a single valid mood string
+const getPrimaryMood = (mood) => {
+  if (!mood || typeof mood !== "string" || mood.trim() === "") return "Happy";
+  return mood.trim();
+};
+
+// -------------------- CREATE MEAL --------------------
 router.post("/", verifyToken, verifyAdmin, async (req, res) => {
   try {
     const { name, description, ingredients, mood, image_url, steps } = req.body;
     if (!name || !mood) return res.status(400).json({ message: "Name and mood are required" });
 
-    const moodArray = Array.isArray(mood) ? mood.map(m => m.trim()) : [mood.trim()];
+    const primaryMood = getPrimaryMood(mood);
 
     await pool.query(
       "INSERT INTO meals (name, description, ingredients, mood, image_url, steps) VALUES (?, ?, ?, ?, ?, ?)",
-      [name.trim(), description || null, JSON.stringify(ingredients || []), JSON.stringify(moodArray), image_url || null, JSON.stringify(steps || [])]
+      [name.trim(), description || null, JSON.stringify(ingredients || []), primaryMood, image_url || null, JSON.stringify(steps || [])]
     );
 
     res.status(201).json({ message: "✅ Meal added successfully" });
@@ -50,23 +56,21 @@ router.post("/", verifyToken, verifyAdmin, async (req, res) => {
   }
 });
 
-// -------------------- UPDATE MEAL (ADMIN ONLY) --------------------
+// -------------------- UPDATE MEAL --------------------
 router.put("/:id", verifyToken, verifyAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     const { name, description, ingredients, mood, image_url, steps } = req.body;
-
     if (!name || !mood) return res.status(400).json({ message: "Name and mood are required" });
 
-    const moodArray = Array.isArray(mood) ? mood.map(m => m.trim()) : [mood.trim()];
+    const primaryMood = getPrimaryMood(mood);
 
     const [result] = await pool.query(
       "UPDATE meals SET name = ?, description = ?, ingredients = ?, mood = ?, image_url = ?, steps = ? WHERE id = ?",
-      [name.trim(), description || null, JSON.stringify(ingredients || []), JSON.stringify(moodArray), image_url || null, JSON.stringify(steps || []), id]
+      [name.trim(), description || null, JSON.stringify(ingredients || []), primaryMood, image_url || null, JSON.stringify(steps || []), id]
     );
 
     if (result.affectedRows === 0) return res.status(404).json({ message: "Meal not found" });
-
     res.json({ message: "✅ Meal updated successfully" });
   } catch (err) {
     console.error(err);
@@ -74,7 +78,7 @@ router.put("/:id", verifyToken, verifyAdmin, async (req, res) => {
   }
 });
 
-// -------------------- DELETE MEAL (ADMIN ONLY) --------------------
+// -------------------- DELETE MEAL --------------------
 router.delete("/:id", verifyToken, verifyAdmin, async (req, res) => {
   try {
     const { id } = req.params;
@@ -92,10 +96,12 @@ router.get("/:id", verifyToken, async (req, res) => {
   try {
     const [rows] = await pool.query("SELECT * FROM meals WHERE id = ?", [req.params.id]);
     if (!rows.length) return res.status(404).json({ message: "Meal not found" });
+
     const meal = rows[0];
     meal.ingredients = safeParseJSON(meal.ingredients);
     meal.steps = safeParseJSON(meal.steps);
-    meal.mood = safeParseJSON(meal.mood);
+    meal.mood = getPrimaryMood(meal.mood);
+
     res.json(meal);
   } catch (err) {
     console.error(err);
@@ -111,7 +117,7 @@ router.get("/", verifyToken, async (req, res) => {
       ...r,
       ingredients: safeParseJSON(r.ingredients),
       steps: safeParseJSON(r.steps),
-      mood: safeParseJSON(r.mood)
+      mood: getPrimaryMood(r.mood),
     }));
     res.json(meals);
   } catch (err) {
@@ -123,16 +129,16 @@ router.get("/", verifyToken, async (req, res) => {
 // -------------------- GET MEALS BY MOOD --------------------
 router.get("/mood/:mood", verifyToken, async (req, res) => {
   try {
-    const moodParam = req.params.mood.toLowerCase();
+    const moodParam = getPrimaryMood(req.params.mood);
     const [rows] = await pool.query(
-      "SELECT * FROM meals WHERE JSON_CONTAINS(LOWER(mood), ?) ORDER BY created_at DESC",
-      [`"${moodParam}"`]
+      "SELECT * FROM meals WHERE mood = ? ORDER BY created_at DESC",
+      [moodParam]
     );
     const meals = rows.map(r => ({
       ...r,
       ingredients: safeParseJSON(r.ingredients),
       steps: safeParseJSON(r.steps),
-      mood: safeParseJSON(r.mood)
+      mood: getPrimaryMood(r.mood),
     }));
     res.json(meals);
   } catch (err) {
@@ -141,7 +147,7 @@ router.get("/mood/:mood", verifyToken, async (req, res) => {
   }
 });
 
-// -------------------- UPLOAD MEAL IMAGE (ADMIN ONLY) --------------------
+// -------------------- UPLOAD MEAL IMAGE --------------------
 router.post("/upload", verifyToken, verifyAdmin, upload.single("image"), (req, res) => {
   if (!req.file) return res.status(400).json({ message: "No file uploaded" });
 

@@ -7,7 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 const moods = ["Happy", "Sad", "Angry", "Stressed", "Bored", "Energised", "Confused", "Grateful"];
 
 const AdminPanel = () => {
-  const [tab, setTab] = useState("meals"); // meals | feedback
+  const [tab, setTab] = useState("meals");
   const [meals, setMeals] = useState([]);
   const [feedback, setFeedback] = useState([]);
   const [loadingMeals, setLoadingMeals] = useState(false);
@@ -15,6 +15,13 @@ const AdminPanel = () => {
   const [filterMood, setFilterMood] = useState("");
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
+
+  // Mood badge renderer
+  const renderMoodBadge = (mood) => (
+    <span className={`mood-badge ${mood.toLowerCase().replace(/\s+/g, "-")}`}>
+      {mood || "Happy"}
+    </span>
+  );
 
   // Fetch meals
   const fetchMeals = async () => {
@@ -25,8 +32,8 @@ const AdminPanel = () => {
         : "http://localhost:5000/api/meals";
       const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
       const data = await res.json();
-      setMeals(data);
-    } catch (err) {
+      setMeals(Array.isArray(data) ? data : []);
+    } catch {
       toast.error("Error fetching meals");
     } finally {
       setLoadingMeals(false);
@@ -37,12 +44,10 @@ const AdminPanel = () => {
   const fetchFeedback = async () => {
     setLoadingFeedback(true);
     try {
-      const res = await fetch("http://localhost:5000/api/feedback", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch("http://localhost:5000/api/feedback", { headers: { Authorization: `Bearer ${token}` } });
       const data = await res.json();
-      setFeedback(data);
-    } catch (err) {
+      setFeedback(Array.isArray(data) ? data : []);
+    } catch {
       toast.error("Error fetching feedback");
     } finally {
       setLoadingFeedback(false);
@@ -54,8 +59,10 @@ const AdminPanel = () => {
     fetchFeedback();
   }, [filterMood]);
 
+  // Navigate to edit meal page
   const openEditMeal = (meal) => navigate(`/admin/edit-meal/${meal.id}`);
 
+  // Delete meal
   const handleDeleteMeal = async (id) => {
     if (!window.confirm("Are you sure you want to delete this meal?")) return;
     try {
@@ -72,6 +79,7 @@ const AdminPanel = () => {
     }
   };
 
+  // Resolve feedback
   const resolveFeedback = async (id) => {
     try {
       const res = await fetch(`http://localhost:5000/api/feedback/${id}/resolve`, {
@@ -92,16 +100,10 @@ const AdminPanel = () => {
       <h1>Admin Panel</h1>
 
       <div className="admin-controls">
-        <button
-          className={`primary-btn ${tab === "meals" ? "active-tab" : ""}`}
-          onClick={() => setTab("meals")}
-        >
+        <button className={`primary-btn ${tab === "meals" ? "active-tab" : ""}`} onClick={() => setTab("meals")}>
           Meals
         </button>
-        <button
-          className={`primary-btn ${tab === "feedback" ? "active-tab" : ""}`}
-          onClick={() => setTab("feedback")}
-        >
+        <button className={`primary-btn ${tab === "feedback" ? "active-tab" : ""}`} onClick={() => setTab("feedback")}>
           Feedback
         </button>
       </div>
@@ -138,8 +140,8 @@ const AdminPanel = () => {
                 {meals.map((meal) => (
                   <tr key={meal.id}>
                     <td>{meal.name}</td>
-                    <td>{meal.mood}</td>
-                    <td>{meal.description.slice(0, 50)}...</td>
+                    <td>{renderMoodBadge(meal.mood)}</td>
+                    <td>{meal.description?.slice(0, 50)}...</td>
                     <td>
                       <button className="edit-btn" onClick={() => openEditMeal(meal)}>
                         Edit
@@ -176,7 +178,7 @@ const AdminPanel = () => {
                   <tr key={f.id}>
                     <td>{f.username || f.user_id}</td>
                     <td>{f.subject}</td>
-                    <td>{f.message.slice(0, 50)}...</td>
+                    <td>{f.message?.slice(0, 50)}...</td>
                     <td>{f.status}</td>
                     <td>
                       {f.status !== "resolved" && (
