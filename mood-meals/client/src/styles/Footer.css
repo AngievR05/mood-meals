@@ -1,4 +1,4 @@
-:root{
+:root { 
   --primary-blue: #5d9cec;
   --secondary-blue: #4a89dc;
   --accent-yellow: #ffce54;
@@ -9,6 +9,7 @@
   --shadow-sm: 0 4px 12px rgba(0,0,0,0.06);
 }
 
+/* Wrapper */
 .footer-marquee-wrapper {
   position: fixed;
   bottom: 0;
@@ -23,33 +24,49 @@
   font-family: 'Segoe UI', sans-serif;
 }
 
+/* Marquee content */
 .footer-marquee {
   display: flex;
-  width: max-content;
-  gap: 2.5rem;
+  gap: 3rem; /* slightly wider spacing */
   animation: scroll-left 50s linear infinite;
   align-items: center;
+  white-space: nowrap;
 }
 
 .footer-marquee-wrapper:hover .footer-marquee {
   animation-play-state: paused;
 }
 
+/* Each item */
 .footer-marquee span {
-  white-space: nowrap;
+  display: inline-block;
   font-size: 0.95rem;
   font-weight: 600;
-  padding-right: 1rem;
   opacity: 0.95;
+  padding-right: 1rem;
+  transition: transform 0.3s ease;
 }
 
+.footer-marquee span a {
+  color: var(--accent-yellow);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.footer-marquee span a:hover {
+  color: var(--primary-blue);
+  text-decoration: underline;
+}
+
+/* Smooth infinite scroll */
 @keyframes scroll-left {
-  0% { transform: translateX(0%); }
+  0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
 }
 
-/* small screens: reduce size */
+/* Small screens: adjust spacing & speed */
 @media (max-width: 480px) {
-  .footer-marquee span { font-size: 0.85rem; padding-right: .6rem; }
-  .footer-marquee { gap: 1.2rem; animation-duration: 60s; }
+  .footer-marquee span { font-size: 0.85rem; padding-right: 0.8rem; }
+  .footer-marquee { gap: 1.5rem; animation-duration: 60s; }
 }
