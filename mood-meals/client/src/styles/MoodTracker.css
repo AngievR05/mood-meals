@@ -3,11 +3,14 @@
   padding: var(--space-lg);
   max-width: 100%;
   margin: 0;
+  background-color: #d7d7d7;
 }
 
 .tracker-header {
   text-align: center;
   margin-bottom: var(--space-md);
+  background-color: #5D9CEC;
+  color: #fff;
 }
 
 .mood-entry {
@@ -75,6 +78,13 @@
   text-align: center;
 }
 
+.mood-jar-log-wrapper {
+  background: #AC92EC;
+}
+.mood-jar-log-wrapper h2{
+  color: #fff;
+}
+
 .mood-jar-section {
   text-align: center;
   margin-bottom: var(--space-md);
@@ -92,9 +102,12 @@
 .log-item {
   display: flex;
   justify-content: space-between;
+  margin-bottom: 5px;
   align-items: center;
   padding: var(--space-md);
   border-bottom: 1px solid var(--neutral-light);
+  background-color: #fff;
+  border-radius: 5px;
 }
 
 .log-entry-left {

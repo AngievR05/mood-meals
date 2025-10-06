@@ -14,7 +14,7 @@
 /* Main container */
 .meals-dashboard {
   font-family: 'Segoe UI', sans-serif;
-  background-color: var(--neutral-light);
+  background-color: #d7d7d7;
   min-height: 100vh;
   padding: 2rem;
   color: var(--text-dark);
@@ -22,7 +22,7 @@
 
 /* Header */
 .dashboard-header {
-  background: linear-gradient(90deg, var(--primary-blue), var(--secondary-blue));
+  background-color: #FC6E51;
   color: var(--white);
   padding: 1.6rem 1rem;
   border-radius: var(--radius-lg);
@@ -39,6 +39,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  
 }
 
 .dashboard-header p {

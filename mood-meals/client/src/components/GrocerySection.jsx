@@ -52,7 +52,7 @@ const GrocerySection = ({ currentMood }) => {
       const res = await fetch("http://localhost:5000/api/groceries", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ item_name: input, quantity: "1 unit" }),
+        body: JSON.stringify({ item_name: input, quantity: "1" }),
       });
       const newItem = await res.json();
       setToBuy([...toBuy, newItem]);

@@ -73,7 +73,7 @@ const MealsDashboard = () => {
 
   return (
     <div className="meals-dashboard">
-      <section className="dashboard-header" style={{ background: headerGradient }}>
+      <section className="dashboard-header">
         <div className="header-top">
           <h1>My Meals Dashboard</h1>
           {role === "admin" && (

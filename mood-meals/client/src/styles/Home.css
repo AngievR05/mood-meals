@@ -18,7 +18,7 @@
 .home-container {
   font-family: 'Segoe UI', sans-serif;
   padding: 2rem;
-  background-color: var(--neutral-light);
+  background-color: #d7d7d7;
   min-height: 100vh;
 }
 
@@ -27,7 +27,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: var(--white);
+  background-color: #A0D468;
   padding: 1.5rem 2rem;
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
@@ -44,11 +44,11 @@
 .home-header h1 {
   font-size: 2.3rem;
   font-weight: 700;
-  color: var(--neutral-dark);
+  color: var(--white);
 }
 
 .home-header p {
-  color: #777;
+  color: var(--white);
   font-size: 1.1rem;
 }
 
@@ -92,6 +92,7 @@
   margin-bottom: 2.5rem;
   padding: 0 0.75rem;
 }
+
 
 /* Mood Cards */
 .mood-card {

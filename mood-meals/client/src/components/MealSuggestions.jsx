@@ -96,9 +96,9 @@ const MealSuggestions = ({ currentMood, onToggleSave }) => {
 
   const sliderSettings = {
     dots: true,
-    infinite: filteredMeals.length > 3,
+    infinite: filteredMeals.length > 4,
     speed: 500,
-    slidesToShow: Math.min(filteredMeals.length, 3),
+    slidesToShow: Math.min(filteredMeals.length, 4),
     slidesToScroll: 1,
     arrows: true,
     autoplay: filteredMeals.length > 1,
