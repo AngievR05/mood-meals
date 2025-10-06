@@ -126,20 +126,20 @@ const MealsDashboard = () => {
 
       <GrocerySection />
 
-      <MealsList
+      {/* <MealsList
         role={role}
         filter={activeFilter}
         searchQuery={searchQuery}
         currentMood={currentMood}
         showViewAllButton={true}
         backendUrl={BACKEND_URL}
-      />
+      /> */}
 
-      {currentMood && (
+      {/* {currentMood && (
         <section className="suggestions-section">
           <MealSuggestions currentMood={currentMood.name} />
         </section>
-      )}
+      )} */}
     </div>
   );
 };

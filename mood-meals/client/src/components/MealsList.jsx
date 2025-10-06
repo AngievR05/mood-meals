@@ -1,34 +1,39 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+// src/components/MealsList.jsx
+import React, { useState, useEffect } from "react";
 import RecipePage from "./RecipePage";
 import "../styles/MealsList.css";
 
 const MealsList = ({
+  meals: parentMeals = [],
   role = "user",
   filter = "all",
+  currentMood = null,
   searchQuery = "",
   sortOption = "name",
-  currentMood = null,
   showViewAllButton = false,
   onToggleSave,
   backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000",
 }) => {
-  const [meals, setMeals] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [meals, setMeals] = useState(parentMeals);
+  const [loading, setLoading] = useState(!parentMeals.length);
   const [selectedMealId, setSelectedMealId] = useState(null);
   const token = localStorage.getItem("token");
 
-  // Fetch meals
+  const normalizeMood = (mood) => (typeof mood === "string" ? mood.trim().toLowerCase() : "uncategorized");
+
+  // Fetch meals only if parentMeals is empty
   useEffect(() => {
+    if (parentMeals.length) return; // skip if meals passed from parent
+
     const fetchMeals = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`${backendUrl}/api/meals`, {
+        const res = await fetch(`${backendUrl}/api/meals`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        // Ensure meal.mood is always a string
-        const mealsData = Array.isArray(res.data)
-          ? res.data.map((m) => ({ ...m, mood: typeof m.mood === "string" ? m.mood : "Uncategorized" }))
+        const data = await res.json();
+        const mealsData = Array.isArray(data)
+          ? data.map((m) => ({ ...m, mood: normalizeMood(m.mood) }))
           : [];
         setMeals(mealsData);
       } catch (err) {
@@ -38,28 +43,20 @@ const MealsList = ({
         setLoading(false);
       }
     };
-    fetchMeals();
-  }, [token, backendUrl]);
 
-  // Filter & sort safely
+    fetchMeals();
+  }, [parentMeals, token, backendUrl]);
+
+  // Apply filters and sorting
   const filteredMeals = meals
     .filter((m) => {
-      // Mood filter
       if (filter === "mood" && currentMood) {
-        const mealMood = typeof m.mood === "string" ? m.mood.toLowerCase() : "";
-        const currentMoodName =
-          typeof currentMood === "string"
-            ? currentMood.toLowerCase()
-            : currentMood?.name?.toLowerCase() || "";
-        return mealMood === currentMoodName;
+        return normalizeMood(m.mood) === normalizeMood(currentMood);
       }
-      // Saved filter
       if (filter === "saved") return !!m.saved;
       return true;
     })
-    .filter((m) =>
-      m.name?.toLowerCase().includes(searchQuery?.toLowerCase() || "")
-    )
+    .filter((m) => m.name?.toLowerCase().includes(searchQuery?.toLowerCase() || ""))
     .sort((a, b) => {
       if (sortOption === "name") return (a.name || "").localeCompare(b.name || "");
       if (sortOption === "mood") return (a.mood || "").localeCompare(b.mood || "");
@@ -73,15 +70,13 @@ const MealsList = ({
       if (!meal) return;
 
       const newSaved = !meal.saved;
-      setMeals((prev) =>
-        prev.map((m) => (m.id === mealId ? { ...m, saved: newSaved } : m))
-      );
+      setMeals((prev) => prev.map((m) => (m.id === mealId ? { ...m, saved: newSaved } : m)));
+      if (onToggleSave) onToggleSave(mealId, newSaved);
 
-      await axios.post(`${backendUrl}/api/saved-meals/${mealId}/toggle`, {}, {
+      await fetch(`${backendUrl}/api/saved-meals/${mealId}/toggle`, {
+        method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       });
-
-      if (onToggleSave) onToggleSave(mealId, newSaved);
     } catch (err) {
       console.error("Error toggling save:", err);
     }
@@ -98,7 +93,6 @@ const MealsList = ({
             meal.image_url?.startsWith("http")
               ? meal.image_url
               : `${backendUrl}${meal.image_url || "/default-meal.png"}`;
-
           const mealMood = typeof meal.mood === "string" ? meal.mood : "Uncategorized";
 
           return (
@@ -119,17 +113,11 @@ const MealsList = ({
               <p className="meal-description">{meal.description}</p>
 
               <div className="meal-card-actions">
-                <button
-                  className="recipe-btn"
-                  onClick={() => setSelectedMealId(meal.id)}
-                >
+                <button className="recipe-btn" onClick={() => setSelectedMealId(meal.id)}>
                   View Recipe
                 </button>
                 {onToggleSave && (
-                  <button
-                    className={`save-btn ${meal.saved ? "saved" : ""}`}
-                    onClick={() => toggleSave(meal.id)}
-                  >
+                  <button className={`save-btn ${meal.saved ? "saved" : ""}`} onClick={() => toggleSave(meal.id)}>
                     {meal.saved ? "★" : "☆"}
                   </button>
                 )}
@@ -144,6 +132,17 @@ const MealsList = ({
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <RecipePage mealId={selectedMealId} onClose={() => setSelectedMealId(null)} />
           </div>
+        </div>
+      )}
+
+      {showViewAllButton && (
+        <div className="view-all-btn-wrapper">
+          <button
+            className="view-all-btn"
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          >
+            View All Meals
+          </button>
         </div>
       )}
     </section>
