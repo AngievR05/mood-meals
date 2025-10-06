@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from "react";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import "../styles/Home.css";
 import "../styles/design-system.css";
 import "../styles/utils.css";
-import "../styles/MoodTracker.css"; // Needed for mood-entry card styling
+import "../styles/MoodTracker.css"; // For mood-entry card styling
 
 import StreakTracker from "../components/StreakTracker";
 import GrocerySection from "../components/GrocerySection";
@@ -69,7 +72,9 @@ const Home = () => {
         });
         setRecentMoods(Array.isArray(recent) ? recent : []);
       } catch (err) {
+        console.error(err);
         setError(err.message);
+        toast.error(`⚠️ ${err.message}`, { position: "bottom-right" });
       } finally {
         setLoading(false);
       }
@@ -83,7 +88,11 @@ const Home = () => {
   }, [selectedMood, todayMood?.mood]);
 
   const handleSaveMood = async () => {
-    if (!selectedMood) return setError("Please select a mood!");
+    if (!selectedMood) {
+      setError("Please select a mood!");
+      toast.warn("😕 Please select a mood before saving.", { position: "bottom-right" });
+      return;
+    }
     setLoading(true);
     setError("");
     try {
@@ -100,8 +109,14 @@ const Home = () => {
       setRecentMoods((prev) => [savedMood, ...prev.filter((m) => m.id !== savedMood.id)]);
       setSelectedMood("");
       setNote("");
+
+      toast.success(`🎉 Mood "${savedMood.mood}" saved successfully!`, {
+        position: "bottom-right",
+      });
     } catch (err) {
+      console.error(err);
       setError(err.message);
+      toast.error(`❌ Failed to save mood: ${err.message}`, { position: "bottom-right" });
     } finally {
       setLoading(false);
     }
@@ -117,8 +132,11 @@ const Home = () => {
       });
       setRecentMoods((prev) => prev.filter((m) => m.id !== id));
       if (todayMood?.id === id) setTodayMood(null);
+      toast.info("🗑️ Mood entry deleted.", { position: "bottom-right" });
     } catch (err) {
+      console.error(err);
       setError(err.message);
+      toast.error(`❌ ${err.message}`, { position: "bottom-right" });
     } finally {
       setLoading(false);
     }
@@ -126,10 +144,13 @@ const Home = () => {
 
   return (
     <div className="home-container">
+      {/* Toast Notifications */}
+      <ToastContainer theme="colored" autoClose={3000} pauseOnHover={false} />
+
       {/* Header */}
       <header className="home-header">
         <div className="header-left">
-          <h1>Welcome back 👋</h1>
+          <h1>Welcome back </h1>
           <p>How are you feeling today?</p>
         </div>
         <div className="header-right">

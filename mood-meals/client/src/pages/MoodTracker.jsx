@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import '../styles/MoodTracker.css';
 import '../styles/StreakTracker.css';
 import JarSVG from '../components/JarSVG';
@@ -43,7 +45,6 @@ const MoodTracker = () => {
   const [todaysMood, setTodaysMood] = useState(null);
   const [streak, setStreak] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
 
   const token = localStorage.getItem('token');
 
@@ -64,7 +65,6 @@ const MoodTracker = () => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      setError('');
       try {
         const moodsData = await fetchJSON('http://localhost:5000/api/moods', {
           headers: { Authorization: `Bearer ${token}` },
@@ -81,7 +81,7 @@ const MoodTracker = () => {
         });
         setStreak(streakData.streak || 0);
       } catch (err) {
-        setError(err.message);
+        toast.error(`⚠️ ${err.message}`);
         setRecentMoods([]);
         setTodaysMood(null);
         setStreak(0);
@@ -94,9 +94,12 @@ const MoodTracker = () => {
   }, [token]);
 
   const handleSave = async () => {
-    if (!selectedMood) return setError('Please select a mood!');
+    if (!selectedMood) {
+      toast.warning('😅 Please select a mood before saving!');
+      return;
+    }
+
     setLoading(true);
-    setError('');
     try {
       const savedMood = await fetchJSON('http://localhost:5000/api/moods', {
         method: 'POST',
@@ -119,8 +122,9 @@ const MoodTracker = () => {
 
       setSelectedMood('');
       setNote('');
+      toast.success(`🎉 Mood "${savedMood.mood}" saved successfully!`);
     } catch (err) {
-      setError(err.message);
+      toast.error(`❌ ${err.message}`);
     } finally {
       setLoading(false);
     }
@@ -142,6 +146,8 @@ const MoodTracker = () => {
 
   return (
     <div className="tracker-container">
+      <ToastContainer position="top-right" autoClose={2500} hideProgressBar theme="colored" />
+
       <section className="tracker-header card">
         <h1>Your Mood Tracker</h1>
         <p>Track your emotions, reflect, and watch your Mood Jar fill up.</p>
@@ -153,7 +159,6 @@ const MoodTracker = () => {
 
       <section className="mood-entry card">
         <h2>Add Your Mood Entry</h2>
-        {error && <p className="auth-error">{error}</p>}
         <div className="mood-grid">
           {moods.map(mood => (
             <button
@@ -216,6 +221,7 @@ const MoodTracker = () => {
           </ul>
         </div>
       </section>
+
       <MoodRadialChart />
     </div>
   );

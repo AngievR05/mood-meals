@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "../styles/GrocerySection.css";
 
 const moodHints = {
@@ -33,6 +35,7 @@ const GrocerySection = ({ currentMood }) => {
         setBought(data.filter((g) => g.purchased === 1));
       } catch (err) {
         console.error(err);
+        toast.error("⚠️ Failed to load groceries.");
       }
     };
     fetchGroceries();
@@ -47,7 +50,7 @@ const GrocerySection = ({ currentMood }) => {
   }, [currentMood]);
 
   const addItem = async () => {
-    if (!input.trim()) return;
+    if (!input.trim()) return toast.warn("📝 Please enter an item name.");
     try {
       const res = await fetch("http://localhost:5000/api/groceries", {
         method: "POST",
@@ -57,8 +60,10 @@ const GrocerySection = ({ currentMood }) => {
       const newItem = await res.json();
       setToBuy([...toBuy, newItem]);
       setInput("");
+      toast.success("✅ Item added to list!");
     } catch (err) {
       console.error(err);
+      toast.error("❌ Failed to add item.");
     }
   };
 
@@ -70,8 +75,10 @@ const GrocerySection = ({ currentMood }) => {
       });
       if (isBought) setBought(bought.filter((i) => i.id !== item.id));
       else setToBuy(toBuy.filter((i) => i.id !== item.id));
+      toast.info(`🗑️ Deleted "${item.item_name}"`);
     } catch (err) {
       console.error(err);
+      toast.error("❌ Could not delete item.");
     }
   };
 
@@ -86,12 +93,15 @@ const GrocerySection = ({ currentMood }) => {
       if (isBought) {
         setBought(bought.filter((i) => i.id !== item.id));
         setToBuy([...toBuy, updatedItem]);
+        toast.info(`↩️ Moved "${item.item_name}" back to To Buy.`);
       } else {
         setToBuy(toBuy.filter((i) => i.id !== item.id));
         setBought([...bought, updatedItem]);
+        toast.success(`✔️ Marked "${item.item_name}" as bought!`);
       }
     } catch (err) {
       console.error(err);
+      toast.error("❌ Could not update item.");
     }
   };
 
@@ -106,8 +116,10 @@ const GrocerySection = ({ currentMood }) => {
 
       if (isBought) setBought(bought.map((i) => (i.id === item.id ? updated : i)));
       else setToBuy(toBuy.map((i) => (i.id === item.id ? updated : i)));
+      toast.info(`🔢 Updated "${item.item_name}" quantity to ${value}.`);
     } catch (err) {
       console.error(err);
+      toast.error("❌ Failed to update quantity.");
     }
   };
 
@@ -133,8 +145,11 @@ const GrocerySection = ({ currentMood }) => {
 
   return (
     <div className="grocery-section">
+      <ToastContainer position="bottom-right" autoClose={2000} hideProgressBar theme="colored" />
+
       <h2>🛒 Grocery List</h2>
       {hint && <p className="mood-hint">{hint}</p>}
+
       <div className="grocery-input">
         <input
           type="text"
