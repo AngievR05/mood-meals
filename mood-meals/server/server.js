@@ -89,9 +89,10 @@ async function start(port = DEFAULT_PORT, attempt = 0) {
     await pool.query('SELECT 1');
     console.log('✅ MySQL pool connected');
 
-    const server = app.listen(port, () =>
-      console.log(`🚀 Server running on http://localhost:${port}`)
-    );
+    const server = app.listen(port, '0.0.0.0', () =>
+  console.log(`🚀 Server running on http://0.0.0.0:${port}`)
+);
+
 
     server.on('error', (err) => {
       if (err.code === 'EADDRINUSE') {
