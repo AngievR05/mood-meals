@@ -1,3 +1,4 @@
+// src/components/RecipePage.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "../styles/RecipePage.css";
@@ -8,7 +9,7 @@ const RecipePage = ({ mealId, onClose }) => {
   const [saved, setSaved] = useState(false);
 
   const token = localStorage.getItem("token");
-  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "/api";
 
   useEffect(() => {
     if (!mealId) return;
@@ -16,7 +17,7 @@ const RecipePage = ({ mealId, onClose }) => {
     const fetchMeal = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`${BACKEND_URL}/api/meals/${mealId}`, {
+        const res = await axios.get(`${BACKEND_URL}/meals/${mealId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const meal = res.data || {};
@@ -32,7 +33,7 @@ const RecipePage = ({ mealId, onClose }) => {
         setRecipe(meal);
 
         // Check if meal is saved by user
-        const savedRes = await axios.get(`${BACKEND_URL}/api/saved-meals`, {
+        const savedRes = await axios.get(`${BACKEND_URL}/saved-meals`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const isSaved = Array.isArray(savedRes.data)
@@ -54,11 +55,11 @@ const RecipePage = ({ mealId, onClose }) => {
 
     try {
       if (!saved) {
-        await axios.post(`${BACKEND_URL}/api/saved-meals/${recipe.id}/save`, {}, {
+        await axios.post(`${BACKEND_URL}/saved-meals/${recipe.id}/save`, {}, {
           headers: { Authorization: `Bearer ${token}` },
         });
       } else {
-        await axios.delete(`${BACKEND_URL}/api/saved-meals/${recipe.id}/unsave`, {
+        await axios.delete(`${BACKEND_URL}/saved-meals/${recipe.id}/unsave`, {
           headers: { Authorization: `Bearer ${token}` },
         });
       }
@@ -84,7 +85,7 @@ const RecipePage = ({ mealId, onClose }) => {
       <div className="recipe-header">
         <h1>{recipe.name || "Untitled Meal"}</h1>
         {moodName && (
-          <span className={`mood-badge ${moodName.toLowerCase()}`}>
+          <span className={`mood-badge ${moodName.toLowerCase().replace(/\s+/g, "-")}`}>
             {moodName}
           </span>
         )}

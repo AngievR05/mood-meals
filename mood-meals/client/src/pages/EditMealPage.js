@@ -1,3 +1,4 @@
+// src/pages/EditMealPage.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "../styles/AdminPanel.css";
@@ -9,6 +10,7 @@ const EditMealPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "/api";
 
   const [formData, setFormData] = useState({
     name: "",
@@ -23,10 +25,11 @@ const EditMealPage = () => {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
 
+  // Fetch meal data
   useEffect(() => {
     const fetchMeal = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/meals/${id}`, {
+        const res = await fetch(`${BACKEND_URL}/meals/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) throw new Error("Failed to fetch meal");
@@ -48,7 +51,7 @@ const EditMealPage = () => {
       }
     };
     fetchMeal();
-  }, [id, token, navigate]);
+  }, [id, token, navigate, BACKEND_URL]);
 
   const handleChange = (e) => setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   const handleStepChange = (index, value) => {
@@ -75,7 +78,7 @@ const EditMealPage = () => {
     data.append("image", imageFile);
 
     try {
-      const res = await fetch("http://localhost:5000/api/meals/upload", {
+      const res = await fetch(`${BACKEND_URL}/meals/upload`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: data,
@@ -106,7 +109,7 @@ const EditMealPage = () => {
     };
 
     try {
-      const res = await fetch(`http://localhost:5000/api/meals/${id}`, {
+      const res = await fetch(`${BACKEND_URL}/meals/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify(body),

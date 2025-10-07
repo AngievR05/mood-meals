@@ -1,3 +1,4 @@
+import * as API from "../api";
 import React, { useState, useEffect } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -66,17 +67,17 @@ const MoodTracker = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const moodsData = await fetchJSON('http://localhost:5000/api/moods', {
+        const moodsData = await fetchJSON('/api/moods', {
           headers: { Authorization: `Bearer ${token}` },
         });
         setRecentMoods(Array.isArray(moodsData) ? moodsData : []);
 
-        const todayData = await fetchJSON('http://localhost:5000/api/moods/today', {
+        const todayData = await fetchJSON('/api/moods/today', {
           headers: { Authorization: `Bearer ${token}` },
         });
         setTodaysMood(todayData);
 
-        const streakData = await fetchJSON('http://localhost:5000/api/user/streak', {
+        const streakData = await fetchJSON('/api/user/streak', {
           headers: { Authorization: `Bearer ${token}` },
         });
         setStreak(streakData.streak || 0);
@@ -101,7 +102,7 @@ const MoodTracker = () => {
 
     setLoading(true);
     try {
-      const savedMood = await fetchJSON('http://localhost:5000/api/moods', {
+      const savedMood = await fetchJSON('/api/moods', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -115,7 +116,7 @@ const MoodTracker = () => {
       setTodaysMood(savedMood);
 
       // Refresh streak
-      const streakData = await fetchJSON('http://localhost:5000/api/user/streak', {
+      const streakData = await fetchJSON('/api/user/streak', {
         headers: { Authorization: `Bearer ${token}` },
       });
       setStreak(streakData.streak || 0);

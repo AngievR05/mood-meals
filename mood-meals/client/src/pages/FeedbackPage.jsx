@@ -1,9 +1,10 @@
+import * as API from "../api";
 import React, { useState, useEffect } from "react"; 
 import FeedbackForm from "../components/FeedbackForm";
 import axios from "axios";
 import "../styles/FeedbackForm.css";
 
-const API_URL = "http://localhost:5000/api/feedback";
+const API_URL = "/api/feedback";
 
 const FeedbackPage = () => {
   const [pastFeedback, setPastFeedback] = useState([]);

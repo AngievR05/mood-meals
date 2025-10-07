@@ -3,6 +3,7 @@ import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "../styles/GrocerySection.css";
+import { fetchGroceries, addGrocery, updateGrocery, deleteGrocery } from "../api"; // <-- API
 
 const moodHints = {
   Happy: ["🍓 Add something sweet!", "🥗 Keep it colorful!"],
@@ -21,16 +22,11 @@ const GrocerySection = ({ currentMood }) => {
   const [bought, setBought] = useState([]);
   const [hint, setHint] = useState("");
 
-  const token = localStorage.getItem("token");
-
   // Fetch groceries on mount
   useEffect(() => {
-    const fetchGroceries = async () => {
+    const load = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/groceries", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const data = await res.json();
+        const data = await fetchGroceries();
         setToBuy(data.filter((g) => g.purchased === 0));
         setBought(data.filter((g) => g.purchased === 1));
       } catch (err) {
@@ -38,8 +34,8 @@ const GrocerySection = ({ currentMood }) => {
         toast.error("⚠️ Failed to load groceries.");
       }
     };
-    fetchGroceries();
-  }, [token]);
+    load();
+  }, []);
 
   // Mood hint
   useEffect(() => {
@@ -52,12 +48,7 @@ const GrocerySection = ({ currentMood }) => {
   const addItem = async () => {
     if (!input.trim()) return toast.warn("📝 Please enter an item name.");
     try {
-      const res = await fetch("http://localhost:5000/api/groceries", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ item_name: input, quantity: "1" }),
-      });
-      const newItem = await res.json();
+      const newItem = await addGrocery({ item_name: input, quantity: "1" });
       setToBuy([...toBuy, newItem]);
       setInput("");
       toast.success("✅ Item added to list!");
@@ -69,10 +60,7 @@ const GrocerySection = ({ currentMood }) => {
 
   const handleDelete = async (item, isBought) => {
     try {
-      await fetch(`http://localhost:5000/api/groceries/${item.id}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await deleteGrocery(item.id);
       if (isBought) setBought(bought.filter((i) => i.id !== item.id));
       else setToBuy(toBuy.filter((i) => i.id !== item.id));
       toast.info(`🗑️ Deleted "${item.item_name}"`);
@@ -84,12 +72,7 @@ const GrocerySection = ({ currentMood }) => {
 
   const toggleBought = async (item, isBought) => {
     try {
-      const updatedItem = await fetch(`http://localhost:5000/api/groceries/${item.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ ...item, purchased: isBought ? 0 : 1 }),
-      }).then((r) => r.json());
-
+      const updatedItem = await updateGrocery(item.id, { ...item, purchased: isBought ? 0 : 1 });
       if (isBought) {
         setBought(bought.filter((i) => i.id !== item.id));
         setToBuy([...toBuy, updatedItem]);
@@ -108,12 +91,7 @@ const GrocerySection = ({ currentMood }) => {
   const handleQtyChange = async (item, value, isBought) => {
     if (!value) return;
     try {
-      const updated = await fetch(`http://localhost:5000/api/groceries/${item.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ ...item, quantity: value }),
-      }).then((r) => r.json());
-
+      const updated = await updateGrocery(item.id, { ...item, quantity: value });
       if (isBought) setBought(bought.map((i) => (i.id === item.id ? updated : i)));
       else setToBuy(toBuy.map((i) => (i.id === item.id ? updated : i)));
       toast.info(`🔢 Updated "${item.item_name}" quantity to ${value}.`);

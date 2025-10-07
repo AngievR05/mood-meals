@@ -1,3 +1,4 @@
+import * as API from "../api";
 import React, { useState, useEffect } from 'react';   
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
@@ -50,11 +51,11 @@ const Profile = () => {
       setLoading(true);
       try {
         const [userRes, moodRes, streakRes, mealsRes, currentMoodRes] = await Promise.all([
-          axios.get('http://localhost:5000/api/profile', authConfig),
-          axios.get('http://localhost:5000/api/profile/mood-entries?range=90', authConfig),
-          axios.get('http://localhost:5000/api/profile/streak', authConfig),
-          axios.get('http://localhost:5000/api/profile/saved-meals', authConfig),
-          axios.get('http://localhost:5000/api/profile/current-mood', authConfig),
+          axios.get('/api/profile', authConfig),
+          axios.get('/api/profile/mood-entries?range=90', authConfig),
+          axios.get('/api/profile/streak', authConfig),
+          axios.get('/api/profile/saved-meals', authConfig),
+          axios.get('/api/profile/current-mood', authConfig),
         ]);
         setUser(userRes.data||{});
         setEditData({ username:userRes.data?.username||'', email:userRes.data?.email||'', avatar:userRes.data?.avatar||'Happy' });
@@ -73,7 +74,7 @@ const Profile = () => {
 
   const handleLogout = () => { localStorage.removeItem('token'); localStorage.removeItem('role'); navigate('/'); };
   const saveProfile = async () => {
-    try { await axios.put('http://localhost:5000/api/profile', editData, authConfig); setUser(prev=>({...prev, ...editData})); setShowEditModal(false); }
+    try { await axios.put('/api/profile', editData, authConfig); setUser(prev=>({...prev, ...editData})); setShowEditModal(false); }
     catch(err){ console.error(err); alert('Failed to update profile'); }
   };
   if(!user || loading) return <div className="loading">Loading profile…</div>;
@@ -124,7 +125,7 @@ const Profile = () => {
                 <p className="meal-mood">Matched moods: {m.mood||'—'}</p>
                 <div className="meal-actions">
                   <button className="btn small" onClick={()=>navigate(`/meals/${m.id}`)}>View</button>
-                  <button className="btn small danger" onClick={async ()=>{if(!window.confirm('Remove this saved meal?')) return; await axios.delete(`http://localhost:5000/api/profile/saved-meals/${m.id}`,authConfig); setSavedMeals(prev=>prev.filter(s=>s.id!==m.id));}}>Remove</button>
+                  <button className="btn small danger" onClick={async ()=>{if(!window.confirm('Remove this saved meal?')) return; await axios.delete(`/api/profile/saved-meals/${m.id}`,authConfig); setSavedMeals(prev=>prev.filter(s=>s.id!==m.id));}}>Remove</button>
                 </div>
               </div>
             </div>

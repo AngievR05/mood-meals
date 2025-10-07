@@ -1,3 +1,4 @@
+import * as API from "../api";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/AdminPanel.css";
@@ -28,8 +29,8 @@ const AdminPanel = () => {
     setLoadingMeals(true);
     try {
       const url = filterMood
-        ? `http://localhost:5000/api/meals/mood/${filterMood}`
-        : "http://localhost:5000/api/meals";
+        ? `/api/meals/mood/${filterMood}`
+        : "/api/meals";
       const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
       const data = await res.json();
       setMeals(Array.isArray(data) ? data : []);
@@ -44,7 +45,7 @@ const AdminPanel = () => {
   const fetchFeedback = async () => {
     setLoadingFeedback(true);
     try {
-      const res = await fetch("http://localhost:5000/api/feedback", { headers: { Authorization: `Bearer ${token}` } });
+      const res = await fetch("/api/feedback", { headers: { Authorization: `Bearer ${token}` } });
       const data = await res.json();
       setFeedback(Array.isArray(data) ? data : []);
     } catch {
@@ -66,7 +67,7 @@ const AdminPanel = () => {
   const handleDeleteMeal = async (id) => {
     if (!window.confirm("Are you sure you want to delete this meal?")) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/meals/${id}`, {
+      const res = await fetch(`/api/meals/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -82,7 +83,7 @@ const AdminPanel = () => {
   // Resolve feedback
   const resolveFeedback = async (id) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/feedback/${id}/resolve`, {
+      const res = await fetch(`/api/feedback/${id}/resolve`, {
         method: "PATCH",
         headers: { Authorization: `Bearer ${token}` },
       });

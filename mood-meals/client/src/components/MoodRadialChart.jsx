@@ -1,3 +1,4 @@
+import * as API from "../api";
 import React, { useEffect, useState } from 'react';
 import { Doughnut } from 'react-chartjs-2';
 import {
@@ -33,7 +34,7 @@ const MoodRadialChart = () => {
       setLoading(true);
       setError('');
       try {
-        const res = await fetch('http://localhost:5000/api/moods', {
+        const res = await fetch('/api/moods', {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) throw new Error('Failed to fetch mood data');

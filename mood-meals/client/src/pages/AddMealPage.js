@@ -1,3 +1,4 @@
+// src/pages/AddMealPage.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/AdminPanel.css";
@@ -8,6 +9,7 @@ const moods = ["Happy", "Sad", "Angry", "Stressed", "Bored", "Energised", "Confu
 const AddMealPage = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "/api";
 
   const [formData, setFormData] = useState({
     name: "",
@@ -46,7 +48,7 @@ const AddMealPage = () => {
     data.append("image", imageFile);
 
     try {
-      const res = await fetch("http://localhost:5000/api/meals/upload", {
+      const res = await fetch(`${BACKEND_URL}/meals/upload`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: data,
@@ -77,7 +79,7 @@ const AddMealPage = () => {
     };
 
     try {
-      const res = await fetch("http://localhost:5000/api/meals", {
+      const res = await fetch(`${BACKEND_URL}/meals`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify(body),

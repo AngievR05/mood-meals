@@ -1,3 +1,4 @@
+// src/pages/SavedMealsPage.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "../styles/SavedMealsPage.css";
@@ -12,7 +13,7 @@ const SavedMealsPage = () => {
   const [selectedMealId, setSelectedMealId] = useState(null);
 
   const token = localStorage.getItem("token");
-  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "/api"; // standardized
 
   // Fetch saved meals from the backend
   useEffect(() => {
@@ -23,12 +24,12 @@ const SavedMealsPage = () => {
 
         if (!token) throw new Error("No authentication token found.");
 
-        const res = await axios.get(`${BACKEND_URL}/api/saved-meals`, {
+        const res = await axios.get(`${BACKEND_URL}/saved-meals`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
         // Map the response to ensure all fields exist
-        const meals = res.data.map(meal => ({
+        const meals = res.data.map((meal) => ({
           id: meal.id || meal.meal_id,
           name: meal.name,
           description: meal.description,
@@ -52,10 +53,10 @@ const SavedMealsPage = () => {
   // Remove saved meal
   const handleUnsave = async (mealId) => {
     try {
-      await axios.delete(`${BACKEND_URL}/api/saved-meals/${mealId}/unsave`, {
+      await axios.delete(`${BACKEND_URL}/saved-meals/${mealId}/unsave`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setSavedMeals(prev => prev.filter(meal => meal.id !== mealId));
+      setSavedMeals((prev) => prev.filter((meal) => meal.id !== mealId));
       toast.success("Meal removed from saved!");
     } catch (err) {
       console.error("Error unsaving meal:", err);
@@ -64,8 +65,8 @@ const SavedMealsPage = () => {
   };
 
   // Filter
-  const moods = ["all", ...new Set(savedMeals.map(m => m.mood))];
-  const filteredMeals = savedMeals.filter(m =>
+  const moods = ["all", ...new Set(savedMeals.map((m) => m.mood))];
+  const filteredMeals = savedMeals.filter((m) =>
     moodFilter === "all" ? true : m.mood === moodFilter
   );
 
@@ -84,8 +85,10 @@ const SavedMealsPage = () => {
             value={moodFilter}
             onChange={(e) => setMoodFilter(e.target.value)}
           >
-            {moods.map(m => (
-              <option key={m} value={m}>{m}</option>
+            {moods.map((m) => (
+              <option key={m} value={m}>
+                {m}
+              </option>
             ))}
           </select>
         </div>
@@ -95,20 +98,22 @@ const SavedMealsPage = () => {
         <p className="no-saved">You haven’t saved any meals yet or no meals match this filter.</p>
       ) : (
         <div className="saved-grid">
-          {filteredMeals.map(meal => (
+          {filteredMeals.map((meal) => (
             <div className="saved-card" key={meal.id}>
               <h3>{meal.name}</h3>
-              {meal.mood && <span className={`mood-badge ${meal.mood.toLowerCase()}`}>{meal.mood}</span>}
+              {meal.mood && (
+                <span className={`mood-badge ${meal.mood.toLowerCase()}`}>{meal.mood}</span>
+              )}
               <p>{meal.description}</p>
               <div className="saved-actions">
-                <button 
-                  className="recipe-btn" 
+                <button
+                  className="recipe-btn"
                   onClick={() => setSelectedMealId(meal.id)}
                 >
                   View Recipe
                 </button>
-                <button 
-                  className="save-btn saved" 
+                <button
+                  className="save-btn saved"
                   onClick={() => handleUnsave(meal.id)}
                   title="Remove from Saved Meals"
                 >

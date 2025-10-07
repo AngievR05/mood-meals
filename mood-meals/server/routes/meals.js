@@ -151,8 +151,12 @@ router.get("/mood/:mood", verifyToken, async (req, res) => {
 router.post("/upload", verifyToken, verifyAdmin, upload.single("image"), (req, res) => {
   if (!req.file) return res.status(400).json({ message: "No file uploaded" });
 
-  const fileUrl = `${process.env.BACKEND_URL || "http://localhost:5000"}/uploads/meals/${req.file.filename}`;
+  // Use process.env.BACKEND_URL or fallback to /api (for local dev or reverse proxy setups)
+  const backendUrl = process.env.BACKEND_URL || "/api";
+  const fileUrl = `${backendUrl}/uploads/meals/${req.file.filename}`;
+
   res.json({ message: "✅ Image uploaded successfully", url: fileUrl });
 });
+
 
 module.exports = router;

@@ -1,3 +1,4 @@
+import * as API from "../api";
 import React, { useState, useEffect } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -61,13 +62,13 @@ const Home = () => {
       setLoading(true);
       setError("");
       try {
-        const today = await fetchJSON("http://localhost:5000/api/moods/today", {
+        const today = await fetchJSON("/api/moods/today", {
           headers: { Authorization: `Bearer ${token}` },
         });
         setTodayMood(today);
         setSelectedMood(today?.mood || "");
 
-        const recent = await fetchJSON("http://localhost:5000/api/moods", {
+        const recent = await fetchJSON("/api/moods", {
           headers: { Authorization: `Bearer ${token}` },
         });
         setRecentMoods(Array.isArray(recent) ? recent : []);
@@ -96,7 +97,7 @@ const Home = () => {
     setLoading(true);
     setError("");
     try {
-      const savedMood = await fetchJSON("http://localhost:5000/api/moods", {
+      const savedMood = await fetchJSON("/api/moods", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -126,7 +127,7 @@ const Home = () => {
     if (!window.confirm("Delete this mood entry?")) return;
     setLoading(true);
     try {
-      await fetchJSON(`http://localhost:5000/api/moods/${id}`, {
+      await fetchJSON(`/api/moods/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });

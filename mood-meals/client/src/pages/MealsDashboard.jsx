@@ -1,3 +1,4 @@
+// src/pages/MealsDashboard.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -6,20 +7,21 @@ import "../styles/MealsDashboard.css";
 import MealSuggestions from "../components/MealSuggestions";
 import GrocerySection from "../components/GrocerySection";
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
+// Use env variable or fallback to local
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "/api";
 
 const MealsDashboard = () => {
   const navigate = useNavigate();
   const [role] = useState(localStorage.getItem("role") || "user");
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Handle admin navigation
+  // Navigate admin to meal management
   const handleAddMealClick = () => {
     toast.info("Redirecting to admin meal management...");
     setTimeout(() => navigate("/admin/meals"), 800);
   };
 
-  // Clear search
+  // Clear search query
   const clearSearch = () => {
     setSearchQuery("");
     toast.success("Search cleared");
@@ -42,7 +44,7 @@ const MealsDashboard = () => {
           <p className="header-subtext">
             Find meal ideas based on your groceries and preferences.
           </p>
-
+          {/* Optional: Add search input if needed in future */}
         </div>
       </section>
 
@@ -50,9 +52,7 @@ const MealsDashboard = () => {
       <GrocerySection />
 
       {/* ===== Meal Suggestions ===== */}
-      
-        <MealSuggestions backendUrl={BACKEND_URL} searchQuery={searchQuery} />
-      
+      <MealSuggestions backendUrl={BACKEND_URL} searchQuery={searchQuery} />
     </div>
   );
 };

@@ -1,8 +1,6 @@
 import React, { useState } from "react";
-import axios from "axios";
+import { submitFeedback } from "../api"; // <-- use centralized API
 import "../styles/FeedbackForm.css";
-
-const API_URL = "http://localhost:5000/api/feedback";
 
 const FeedbackForm = ({ onSuccess }) => {
   const [subject, setSubject] = useState("");
@@ -16,25 +14,12 @@ const FeedbackForm = ({ onSuccess }) => {
     setError("");
 
     try {
-      await axios.post(
-        API_URL,
-        {
-          subject,
-          message,
-          attachments: [], // no uploads for now
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-
+      await submitFeedback({ subject, message, attachments: [] });
       setSubject("");
       setMessage("");
       if (onSuccess) onSuccess();
     } catch (err) {
-      console.error(err.response?.data || err);
+      console.error(err);
       setError("Failed to submit feedback. Please try again.");
     } finally {
       setLoading(false);

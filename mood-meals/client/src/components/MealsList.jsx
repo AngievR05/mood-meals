@@ -12,7 +12,7 @@ const MealsList = ({
   sortOption = "name",
   showViewAllButton = false,
   onToggleSave,
-  backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000",
+  backendUrl = process.env.REACT_APP_BACKEND_URL || "/api", // uses relative path if env not set
 }) => {
   const [meals, setMeals] = useState(parentMeals);
   const [loading, setLoading] = useState(!parentMeals.length);
@@ -28,7 +28,7 @@ const MealsList = ({
     const fetchMeals = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`${backendUrl}/api/meals`, {
+        const res = await fetch(`${backendUrl}/meals`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
@@ -73,7 +73,7 @@ const MealsList = ({
       setMeals((prev) => prev.map((m) => (m.id === mealId ? { ...m, saved: newSaved } : m)));
       if (onToggleSave) onToggleSave(mealId, newSaved);
 
-      await fetch(`${backendUrl}/api/saved-meals/${mealId}/toggle`, {
+      await fetch(`${backendUrl}/saved-meals/${mealId}/toggle`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       });

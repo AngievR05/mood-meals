@@ -14,7 +14,7 @@ const Recipes = () => {
   const [moodFilter, setMoodFilter] = useState("all");
 
   const token = localStorage.getItem("token");
-  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "/api"; // standardized
 
   const normalizeMood = (mood) =>
     typeof mood === "string" ? mood.trim().toLowerCase() : "uncategorized";
@@ -24,12 +24,14 @@ const Recipes = () => {
       setLoading(true);
       try {
         const [mealsRes, savedRes] = await Promise.all([
-          axios.get(`${BACKEND_URL}/api/meals`, { headers: { Authorization: `Bearer ${token}` } }),
-          axios.get(`${BACKEND_URL}/api/saved-meals`, { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get(`${BACKEND_URL}/meals`, { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get(`${BACKEND_URL}/saved-meals`, { headers: { Authorization: `Bearer ${token}` } }),
         ]);
 
         const mealsData = Array.isArray(mealsRes.data) ? mealsRes.data : [];
-        const savedIds = Array.isArray(savedRes.data) ? savedRes.data.map((m) => m.meal_id || m.id) : [];
+        const savedIds = Array.isArray(savedRes.data)
+          ? savedRes.data.map((m) => m.meal_id || m.id)
+          : [];
 
         const mealsWithSaved = mealsData.map((meal) => ({
           ...meal,
@@ -65,7 +67,8 @@ const Recipes = () => {
   }, [moodFilter, allMeals]);
 
   const handleToggleSave = (mealId, currentSaved) => {
-    const toggle = (list) => list.map((m) => (m.id === mealId ? { ...m, saved: !currentSaved } : m));
+    const toggle = (list) =>
+      list.map((m) => (m.id === mealId ? { ...m, saved: !currentSaved } : m));
     setAllMeals((prev) => toggle(prev));
     setMeals((prev) => toggle(prev));
   };
@@ -76,7 +79,11 @@ const Recipes = () => {
 
       <div className="recipes-filter">
         <label htmlFor="mood">Filter by Mood: </label>
-        <select id="mood" value={moodFilter} onChange={(e) => setMoodFilter(e.target.value)}>
+        <select
+          id="mood"
+          value={moodFilter}
+          onChange={(e) => setMoodFilter(e.target.value)}
+        >
           <option value="all">All</option>
           {moods.map((m) => (
             <option key={m} value={m}>
@@ -91,7 +98,7 @@ const Recipes = () => {
       ) : meals.length > 0 ? (
         <MealsList
           meals={meals}
-          filter={moodFilter === "all" ? "all" : "mood"} // Only filter by mood if a specific mood is selected
+          filter={moodFilter === "all" ? "all" : "mood"}
           currentMood={moodFilter === "all" ? null : moodFilter}
           onToggleSave={handleToggleSave}
           onViewRecipe={(id) => setSelectedMealId(id)}

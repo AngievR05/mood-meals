@@ -36,7 +36,7 @@ const MealSuggestions = ({ currentMood, onToggleSave }) => {
   const [chefTip, setChefTip] = useState(chefTips[0]);
   const [loadingMeals, setLoadingMeals] = useState(false);
   const token = localStorage.getItem("token");
-  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "/api"; // dynamic backend
   const navigate = useNavigate();
 
   // Rotate chef tips
@@ -52,7 +52,7 @@ const MealSuggestions = ({ currentMood, onToggleSave }) => {
     const fetchMeals = async () => {
       setLoadingMeals(true);
       try {
-        const res = await axios.get(`${BACKEND_URL}/api/meals`, {
+        const res = await axios.get(`${BACKEND_URL}/meals`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const mealsData = Array.isArray(res.data) ? res.data : [];
@@ -134,20 +134,27 @@ const MealSuggestions = ({ currentMood, onToggleSave }) => {
 
       {!loadingMeals && filteredMeals.length > 0 && (
         <Slider {...sliderSettings}>
-          {filteredMeals.map((meal) => (
-            <div key={meal.id} className="meal-card" style={{ borderColor: moodColors[moodName] || "#ccc" }}>
-              <img src={meal.image_url || "/default-meal.png"} alt={meal.name} className="meal-image" loading="lazy" />
-              <p className="meal-name">{meal.name}</p>
-              <div className="meal-card-actions">
-                <button className="view-recipe-btn" onClick={() => setSelectedMealId(meal.id)}>View Recipe</button>
-                {onToggleSave && (
-                  <button className={`save-btn ${meal.saved ? "saved" : ""}`} onClick={() => onToggleSave(meal.id)}>
-                    {meal.saved ? "★" : "☆"}
-                  </button>
-                )}
+          {filteredMeals.map((meal) => {
+            const imageSrc =
+              meal.image_url?.startsWith("http")
+                ? meal.image_url
+                : `${BACKEND_URL}${meal.image_url || "/default-meal.png"}`;
+
+            return (
+              <div key={meal.id} className="meal-card" style={{ borderColor: moodColors[moodName] || "#ccc" }}>
+                <img src={imageSrc} alt={meal.name} className="meal-image" loading="lazy" />
+                <p className="meal-name">{meal.name}</p>
+                <div className="meal-card-actions">
+                  <button className="view-recipe-btn" onClick={() => setSelectedMealId(meal.id)}>View Recipe</button>
+                  {onToggleSave && (
+                    <button className={`save-btn ${meal.saved ? "saved" : ""}`} onClick={() => onToggleSave(meal.id)}>
+                      {meal.saved ? "★" : "☆"}
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </Slider>
       )}
 

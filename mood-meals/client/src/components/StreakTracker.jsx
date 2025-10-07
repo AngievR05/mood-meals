@@ -1,3 +1,4 @@
+import * as API from "../api";
 import React, { useState, useEffect } from 'react';
 import '../styles/StreakTracker.css';
 
@@ -37,7 +38,7 @@ const StreakTracker = ({ currentMood }) => {
     const fetchStreak = async () => {
       if (!token) return;
       try {
-        const res = await fetch('http://localhost:5000/api/user/streak', {
+        const res = await fetch('/api/user/streak', {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
