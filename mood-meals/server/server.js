@@ -81,33 +81,16 @@ app.use((err, req, res, next) => {
 });
 
 // ------------------ SERVER START ------------------
-const DEFAULT_PORT = parseInt(process.env.PORT, 10) || 5000;
-const MAX_PORT_TRIES = 10;
+const PORT = parseInt(process.env.PORT, 10) || 5000;
 
-async function start(port = DEFAULT_PORT, attempt = 0) {
+async function start() {
   try {
     await pool.query('SELECT 1');
     console.log('✅ MySQL pool connected');
 
-    const server = app.listen(port, '0.0.0.0', () =>
-  console.log(`🚀 Server running on http://0.0.0.0:${port}`)
-);
-
-
-    server.on('error', (err) => {
-      if (err.code === 'EADDRINUSE') {
-        if (attempt < MAX_PORT_TRIES) {
-          console.warn(`⚠️ Port ${port} busy, trying ${port + 1}...`);
-          start(port + 1, attempt + 1);
-        } else {
-          console.error(`❌ No free ports after ${MAX_PORT_TRIES} tries.`);
-          process.exit(1);
-        }
-      } else {
-        console.error(err);
-        process.exit(1);
-      }
-    });
+    app.listen(PORT, '0.0.0.0', () =>
+      console.log(`🚀 Server running on http://0.0.0.0:${PORT}`)
+    );
   } catch (err) {
     console.error('❌ DB connection failed:', err.message);
     process.exit(1);
@@ -115,3 +98,4 @@ async function start(port = DEFAULT_PORT, attempt = 0) {
 }
 
 start();
+
