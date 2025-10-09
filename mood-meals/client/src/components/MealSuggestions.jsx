@@ -1,4 +1,3 @@
-// src/components/MealSuggestions.jsx
 import React, { useState, useEffect } from "react";
 import Slider from "react-slick";
 import RecipePage from "./RecipePage";
@@ -32,14 +31,13 @@ const MealSuggestions = ({ currentMood, onToggleSave }) => {
   const [selectedMealId, setSelectedMealId] = useState(null);
   const [allMeals, setAllMeals] = useState([]);
   const [filteredMeals, setFilteredMeals] = useState([]);
-  const [filterMode, setFilterMode] = useState("mood"); // mood | all
+  const [filterMode, setFilterMode] = useState("mood");
   const [chefTip, setChefTip] = useState(chefTips[0]);
   const [loadingMeals, setLoadingMeals] = useState(false);
   const token = localStorage.getItem("token");
-  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "/api"; // dynamic backend
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "";
   const navigate = useNavigate();
 
-  // Rotate chef tips
   useEffect(() => {
     const interval = setInterval(() => {
       setChefTip(chefTips[Math.floor(Math.random() * chefTips.length)]);
@@ -47,16 +45,12 @@ const MealSuggestions = ({ currentMood, onToggleSave }) => {
     return () => clearInterval(interval);
   }, []);
 
-  // Fetch all meals
   useEffect(() => {
     const fetchMeals = async () => {
       setLoadingMeals(true);
       try {
-        const res = await axios.get(`${BACKEND_URL}/meals`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const mealsData = Array.isArray(res.data) ? res.data : [];
-        setAllMeals(mealsData);
+        const res = await axios.get(`${BACKEND_URL}/api/meals`, { headers: { Authorization: `Bearer ${token}` } });
+        setAllMeals(Array.isArray(res.data) ? res.data : []);
       } catch (err) {
         console.error("Failed to fetch meals:", err);
         setAllMeals([]);
@@ -67,30 +61,15 @@ const MealSuggestions = ({ currentMood, onToggleSave }) => {
     fetchMeals();
   }, [token, BACKEND_URL]);
 
-  // Filter meals: prioritize current mood
   useEffect(() => {
     if (!allMeals.length) return setFilteredMeals([]);
-
-    let filtered = [];
-    if (filterMode === "mood" && currentMood) {
-      const moodName = typeof currentMood === "string" ? currentMood : currentMood.name;
-      filtered = allMeals.filter(
-        (meal) => (meal.mood || "").toLowerCase() === moodName.toLowerCase()
-      );
-    } else {
-      filtered = [...allMeals];
-    }
-
-    setFilteredMeals(filtered);
-  }, [allMeals, filterMode, currentMood]);
-
-  if (!allMeals.length)
-    return (
-      <div className="meal-suggestions">
-        <h2>🍽️ Meal Suggestions</h2>
-        <p>Loading meals...</p>
-      </div>
+    const moodName = typeof currentMood === "string" ? currentMood : currentMood?.name || "";
+    setFilteredMeals(
+      filterMode === "mood" && moodName
+        ? allMeals.filter((meal) => (meal.mood || "").toLowerCase() === moodName.toLowerCase())
+        : [...allMeals]
     );
+  }, [allMeals, filterMode, currentMood]);
 
   const moodName = currentMood ? (typeof currentMood === "string" ? currentMood : currentMood.name) : "All";
 
@@ -115,16 +94,10 @@ const MealSuggestions = ({ currentMood, onToggleSave }) => {
       {chefTip && <p className="chef-tip">{chefTip}</p>}
 
       <div className="filter-buttons">
-        <button
-          className={filterMode === "mood" ? "active" : ""}
-          onClick={() => setFilterMode("mood")}
-        >
+        <button className={filterMode === "mood" ? "active" : ""} onClick={() => setFilterMode("mood")}>
           Mood Only
         </button>
-        <button
-          className={filterMode === "all" ? "active" : ""}
-          onClick={() => setFilterMode("all")}
-        >
+        <button className={filterMode === "all" ? "active" : ""} onClick={() => setFilterMode("all")}>
           Show All
         </button>
       </div>
@@ -136,16 +109,16 @@ const MealSuggestions = ({ currentMood, onToggleSave }) => {
         <Slider {...sliderSettings}>
           {filteredMeals.map((meal) => {
             const imageSrc =
-              meal.image_url?.startsWith("http")
-                ? meal.image_url
-                : `${BACKEND_URL}${meal.image_url || "/default-meal.png"}`;
+              meal.image_url?.startsWith("http") ? meal.image_url : `${BACKEND_URL}${meal.image_url || "/default-meal.png"}`;
 
             return (
               <div key={meal.id} className="meal-card" style={{ borderColor: moodColors[moodName] || "#ccc" }}>
                 <img src={imageSrc} alt={meal.name} className="meal-image" loading="lazy" />
                 <p className="meal-name">{meal.name}</p>
                 <div className="meal-card-actions">
-                  <button className="view-recipe-btn" onClick={() => setSelectedMealId(meal.id)}>View Recipe</button>
+                  <button className="view-recipe-btn" onClick={() => setSelectedMealId(meal.id)}>
+                    View Recipe
+                  </button>
                   {onToggleSave && (
                     <button className={`save-btn ${meal.saved ? "saved" : ""}`} onClick={() => onToggleSave(meal.id)}>
                       {meal.saved ? "★" : "☆"}
@@ -158,7 +131,6 @@ const MealSuggestions = ({ currentMood, onToggleSave }) => {
         </Slider>
       )}
 
-      {/* View All Meals button */}
       <div className="view-all-btn-wrapper">
         <button className="view-all-btn" onClick={() => navigate("/recipes")}>
           View All Meals
@@ -177,3 +149,4 @@ const MealSuggestions = ({ currentMood, onToggleSave }) => {
 };
 
 export default MealSuggestions;
+

@@ -1,4 +1,3 @@
-// src/components/MealsList.jsx
 import React, { useState, useEffect } from "react";
 import RecipePage from "./RecipePage";
 import "../styles/MealsList.css";
@@ -12,7 +11,7 @@ const MealsList = ({
   sortOption = "name",
   showViewAllButton = false,
   onToggleSave,
-  backendUrl = process.env.REACT_APP_BACKEND_URL || "/api", // uses relative path if env not set
+  backendUrl = process.env.REACT_APP_BACKEND_URL || "",
 }) => {
   const [meals, setMeals] = useState(parentMeals);
   const [loading, setLoading] = useState(!parentMeals.length);
@@ -21,14 +20,14 @@ const MealsList = ({
 
   const normalizeMood = (mood) => (typeof mood === "string" ? mood.trim().toLowerCase() : "uncategorized");
 
-  // Fetch meals only if parentMeals is empty
+  // Fetch meals if parentMeals not passed
   useEffect(() => {
-    if (parentMeals.length) return; // skip if meals passed from parent
+    if (parentMeals.length) return;
 
     const fetchMeals = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`${backendUrl}/meals`, {
+        const res = await fetch(`${backendUrl}/api/meals`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
@@ -47,12 +46,10 @@ const MealsList = ({
     fetchMeals();
   }, [parentMeals, token, backendUrl]);
 
-  // Apply filters and sorting
+  // Filters + sorting
   const filteredMeals = meals
     .filter((m) => {
-      if (filter === "mood" && currentMood) {
-        return normalizeMood(m.mood) === normalizeMood(currentMood);
-      }
+      if (filter === "mood" && currentMood) return normalizeMood(m.mood) === normalizeMood(currentMood);
       if (filter === "saved") return !!m.saved;
       return true;
     })
@@ -73,7 +70,7 @@ const MealsList = ({
       setMeals((prev) => prev.map((m) => (m.id === mealId ? { ...m, saved: newSaved } : m)));
       if (onToggleSave) onToggleSave(mealId, newSaved);
 
-      await fetch(`${backendUrl}/saved-meals/${mealId}/toggle`, {
+      await fetch(`${backendUrl}/api/saved-meals/${mealId}/toggle`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -137,10 +134,7 @@ const MealsList = ({
 
       {showViewAllButton && (
         <div className="view-all-btn-wrapper">
-          <button
-            className="view-all-btn"
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          >
+          <button className="view-all-btn" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
             View All Meals
           </button>
         </div>
@@ -150,3 +144,4 @@ const MealsList = ({
 };
 
 export default MealsList;
+

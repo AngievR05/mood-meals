@@ -14,74 +14,73 @@ const Friends = () => {
   const [snackbar, setSnackbar] = useState({ message: "", type: "" });
   const [activeTab, setActiveTab] = useState("pending"); // pending | accepted
 
-  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "/api";
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "";
 
   const showSnackbar = (message, type = "success") => {
     setSnackbar({ message, type });
     setTimeout(() => setSnackbar({ message: "", type: "" }), 3000);
   };
+const fetchFriends = async () => {
+  try {
+    const res = await axios.get(`${BACKEND_URL}/api/friends`, {   // ✅ added /api
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+    });
 
-  const fetchFriends = async () => {
-    try {
-      const res = await axios.get(`${BACKEND_URL}/friends`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      });
+    const enhance = (list = []) =>
+      list.map((f) => ({
+        ...f,
+        last_moods: f.latest_mood ? [{ mood: f.latest_mood, notes: f.mood_time }] : [],
+        last_meals: f.last_meal ? [{ meal_name: f.last_meal }] : [],
+        encouragements: f.encouragements || [],
+      }));
 
-      const enhance = (list) =>
-        list.map((f) => ({
-          ...f,
-          last_moods: f.latest_mood ? [{ mood: f.latest_mood, notes: f.mood_time }] : [],
-          last_meals: f.last_meal ? [{ meal_name: f.last_meal }] : [],
-          encouragements: f.encouragements || [],
-        }));
+    setFriends({
+      pendingReceived: enhance(res.data?.pendingReceived || []),
+      pendingSent: enhance(res.data?.pendingSent || []),
+      accepted: enhance(res.data?.accepted || []),
+    });
+  } catch (err) {
+    console.error(err);
+    showSnackbar("Error fetching friends", "error");
+  }
+};
 
-      setFriends({
-        pendingReceived: enhance(res.data.pendingReceived),
-        pendingSent: enhance(res.data.pendingSent),
-        accepted: enhance(res.data.accepted),
-      });
-    } catch (err) {
-      console.error(err);
-      showSnackbar("Error fetching friends", "error");
-    }
-  };
-
-  const addFriend = async () => {
-    if (!newFriend.trim()) return showSnackbar("Enter username or email", "error");
-    try {
-      const res = await axios.post(
-        `${BACKEND_URL}/friends/add`,
-        { friendIdentifier: newFriend },
-        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
-      );
-      showSnackbar(res.data.message || "Friend request sent");
-      setNewFriend("");
-      fetchFriends();
-    } catch (err) {
-      showSnackbar(err.response?.data?.error || "Error sending friend request", "error");
-    }
-  };
+const addFriend = async () => {
+  if (!newFriend.trim()) return showSnackbar("Enter username or email", "error");
+  try {
+    const res = await axios.post(
+      `${BACKEND_URL}/api/friends/add`,   // ✅ fixed
+      { friendIdentifier: newFriend },
+      { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
+    );
+    showSnackbar(res.data.message || "Friend request sent");
+    setNewFriend("");
+    fetchFriends();
+  } catch (err) {
+    showSnackbar(err.response?.data?.error || "Error sending friend request", "error");
+  }
+};
 
   const updateFriend = async (action, friendshipId, friendId) => {
     try {
       let res;
-      if (action === "accept") {
-        res = await axios.post(
-          `${BACKEND_URL}/friends/accept`,
-          { friendshipId },
-          { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
-        );
-      } else if (action === "reject") {
-        res = await axios.post(
-          `${BACKEND_URL}/friends/reject`,
-          { friendshipId },
-          { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
-        );
-      } else if (action === "remove") {
-        res = await axios.delete(`${BACKEND_URL}/friends/${friendId}`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        });
-      }
+if (action === "accept") {
+  res = await axios.post(
+    `${BACKEND_URL}/api/friends/accept`,
+    { friendshipId },
+    { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
+  );
+} else if (action === "reject") {
+  res = await axios.post(
+    `${BACKEND_URL}/api/friends/reject`,
+    { friendshipId },
+    { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
+  );
+} else if (action === "remove") {
+  res = await axios.delete(`${BACKEND_URL}/api/friends/${friendId}`, {
+    headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+  });
+}
       showSnackbar(res?.data?.message || `${action} successful`);
       fetchFriends();
     } catch (err) {
@@ -103,11 +102,11 @@ const Friends = () => {
     const message = encourageMsgs[friendId];
     if (!message?.trim()) return showSnackbar("Enter a message", "error");
     try {
-      const res = await axios.post(
-        `${BACKEND_URL}/friends/encourage`,
-        { receiverId: friendId, message },
-        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
-      );
+const res = await axios.post(
+  `${BACKEND_URL}/api/friends/encourage`,
+  { receiverId: friendId, message },
+  { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
+);
       showSnackbar(res.data.message || "Encouragement sent");
       setEncourageMsgs((prev) => ({ ...prev, [friendId]: "" }));
       fetchFriends();

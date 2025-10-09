@@ -9,7 +9,7 @@ const moods = ["Happy", "Sad", "Angry", "Stressed", "Bored", "Energised", "Confu
 const AddMealPage = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
-  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "/api";
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
 
   const [formData, setFormData] = useState({
     name: "",
@@ -23,14 +23,23 @@ const AddMealPage = () => {
   const [preview, setPreview] = useState(null);
   const [uploading, setUploading] = useState(false);
 
-  const handleChange = (e) => setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  const handleChange = (e) =>
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+
   const handleStepChange = (index, value) => {
     const newSteps = [...formData.steps];
     newSteps[index] = value;
-    setFormData(prev => ({ ...prev, steps: newSteps }));
+    setFormData((prev) => ({ ...prev, steps: newSteps }));
   };
-  const addStep = () => setFormData(prev => ({ ...prev, steps: [...prev.steps, ""] }));
-  const removeStep = (index) => setFormData(prev => ({ ...prev, steps: prev.steps.filter((_, i) => i !== index) }));
+
+  const addStep = () =>
+    setFormData((prev) => ({ ...prev, steps: [...prev.steps, ""] }));
+
+  const removeStep = (index) =>
+    setFormData((prev) => ({
+      ...prev,
+      steps: prev.steps.filter((_, i) => i !== index),
+    }));
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -42,21 +51,25 @@ const AddMealPage = () => {
 
   const uploadImage = async () => {
     if (!imageFile) return formData.image_url || "";
-    setUploading(true);
 
+    setUploading(true);
     const data = new FormData();
     data.append("image", imageFile);
 
     try {
-      const res = await fetch(`${BACKEND_URL}/meals/upload`, {
+      const res = await fetch(`${BACKEND_URL}/api/meals/upload`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: data,
       });
+
       const result = await res.json();
       if (!res.ok) throw new Error(result.message || "Upload failed");
-      setPreview(result.url);
-      return result.url;
+
+      // Prepend backend URL to make it fully accessible
+      const FULL_URL = `${result.url.startsWith("http") ? "" : BACKEND_URL}${result.url}`;
+      setPreview(FULL_URL);
+      return FULL_URL;
     } catch (err) {
       toast.error(err.message);
       return "";
@@ -70,20 +83,25 @@ const AddMealPage = () => {
     const uploadedUrl = await uploadImage();
 
     const body = {
-      name: formData.name,
-      description: formData.description,
-      ingredients: formData.ingredients.split(",").map(i => i.trim()),
-      mood: formData.mood,
-      image_url: uploadedUrl || formData.image_url,
-      steps: formData.steps.map(s => s.trim()).filter(Boolean),
+      ...formData,
+      ingredients: formData.ingredients
+        .split(",")
+        .map((i) => i.trim())
+        .filter(Boolean),
+      steps: formData.steps.map((s) => s.trim()).filter(Boolean),
+      image_url: uploadedUrl,
     };
 
     try {
-      const res = await fetch(`${BACKEND_URL}/meals`, {
+      const res = await fetch(`${BACKEND_URL}/api/meals`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify(body),
       });
+
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Error saving meal");
 
@@ -98,11 +116,33 @@ const AddMealPage = () => {
     <div className="admin-panel">
       <h1>Add New Meal</h1>
       <form onSubmit={handleSubmit}>
-        <input type="text" name="name" placeholder="Meal Name" value={formData.name} onChange={handleChange} required />
-        <textarea name="description" placeholder="Description" value={formData.description} onChange={handleChange} required />
-        <input type="text" name="ingredients" placeholder="Ingredients (comma separated)" value={formData.ingredients} onChange={handleChange} required />
+        <input
+          type="text"
+          name="name"
+          placeholder="Meal Name"
+          value={formData.name}
+          onChange={handleChange}
+          required
+        />
+        <textarea
+          name="description"
+          placeholder="Description"
+          value={formData.description}
+          onChange={handleChange}
+        />
+        <input
+          type="text"
+          name="ingredients"
+          placeholder="Ingredients (comma separated)"
+          value={formData.ingredients}
+          onChange={handleChange}
+        />
         <select name="mood" value={formData.mood} onChange={handleChange}>
-          {moods.map(m => <option key={m} value={m}>{m}</option>)}
+          {moods.map((m) => (
+            <option key={m} value={m}>
+              {m}
+            </option>
+          ))}
         </select>
 
         <input type="file" accept="image/*" onChange={handleImageChange} />
@@ -111,17 +151,36 @@ const AddMealPage = () => {
         <h3>Steps</h3>
         {formData.steps.map((step, idx) => (
           <div key={idx} className="step-input">
-            <input type="text" value={step} onChange={e => handleStepChange(idx, e.target.value)} placeholder={`Step ${idx + 1}`} required />
-            <button type="button" className="delete-step-btn" onClick={() => removeStep(idx)}>x</button>
+            <input
+              type="text"
+              value={step}
+              onChange={(e) => handleStepChange(idx, e.target.value)}
+              placeholder={`Step ${idx + 1}`}
+            />
+            <button
+              type="button"
+              className="delete-step-btn"
+              onClick={() => removeStep(idx)}
+            >
+              x
+            </button>
           </div>
         ))}
-        <button type="button" className="add-step-btn" onClick={addStep}>+ Add Step</button>
+        <button type="button" className="add-step-btn" onClick={addStep}>
+          + Add Step
+        </button>
 
         <div className="modal-buttons">
           <button type="submit" className="primary-btn" disabled={uploading}>
             {uploading ? "Uploading..." : "Add Meal"}
           </button>
-          <button type="button" className="secondary-btn" onClick={() => navigate("/admin")}>Cancel</button>
+          <button
+            type="button"
+            className="secondary-btn"
+            onClick={() => navigate("/admin")}
+          >
+            Cancel
+          </button>
         </div>
       </form>
     </div>
@@ -129,3 +188,4 @@ const AddMealPage = () => {
 };
 
 export default AddMealPage;
+

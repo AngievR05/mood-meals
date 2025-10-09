@@ -85,7 +85,7 @@ const PORT = parseInt(process.env.PORT, 10) || 5000;
 
 async function start() {
   try {
-    await pool.query('SELECT 1');
+    await pool.query('SELECT 1'); // test DB connection
     console.log('✅ MySQL pool connected');
 
     app.listen(PORT, '0.0.0.0', () =>
@@ -98,4 +98,3 @@ async function start() {
 }
 
 start();
-

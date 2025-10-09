@@ -25,18 +25,15 @@ const upload = multer({
   },
 });
 
-// -------------------- HELPER --------------------
+// -------------------- HELPERS --------------------
 const safeParseJSON = (json, defaultValue = []) => {
   try { return JSON.parse(json); } catch { return defaultValue; }
 };
+const getPrimaryMood = (mood) => (!mood || typeof mood !== "string" || mood.trim() === "" ? "Happy" : mood.trim());
 
-// Always return a single valid mood string
-const getPrimaryMood = (mood) => {
-  if (!mood || typeof mood !== "string" || mood.trim() === "") return "Happy";
-  return mood.trim();
-};
+// -------------------- CRUD --------------------
 
-// -------------------- CREATE MEAL --------------------
+// Create meal
 router.post("/", verifyToken, verifyAdmin, async (req, res) => {
   try {
     const { name, description, ingredients, mood, image_url, steps } = req.body;
@@ -56,7 +53,7 @@ router.post("/", verifyToken, verifyAdmin, async (req, res) => {
   }
 });
 
-// -------------------- UPDATE MEAL --------------------
+// Update meal
 router.put("/:id", verifyToken, verifyAdmin, async (req, res) => {
   try {
     const { id } = req.params;
@@ -78,7 +75,7 @@ router.put("/:id", verifyToken, verifyAdmin, async (req, res) => {
   }
 });
 
-// -------------------- DELETE MEAL --------------------
+// Delete meal
 router.delete("/:id", verifyToken, verifyAdmin, async (req, res) => {
   try {
     const { id } = req.params;
@@ -91,7 +88,7 @@ router.delete("/:id", verifyToken, verifyAdmin, async (req, res) => {
   }
 });
 
-// -------------------- GET SINGLE MEAL --------------------
+// Get single meal
 router.get("/:id", verifyToken, async (req, res) => {
   try {
     const [rows] = await pool.query("SELECT * FROM meals WHERE id = ?", [req.params.id]);
@@ -109,7 +106,7 @@ router.get("/:id", verifyToken, async (req, res) => {
   }
 });
 
-// -------------------- GET ALL MEALS --------------------
+// Get all meals
 router.get("/", verifyToken, async (req, res) => {
   try {
     const [rows] = await pool.query("SELECT * FROM meals ORDER BY created_at DESC");
@@ -126,38 +123,14 @@ router.get("/", verifyToken, async (req, res) => {
   }
 });
 
-// -------------------- GET MEALS BY MOOD --------------------
-router.get("/mood/:mood", verifyToken, async (req, res) => {
-  try {
-    const moodParam = getPrimaryMood(req.params.mood);
-    const [rows] = await pool.query(
-      "SELECT * FROM meals WHERE mood = ? ORDER BY created_at DESC",
-      [moodParam]
-    );
-    const meals = rows.map(r => ({
-      ...r,
-      ingredients: safeParseJSON(r.ingredients),
-      steps: safeParseJSON(r.steps),
-      mood: getPrimaryMood(r.mood),
-    }));
-    res.json(meals);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error while fetching meals by mood" });
-  }
-});
-
-// -------------------- UPLOAD MEAL IMAGE --------------------
+// Upload meal image
 router.post("/upload", verifyToken, verifyAdmin, upload.single("image"), (req, res) => {
   if (!req.file) return res.status(400).json({ message: "No file uploaded" });
 
-  // ✅ FIX: use empty string or full URL so frontend can access the file
-  // const backendUrl = process.env.BACKEND_URL || ""; // relative path
-  const backendUrl = process.env.BACKEND_URL || "https://moodmeals.site"; // full URL recommended
+  const backendUrl = process.env.BACKEND_URL || ""; // in prod, use full domain
   const fileUrl = `${backendUrl}/uploads/meals/${req.file.filename}`;
 
   res.json({ message: "✅ Image uploaded successfully", url: fileUrl });
 });
-
 
 module.exports = router;
