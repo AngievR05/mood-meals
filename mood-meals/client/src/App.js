@@ -1,6 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
+import AnalyticsTracker from "./analytics/AnalyticsTracker";
+
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import FloatingFeedbackButton from './components/FloatingFeedbackButton';
@@ -36,6 +38,7 @@ const Layout = ({ children }) => (
 function App() {
   return (
     <Router>
+      <AnalyticsTracker />
       <Routes>
         {/* Public Routes - no navbar/footer/feedback */}
         <Route path="/" element={<Login />} />

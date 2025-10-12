@@ -7,6 +7,7 @@ import '../styles/StreakTracker.css';
 import JarSVG from '../components/JarSVG';
 import spinner from '../assets/images/Group2.png';
 import MoodRadialChart from '../components/MoodRadialChart';
+import { logEvent } from "../utils/analytics"; // ✅ Google Analytics helper
 
 import happy from '../assets/emotions/Happy.png';
 import sad from '../assets/emotions/Sad.png';
@@ -111,6 +112,12 @@ const MoodTracker = () => {
         body: JSON.stringify({ mood: selectedMood, note }),
       });
 
+      // ✅ Log Google Analytics event when a mood is saved
+      logEvent("mood_saved", {
+        mood: savedMood.mood,
+        note: note || "none",
+      });
+
       // Update recent moods and today's mood
       setRecentMoods(prev => [savedMood, ...(prev || []).filter(m => m.id !== savedMood.id)]);
       setTodaysMood(savedMood);
@@ -129,6 +136,12 @@ const MoodTracker = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleMoodSelect = (moodName) => {
+    setSelectedMood(moodName);
+    // ✅ Log event when a mood is selected
+    logEvent("mood_selected", { mood: moodName });
   };
 
   const bubblesData = (recentMoods || []).slice(0, 8).map((entry, i) => {
@@ -152,10 +165,6 @@ const MoodTracker = () => {
       <section className="tracker-header card">
         <h1>Your Mood Tracker</h1>
         <p>Track your emotions, reflect, and watch your Mood Jar fill up.</p>
-        {/* <div className="streak-inline">
-          <h3>🔥 Current Streak:</h3>
-          <span className="streak-days">{streak} {streak === 1 ? 'day' : 'days'}</span>
-        </div> */}
       </section>
 
       <section className="mood-entry card">
@@ -168,7 +177,7 @@ const MoodTracker = () => {
                 todaysMood?.mood === mood.name ? 'today' : ''
               }`}
               style={{ background: mood.color }}
-              onClick={() => setSelectedMood(mood.name)}
+              onClick={() => handleMoodSelect(mood.name)}
               disabled={loading}
             >
               <div className="mood-icon">

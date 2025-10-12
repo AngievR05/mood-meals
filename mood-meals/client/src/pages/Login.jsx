@@ -1,5 +1,5 @@
 import * as API from "../api";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Auth.css';
 import bgImage from '../assets/images/background.jpg';
@@ -11,6 +11,15 @@ const Login = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // 🔹 Google Analytics page tracking
+  useEffect(() => {
+    if (window.gtag) {
+      window.gtag('config', 'G-GNDG8TN9J3', {
+        page_path: '/login',
+      });
+    }
+  }, []);
 
   const handleChange = (e) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -50,9 +59,18 @@ const Login = () => {
       localStorage.setItem('token', data.token);
       localStorage.setItem('username', data.username);
       localStorage.setItem('email', data.email);
-      localStorage.setItem('role', data.role); // <-- NEW
+      localStorage.setItem('role', data.role);
 
       setSuccess('✅ Logged in successfully! Redirecting...');
+
+      // 🔹 Track successful login in GA
+      if (window.gtag) {
+        window.gtag('event', 'login', {
+          method: 'Mood Meals Login Form',
+          user_role: data.role,
+        });
+      }
+
       setTimeout(() => navigate('/home'), 1500);
     } catch (err) {
       setError(err.message);

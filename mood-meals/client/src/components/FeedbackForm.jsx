@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { submitFeedback } from "../api"; // <-- use centralized API
+import { submitFeedback } from "../api";
 import "../styles/FeedbackForm.css";
+import { logEvent } from "../utils/analytics"; // ✅ GA helper
 
 const FeedbackForm = ({ onSuccess }) => {
   const [subject, setSubject] = useState("");
@@ -15,6 +16,13 @@ const FeedbackForm = ({ onSuccess }) => {
 
     try {
       await submitFeedback({ subject, message, attachments: [] });
+
+      // ✅ Log Google Analytics event for feedback submission
+      logEvent("feedback_submitted", {
+        subject,
+        message_length: message.length,
+      });
+
       setSubject("");
       setMessage("");
       if (onSuccess) onSuccess();

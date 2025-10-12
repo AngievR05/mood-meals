@@ -1,5 +1,5 @@
 import * as API from "../api";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Auth.css';
 import bgImage from '../assets/images/background.jpg';
@@ -9,6 +9,15 @@ const Register = () => {
   const [formData, setFormData] = useState({ username: '', email: '', password: '' });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  // 🔹 Google Analytics page tracking
+  useEffect(() => {
+    if (window.gtag) {
+      window.gtag('config', 'G-GNDG8TN9J3', {
+        page_path: '/register',
+      });
+    }
+  }, []);
 
   const handleChange = (e) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -38,13 +47,22 @@ const Register = () => {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData), // role optional; backend defaults to 'user'
+        body: JSON.stringify(formData),
       });
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Registration failed');
 
       setSuccess('🎉 Registered successfully! Redirecting...');
+
+      // 🔹 Track registration event in GA
+      if (window.gtag) {
+        window.gtag('event', 'sign_up', {
+          method: 'Mood Meals Register Form',
+          username: formData.username,
+        });
+      }
+
       setTimeout(() => navigate('/'), 2000);
     } catch (err) {
       setError(err.message);
