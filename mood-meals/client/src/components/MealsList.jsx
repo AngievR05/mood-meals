@@ -1,52 +1,68 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import RecipePage from "./RecipePage";
 import "../styles/MealsList.css";
+import axios from "axios";
 
 const MealsList = ({
   meals: parentMeals = [],
-  role = "user",
   filter = "all",
   currentMood = null,
   searchQuery = "",
   sortOption = "name",
   showViewAllButton = false,
-  onToggleSave,
-  backendUrl = process.env.REACT_APP_BACKEND_URL || "",
+  backendUrl,
 }) => {
   const [meals, setMeals] = useState(parentMeals);
   const [loading, setLoading] = useState(!parentMeals.length);
   const [selectedMealId, setSelectedMealId] = useState(null);
+  const [error, setError] = useState(null);
+
   const token = localStorage.getItem("token");
+  const BACKEND_URL = backendUrl || process.env.REACT_APP_BACKEND_URL || "https://moodmeals.site/api";
 
   const normalizeMood = (mood) => (typeof mood === "string" ? mood.trim().toLowerCase() : "uncategorized");
 
-  // Fetch meals if parentMeals not passed
   useEffect(() => {
     if (parentMeals.length) return;
+    if (!token) return setError("You must be logged in to fetch meals.");
 
     const fetchMeals = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`${backendUrl}/api/meals`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const data = await res.json();
-        const mealsData = Array.isArray(data)
-          ? data.map((m) => ({ ...m, mood: normalizeMood(m.mood) }))
-          : [];
-        setMeals(mealsData);
+        const res = await axios.get(`${BACKEND_URL}/meals`, { headers: { Authorization: `Bearer ${token}` } });
+        const data = Array.isArray(res.data) ? res.data : [];
+        setMeals(data.map((m) => ({ ...m, mood: normalizeMood(m.mood), saved: m.saved || false })));
       } catch (err) {
         console.error("Failed to fetch meals:", err);
-        setMeals([]);
+        setError(err.message || "Failed to fetch meals");
       } finally {
         setLoading(false);
       }
     };
 
     fetchMeals();
-  }, [parentMeals, token, backendUrl]);
+  }, [parentMeals, token, BACKEND_URL]);
 
-  // Filters + sorting
+  const toggleSave = async (mealId) => {
+    const meal = meals.find((m) => m.id === mealId);
+    if (!meal || !token) return;
+
+    const newSaved = !meal.saved;
+    setMeals((prev) => prev.map((m) => (m.id === mealId ? { ...m, saved: newSaved } : m)));
+
+    try {
+      const url = `${BACKEND_URL}/saved-meals/${mealId}/${newSaved ? "save" : "unsave"}`;
+      await axios({ method: newSaved ? "POST" : "DELETE", url, headers: { Authorization: `Bearer ${token}` } });
+    } catch (err) {
+      console.error("Error toggling save:", err);
+      setMeals((prev) => prev.map((m) => (m.id === mealId ? { ...m, saved: meal.saved } : m)));
+    }
+  };
+
+  if (loading) return <p className="loading">Loading meals...</p>;
+  if (error) return <p className="no-meals">{error}</p>;
+  if (!meals.length) return <p className="no-meals">No meals available.</p>;
+
   const filteredMeals = meals
     .filter((m) => {
       if (filter === "mood" && currentMood) return normalizeMood(m.mood) === normalizeMood(currentMood);
@@ -61,67 +77,27 @@ const MealsList = ({
       return 0;
     });
 
-  const toggleSave = async (mealId) => {
-    try {
-      const meal = meals.find((m) => m.id === mealId);
-      if (!meal) return;
-
-      const newSaved = !meal.saved;
-      setMeals((prev) => prev.map((m) => (m.id === mealId ? { ...m, saved: newSaved } : m)));
-      if (onToggleSave) onToggleSave(mealId, newSaved);
-
-      await fetch(`${backendUrl}/api/saved-meals/${mealId}/toggle`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-    } catch (err) {
-      console.error("Error toggling save:", err);
-    }
-  };
-
-  if (loading) return <p className="loading">Loading meals...</p>;
-  if (!filteredMeals.length) return <p className="no-meals">No meals available.</p>;
-
   return (
     <section className="meals-section">
       <div className="meals-grid">
-        {filteredMeals.map((meal) => {
-          const imageSrc =
-            meal.image_url?.startsWith("http")
-              ? meal.image_url
-              : `${backendUrl}${meal.image_url || "/default-meal.png"}`;
-          const mealMood = typeof meal.mood === "string" ? meal.mood : "Uncategorized";
-
-          return (
-            <div className="meal-card" key={meal.id}>
-              <div className="meal-image-wrapper">
-                <img src={imageSrc} alt={meal.name || "Meal"} className="meal-image" />
-              </div>
-
-              <div className="meal-header">
-                <h3>{meal.name}</h3>
-                {mealMood && (
-                  <span className={`mood-badge ${mealMood.toLowerCase().replace(/\s+/g, "-")}`}>
-                    {mealMood}
-                  </span>
-                )}
-              </div>
-
-              <p className="meal-description">{meal.description}</p>
-
-              <div className="meal-card-actions">
-                <button className="recipe-btn" onClick={() => setSelectedMealId(meal.id)}>
-                  View Recipe
-                </button>
-                {onToggleSave && (
-                  <button className={`save-btn ${meal.saved ? "saved" : ""}`} onClick={() => toggleSave(meal.id)}>
-                    {meal.saved ? "★" : "☆"}
-                  </button>
-                )}
-              </div>
+        {filteredMeals.map((meal) => (
+          <div className="meal-card" key={meal.id}>
+            <div className="meal-image-wrapper">
+              <img src={meal.image_url || "/uploads/meals/default-meal.png"} alt={meal.name} />
             </div>
-          );
-        })}
+            <div className="meal-header">
+              <h3>{meal.name}</h3>
+              {meal.mood && <span className={`mood-badge ${meal.mood.toLowerCase().replace(/\s+/g, "-")}`}>{meal.mood}</span>}
+            </div>
+            <p className="meal-description">{meal.description}</p>
+            <div className="meal-card-actions">
+              <button className="recipe-btn" onClick={() => setSelectedMealId(meal.id)}>View Recipe</button>
+              <button className={`save-btn ${meal.saved ? "saved" : ""}`} onClick={() => toggleSave(meal.id)}>
+                {meal.saved ? "★" : "☆"}
+              </button>
+            </div>
+          </div>
+        ))}
       </div>
 
       {selectedMealId && (
@@ -144,4 +120,3 @@ const MealsList = ({
 };
 
 export default MealsList;
-

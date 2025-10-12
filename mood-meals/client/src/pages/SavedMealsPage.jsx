@@ -13,26 +13,22 @@ const SavedMealsPage = () => {
   const [selectedMealId, setSelectedMealId] = useState(null);
 
   const token = localStorage.getItem("token");
-  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "/api"; // standardized
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "https://moodmeals.site/api";
 
-  // Fetch saved meals from the backend
   useEffect(() => {
-    const fetchSaved = async () => {
+    const fetchSavedMeals = async () => {
+      if (!token) return setError("No authentication token found.");
       try {
         setLoading(true);
-        setError("");
-
-        if (!token) throw new Error("No authentication token found.");
-
         const res = await axios.get(`${BACKEND_URL}/saved-meals`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        // Map the response to ensure all fields exist
-        const meals = res.data.map((meal) => ({
-          id: meal.id || meal.meal_id,
-          name: meal.name,
-          description: meal.description,
+        const data = Array.isArray(res.data) ? res.data : [];
+        const meals = data.map((meal) => ({
+          id: meal.id ?? meal.meal_id,
+          name: meal.name || "Untitled Meal",
+          description: meal.description || "",
           mood: meal.mood || "Uncategorized",
           image_url: meal.image_url || "",
           saved: true,
@@ -41,34 +37,31 @@ const SavedMealsPage = () => {
         setSavedMeals(meals);
       } catch (err) {
         console.error("Error fetching saved meals:", err);
-        setError(err.response?.data?.message || err.message || "Failed to load saved meals");
+        setError(err.response?.data?.message || "Failed to load saved meals");
       } finally {
         setLoading(false);
       }
     };
-
-    fetchSaved();
+    fetchSavedMeals();
   }, [token, BACKEND_URL]);
 
-  // Remove saved meal
-  const handleUnsave = async (mealId) => {
+  const toggleSave = async (mealId, currentSaved) => {
+    if (!token) return;
     try {
-      await axios.delete(`${BACKEND_URL}/saved-meals/${mealId}/unsave`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setSavedMeals((prev) => prev.filter((meal) => meal.id !== mealId));
-      toast.success("Meal removed from saved!");
+      const url = `${BACKEND_URL}/saved-meals/${mealId}/${currentSaved ? "unsave" : "save"}`;
+      await axios({ method: currentSaved ? "DELETE" : "POST", url, headers: { Authorization: `Bearer ${token}` } });
+      setSavedMeals((prev) =>
+        prev.map((m) => (m.id === mealId ? { ...m, saved: !currentSaved } : m))
+      );
+      toast.success(currentSaved ? "Meal removed from saved!" : "Meal saved!");
     } catch (err) {
-      console.error("Error unsaving meal:", err);
-      toast.error(err.response?.data?.message || "Failed to remove saved meal");
+      console.error("Error toggling saved meal:", err);
+      toast.error(err.response?.data?.message || "Failed to toggle save");
     }
   };
 
-  // Filter
   const moods = ["all", ...new Set(savedMeals.map((m) => m.mood))];
-  const filteredMeals = savedMeals.filter((m) =>
-    moodFilter === "all" ? true : m.mood === moodFilter
-  );
+  const filteredMeals = savedMeals.filter((m) => (moodFilter === "all" ? true : m.mood === moodFilter));
 
   if (loading) return <p className="loading-text">Loading saved meals...</p>;
   if (error) return <p className="error-text">{error}</p>;
@@ -80,16 +73,8 @@ const SavedMealsPage = () => {
       {savedMeals.length > 0 && (
         <div className="filter-container">
           <label htmlFor="mood-filter">Filter by Mood:</label>
-          <select
-            id="mood-filter"
-            value={moodFilter}
-            onChange={(e) => setMoodFilter(e.target.value)}
-          >
-            {moods.map((m) => (
-              <option key={m} value={m}>
-                {m}
-              </option>
-            ))}
+          <select id="mood-filter" value={moodFilter} onChange={(e) => setMoodFilter(e.target.value)}>
+            {moods.map((m) => <option key={m} value={m}>{m}</option>)}
           </select>
         </div>
       )}
@@ -101,23 +86,12 @@ const SavedMealsPage = () => {
           {filteredMeals.map((meal) => (
             <div className="saved-card" key={meal.id}>
               <h3>{meal.name}</h3>
-              {meal.mood && (
-                <span className={`mood-badge ${meal.mood.toLowerCase()}`}>{meal.mood}</span>
-              )}
+              {meal.mood && <span className={`mood-badge ${meal.mood.toLowerCase()}`}>{meal.mood}</span>}
               <p>{meal.description}</p>
               <div className="saved-actions">
-                <button
-                  className="recipe-btn"
-                  onClick={() => setSelectedMealId(meal.id)}
-                >
-                  View Recipe
-                </button>
-                <button
-                  className="save-btn saved"
-                  onClick={() => handleUnsave(meal.id)}
-                  title="Remove from Saved Meals"
-                >
-                  ★
+                <button className="recipe-btn" onClick={() => setSelectedMealId(meal.id)}>View Recipe</button>
+                <button className={`save-btn ${meal.saved ? "saved" : ""}`} onClick={() => toggleSave(meal.id, meal.saved)}>
+                  {meal.saved ? "★" : "☆"}
                 </button>
               </div>
             </div>
@@ -125,7 +99,6 @@ const SavedMealsPage = () => {
         </div>
       )}
 
-      {/* Modal for RecipePage */}
       {selectedMealId && (
         <div className="modal-overlay" onClick={() => setSelectedMealId(null)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>

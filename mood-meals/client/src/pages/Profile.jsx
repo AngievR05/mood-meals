@@ -1,4 +1,3 @@
-import * as API from "../api";
 import React, { useState, useEffect } from 'react';   
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
@@ -38,53 +37,104 @@ const Profile = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editData, setEditData] = useState({ username:'', email:'', avatar:'Happy' });
   const authConfig = { headers: { Authorization: `Bearer ${token}` } };
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "https://moodmeals.site/api";
 
   const getTopEmotions = (entries) => {
+    if (!Array.isArray(entries)) return [];
     const counts = {};
     entries.forEach(e => { if(!e.mood) return; counts[e.mood] = (counts[e.mood]||0)+1; });
-    return Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(([m,c])=>({ mood:m, count:c }));
+    return Object.entries(counts)
+      .sort((a,b)=>b[1]-a[1])
+      .map(([m,count])=>({ mood:m, count }));
   };
 
   useEffect(() => {
     if(!token){ navigate('/'); return; }
+
     const fetchProfile = async () => {
       setLoading(true);
       try {
         const [userRes, moodRes, streakRes, mealsRes, currentMoodRes] = await Promise.all([
-          axios.get('/api/profile', authConfig),
-          axios.get('/api/profile/mood-entries?range=90', authConfig),
-          axios.get('/api/profile/streak', authConfig),
-          axios.get('/api/profile/saved-meals', authConfig),
-          axios.get('/api/profile/current-mood', authConfig),
+          axios.get(`${BACKEND_URL}/profile`, authConfig),
+          axios.get(`${BACKEND_URL}/profile/mood-entries?range=90`, authConfig),
+          axios.get(`${BACKEND_URL}/profile/streak`, authConfig),
+          axios.get(`${BACKEND_URL}/saved-meals`, authConfig),
+          axios.get(`${BACKEND_URL}/profile/current-mood`, authConfig),
         ]);
-        setUser(userRes.data||{});
-        setEditData({ username:userRes.data?.username||'', email:userRes.data?.email||'', avatar:userRes.data?.avatar||'Happy' });
-        setMoodStats(moodRes.data||[]);
-        setStreak(streakRes.data?.streak||0);
-        setSavedMeals(mealsRes.data||[]);
-        setCurrentMood(currentMoodRes.data||null);
+
+        setUser(userRes.data || {});
+        setEditData({
+          username: userRes.data?.username || '',
+          email: userRes.data?.email || '',
+          avatar: userRes.data?.avatar || 'Happy'
+        });
+
+        setMoodStats(Array.isArray(moodRes.data) ? moodRes.data : []);
+        setStreak(streakRes.data?.streak || 0);
+        setSavedMeals(Array.isArray(mealsRes.data) ? mealsRes.data.map(m => ({ ...m, saved: true })) : []);
+        setCurrentMood(currentMoodRes.data || null);
+
       } catch(err){
-        console.error('Profile fetch error',err);
-        if(err.response?.status===401){ localStorage.removeItem('token'); navigate('/'); } 
-        else alert('Failed to fetch profile data.');
-      } finally { setLoading(false); }
+        console.error('Profile fetch error', err);
+        if(err.response?.status === 401){
+          localStorage.removeItem('token'); 
+          navigate('/');
+        } else {
+          alert('Failed to fetch profile data.');
+        }
+      } finally {
+        setLoading(false);
+      }
     };
+
     fetchProfile();
   }, [navigate, token]);
 
-  const handleLogout = () => { localStorage.removeItem('token'); localStorage.removeItem('role'); navigate('/'); };
-  const saveProfile = async () => {
-    try { await axios.put('/api/profile', editData, authConfig); setUser(prev=>({...prev, ...editData})); setShowEditModal(false); }
-    catch(err){ console.error(err); alert('Failed to update profile'); }
+  const handleLogout = () => {
+    localStorage.removeItem('token'); 
+    localStorage.removeItem('role'); 
+    navigate('/'); 
   };
+
+  const saveProfile = async () => {
+    try { 
+      await axios.put(`${BACKEND_URL}/profile`, editData, authConfig);
+      setUser(prev => ({ ...prev, ...editData }));
+      setShowEditModal(false); 
+    } catch(err){ 
+      console.error(err); 
+      alert('Failed to update profile'); 
+    }
+  };
+
+  const toggleSaveMeal = async (mealId, currentlySaved) => {
+    try {
+      const url = `${BACKEND_URL}/saved-meals/${mealId}/${currentlySaved ? "unsave" : "save"}`;
+      await axios({ method: currentlySaved ? "DELETE" : "POST", url, headers: authConfig.headers });
+      setSavedMeals(prev => prev.map(m => m.id === mealId ? { ...m, saved: !currentlySaved } : m).filter(m => !currentlySaved || m.id !== mealId));
+    } catch(err){
+      console.error("Failed to toggle saved meal:", err);
+      alert(err.response?.data?.message || "Failed to toggle saved meal");
+    }
+  };
+
   if(!user || loading) return <div className="loading">Loading profile…</div>;
+
   const topEmotions = getTopEmotions(moodStats).slice(0,4);
-  const monthDates = Array.from({length:30},(_,i)=>{ const d=new Date(); d.setDate(d.getDate()-i); const dateStr=d.toISOString().slice(0,10); const moodEntry=moodStats.find(m=>(m.date||m.created_at||'').slice(0,10)===dateStr); return {date:dateStr, mood:moodEntry?.mood||null}; }).reverse();
+  const monthDates = Array.from({length:30},(_,i)=>{
+    const d=new Date(); 
+    d.setDate(d.getDate()-i); 
+    const dateStr=d.toISOString().slice(0,10); 
+    const moodEntry = moodStats.find(m=>(m.date||m.created_at||'').slice(0,10)===dateStr); 
+    return {date:dateStr, mood:moodEntry?.mood||null}; 
+  }).reverse();
 
   return (
     <div className="profile-container">
       <div className="profile-header">
-        <div className="profile-avatar"><img src={avatars.find(a=>a.name===user.avatar)?.image||happy} alt="avatar" /></div>
+        <div className="profile-avatar">
+          <img src={avatars.find(a=>a.name===user.avatar)?.image||happy} alt="avatar" />
+        </div>
         <div className="profile-info">
           <h2>{user.username}</h2>
           <span className="username">@{user.username}</span>
@@ -125,7 +175,9 @@ const Profile = () => {
                 <p className="meal-mood">Matched moods: {m.mood||'—'}</p>
                 <div className="meal-actions">
                   <button className="btn small" onClick={()=>navigate(`/meals/${m.id}`)}>View</button>
-                  <button className="btn small danger" onClick={async ()=>{if(!window.confirm('Remove this saved meal?')) return; await axios.delete(`/api/profile/saved-meals/${m.id}`,authConfig); setSavedMeals(prev=>prev.filter(s=>s.id!==m.id));}}>Remove</button>
+                  <button className={`btn small ${m.saved?'danger':'primary'}`} onClick={()=>toggleSaveMeal(m.id, m.saved)}>
+                    {m.saved ? 'Remove' : 'Save'}
+                  </button>
                 </div>
               </div>
             </div>

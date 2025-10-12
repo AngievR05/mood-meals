@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/AdminPanel.css";
 import { toast } from "react-toastify";
+import imageCompression from "browser-image-compression";
 
 const moods = ["Happy", "Sad", "Angry", "Stressed", "Bored", "Energised", "Confused", "Grateful"];
 
@@ -41,13 +42,20 @@ const AddMealPage = () => {
       steps: prev.steps.filter((_, i) => i !== index),
     }));
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
+const handleImageChange = async (e) => {
+  let file = e.target.files[0];
+  if (file) {
+    try {
+      const options = { maxSizeMB: 2, maxWidthOrHeight: 1024 };
+      file = await imageCompression(file, options);
       setImageFile(file);
       setPreview(URL.createObjectURL(file));
+    } catch (err) {
+      toast.error("Image compression failed");
+      console.error(err);
     }
-  };
+  }
+};
 
   const uploadImage = async () => {
     if (!imageFile) return formData.image_url || "";
@@ -145,8 +153,8 @@ const AddMealPage = () => {
           ))}
         </select>
 
-        <input type="file" accept="image/*" onChange={handleImageChange} />
-        {preview && <img src={preview} alt="Preview" className="image-preview" />}
+<input type="file" accept="image/*" onChange={handleImageChange} />
+{preview && <img src={preview} alt="Preview" className="image-preview" />}
 
         <h3>Steps</h3>
         {formData.steps.map((step, idx) => (

@@ -12,7 +12,10 @@ if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, uploadsDir),
-  filename: (req, file, cb) => cb(null, `${Date.now()}${path.extname(file.originalname)}`),
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase() || ".jpg"; // default to .jpg if missing
+    cb(null, `${Date.now()}${ext}`);
+  },
 });
 
 const upload = multer({
@@ -123,12 +126,15 @@ router.get("/", verifyToken, async (req, res) => {
   }
 });
 
-// Upload meal image
+// -------------------- UPLOAD MEAL IMAGE --------------------
 router.post("/upload", verifyToken, verifyAdmin, upload.single("image"), (req, res) => {
   if (!req.file) return res.status(400).json({ message: "No file uploaded" });
 
-  const backendUrl = process.env.BACKEND_URL || ""; // in prod, use full domain
-  const fileUrl = `${backendUrl}/uploads/meals/${req.file.filename}`;
+  const backendUrl = process.env.BACKEND_URL || ""; // prod full URL
+  const fileExt = path.extname(req.file.originalname).toLowerCase() || ".jpg"; // ensure extension
+  const fileName = req.file.filename.endsWith(fileExt) ? req.file.filename : req.file.filename + fileExt;
+
+  const fileUrl = `${backendUrl}/uploads/meals/${fileName}`;
 
   res.json({ message: "✅ Image uploaded successfully", url: fileUrl });
 });

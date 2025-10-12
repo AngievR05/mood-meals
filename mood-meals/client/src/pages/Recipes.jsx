@@ -1,9 +1,9 @@
-// src/pages/RecipesPage.jsx
+// src/pages/Recipes.jsx
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import MealsList from "../components/MealsList";
 import RecipePage from "../components/RecipePage";
 import "../styles/RecipesPage.css";
+import axios from "axios";
 
 const Recipes = () => {
   const [allMeals, setAllMeals] = useState([]);
@@ -14,7 +14,12 @@ const Recipes = () => {
   const [moodFilter, setMoodFilter] = useState("all");
 
   const token = localStorage.getItem("token");
-  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "/api"; // standardized
+
+  // ✅ Correct backend URL handling
+  const BACKEND_URL =
+    process.env.NODE_ENV === "production"
+      ? "/api"
+      : process.env.REACT_APP_BACKEND_URL || "http://localhost:5000/api";
 
   const normalizeMood = (mood) =>
     typeof mood === "string" ? mood.trim().toLowerCase() : "uncategorized";
@@ -29,9 +34,7 @@ const Recipes = () => {
         ]);
 
         const mealsData = Array.isArray(mealsRes.data) ? mealsRes.data : [];
-        const savedIds = Array.isArray(savedRes.data)
-          ? savedRes.data.map((m) => m.meal_id || m.id)
-          : [];
+        const savedIds = Array.isArray(savedRes.data) ? savedRes.data.map((m) => m.meal_id || m.id) : [];
 
         const mealsWithSaved = mealsData.map((meal) => ({
           ...meal,
@@ -61,17 +64,9 @@ const Recipes = () => {
     if (moodFilter === "all") {
       setMeals(allMeals);
     } else {
-      const filtered = allMeals.filter((meal) => meal.mood === normalizeMood(moodFilter));
-      setMeals(filtered);
+      setMeals(allMeals.filter((meal) => meal.mood === normalizeMood(moodFilter)));
     }
   }, [moodFilter, allMeals]);
-
-  const handleToggleSave = (mealId, currentSaved) => {
-    const toggle = (list) =>
-      list.map((m) => (m.id === mealId ? { ...m, saved: !currentSaved } : m));
-    setAllMeals((prev) => toggle(prev));
-    setMeals((prev) => toggle(prev));
-  };
 
   return (
     <div className="recipes-page">
@@ -79,11 +74,7 @@ const Recipes = () => {
 
       <div className="recipes-filter">
         <label htmlFor="mood">Filter by Mood: </label>
-        <select
-          id="mood"
-          value={moodFilter}
-          onChange={(e) => setMoodFilter(e.target.value)}
-        >
+        <select id="mood" value={moodFilter} onChange={(e) => setMoodFilter(e.target.value)}>
           <option value="all">All</option>
           {moods.map((m) => (
             <option key={m} value={m}>
@@ -100,8 +91,9 @@ const Recipes = () => {
           meals={meals}
           filter={moodFilter === "all" ? "all" : "mood"}
           currentMood={moodFilter === "all" ? null : moodFilter}
-          onToggleSave={handleToggleSave}
+          onToggleSave={() => {}}
           onViewRecipe={(id) => setSelectedMealId(id)}
+          backendUrl={BACKEND_URL} // pass backend URL down
         />
       ) : (
         <p className="no-meals">No meals found for this mood.</p>
@@ -110,7 +102,7 @@ const Recipes = () => {
       {selectedMealId && (
         <div className="modal-overlay" onClick={() => setSelectedMealId(null)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <RecipePage mealId={selectedMealId} onClose={() => setSelectedMealId(null)} />
+            <RecipePage mealId={selectedMealId} onClose={() => setSelectedMealId(null)} backendUrl={BACKEND_URL} />
           </div>
         </div>
       )}
