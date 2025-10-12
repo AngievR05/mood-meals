@@ -12,75 +12,77 @@ const Friends = () => {
   const [newFriend, setNewFriend] = useState("");
   const [encourageMsgs, setEncourageMsgs] = useState({});
   const [snackbar, setSnackbar] = useState({ message: "", type: "" });
-  const [activeTab, setActiveTab] = useState("pending"); // pending | accepted
+  const [activeTab, setActiveTab] = useState("pending");
 
+  // ⚡ FIX: use BACKEND_URL directly, no extra /api
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "";
 
   const showSnackbar = (message, type = "success") => {
     setSnackbar({ message, type });
     setTimeout(() => setSnackbar({ message: "", type: "" }), 3000);
   };
-const fetchFriends = async () => {
-  try {
-    const res = await axios.get(`${BACKEND_URL}/api/friends`, {   // ✅ added /api
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-    });
 
-    const enhance = (list = []) =>
-      list.map((f) => ({
-        ...f,
-        last_moods: f.latest_mood ? [{ mood: f.latest_mood, notes: f.mood_time }] : [],
-        last_meals: f.last_meal ? [{ meal_name: f.last_meal }] : [],
-        encouragements: f.encouragements || [],
-      }));
+  const fetchFriends = async () => {
+    try {
+      const res = await axios.get(`${BACKEND_URL}/friends`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
 
-    setFriends({
-      pendingReceived: enhance(res.data?.pendingReceived || []),
-      pendingSent: enhance(res.data?.pendingSent || []),
-      accepted: enhance(res.data?.accepted || []),
-    });
-  } catch (err) {
-    console.error(err);
-    showSnackbar("Error fetching friends", "error");
-  }
-};
+      const enhance = (list = []) =>
+        list.map((f) => ({
+          ...f,
+          last_moods: f.latest_mood ? [{ mood: f.latest_mood, notes: f.mood_time }] : [],
+          last_meals: f.last_meal ? [{ meal_name: f.last_meal }] : [],
+          encouragements: f.encouragements || [],
+        }));
 
-const addFriend = async () => {
-  if (!newFriend.trim()) return showSnackbar("Enter username or email", "error");
-  try {
-    const res = await axios.post(
-      `${BACKEND_URL}/api/friends/add`,   // ✅ fixed
-      { friendIdentifier: newFriend },
-      { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
-    );
-    showSnackbar(res.data.message || "Friend request sent");
-    setNewFriend("");
-    fetchFriends();
-  } catch (err) {
-    showSnackbar(err.response?.data?.error || "Error sending friend request", "error");
-  }
-};
+      setFriends({
+        pendingReceived: enhance(res.data?.pendingReceived || []),
+        pendingSent: enhance(res.data?.pendingSent || []),
+        accepted: enhance(res.data?.accepted || []),
+      });
+    } catch (err) {
+      console.error(err);
+      showSnackbar("Error fetching friends", "error");
+    }
+  };
+
+  const addFriend = async () => {
+    if (!newFriend.trim()) return showSnackbar("Enter username or email", "error");
+    try {
+      const res = await axios.post(
+        `${BACKEND_URL}/friends/add`, // ⚡ FIX: removed extra /api
+        { friendIdentifier: newFriend },
+        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
+      );
+      showSnackbar(res.data.message || "Friend request sent");
+      setNewFriend("");
+      fetchFriends();
+    } catch (err) {
+      showSnackbar(err.response?.data?.error || "Error sending friend request", "error");
+    }
+  };
 
   const updateFriend = async (action, friendshipId, friendId) => {
     try {
       let res;
-if (action === "accept") {
-  res = await axios.post(
-    `${BACKEND_URL}/api/friends/accept`,
-    { friendshipId },
-    { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
-  );
-} else if (action === "reject") {
-  res = await axios.post(
-    `${BACKEND_URL}/api/friends/reject`,
-    { friendshipId },
-    { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
-  );
-} else if (action === "remove") {
-  res = await axios.delete(`${BACKEND_URL}/api/friends/${friendId}`, {
-    headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-  });
-}
+      if (action === "accept") {
+        res = await axios.post(
+          `${BACKEND_URL}/friends/accept`,
+          { friendshipId },
+          { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
+        );
+      } else if (action === "reject") {
+        res = await axios.post(
+          `${BACKEND_URL}/friends/reject`,
+          { friendshipId },
+          { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
+        );
+      } else if (action === "remove") {
+        res = await axios.delete(`${BACKEND_URL}/friends/${friendId}`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        });
+      }
       showSnackbar(res?.data?.message || `${action} successful`);
       fetchFriends();
     } catch (err) {
@@ -102,11 +104,11 @@ if (action === "accept") {
     const message = encourageMsgs[friendId];
     if (!message?.trim()) return showSnackbar("Enter a message", "error");
     try {
-const res = await axios.post(
-  `${BACKEND_URL}/api/friends/encourage`,
-  { receiverId: friendId, message },
-  { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
-);
+      const res = await axios.post(
+        `${BACKEND_URL}/friends/encourage`,
+        { receiverId: friendId, message },
+        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
+      );
       showSnackbar(res.data.message || "Encouragement sent");
       setEncourageMsgs((prev) => ({ ...prev, [friendId]: "" }));
       fetchFriends();
@@ -124,7 +126,6 @@ const res = await axios.post(
 
   return (
     <div className="friends-page">
-      {/* Add Friend */}
       <section className="connect-section card">
         <h2>Connect with Friends</h2>
         <div className="connect-inputs">
@@ -138,10 +139,8 @@ const res = await axios.post(
         </div>
       </section>
 
-      {/* Snackbar */}
       {snackbar.message && <div className={`snackbar show ${snackbar.type}`}>{snackbar.message}</div>}
 
-      {/* Tabs */}
       <div className="tabs">
         <button className={activeTab === "pending" ? "active" : ""} onClick={() => setActiveTab("pending")}>
           Pending
@@ -151,7 +150,6 @@ const res = await axios.post(
         </button>
       </div>
 
-      {/* Stats */}
       {activeTab === "accepted" && (
         <div className="friend-stats card">
           <span>Total Friends: {stats.total}</span>
@@ -159,7 +157,6 @@ const res = await axios.post(
         </div>
       )}
 
-      {/* Pending Received */}
       {activeTab === "pending" && pendingReceived.length > 0 && (
         <section className="pending-section">
           <h2>Pending Requests</h2>
@@ -179,7 +176,6 @@ const res = await axios.post(
         </section>
       )}
 
-      {/* Pending Sent */}
       {activeTab === "pending" && pendingSent.length > 0 && (
         <section className="pending-section">
           <h2>Sent Requests</h2>
@@ -192,7 +188,6 @@ const res = await axios.post(
         </section>
       )}
 
-      {/* Accepted Friends */}
       {activeTab === "accepted" && accepted.length > 0 && (
         <section className="accepted-section">
           {accepted.map((f) => (
@@ -202,7 +197,6 @@ const res = await axios.post(
                 <button onClick={() => updateFriend("remove", f.friendship_id, f.friend_id)}>Remove</button>
               </div>
 
-              {/* Feed */}
               <div className="feed-section grid">
                 {f.last_moods.map((m, idx) => (
                   <div key={idx} className="feed-item mood">
@@ -210,9 +204,7 @@ const res = await axios.post(
                   </div>
                 ))}
                 {f.last_meals.map((m, idx) => (
-                  <div key={idx} className="feed-item meal">
-                    🍽 {m.meal_name}
-                  </div>
+                  <div key={idx} className="feed-item meal">🍽 {m.meal_name}</div>
                 ))}
                 {f.encouragements.map((enc, idx) => (
                   <div key={idx} className="feed-item encouragement-item">
@@ -221,7 +213,6 @@ const res = await axios.post(
                 ))}
               </div>
 
-              {/* Encourage */}
               <div className="encourage-section">
                 <input
                   placeholder="Send encouragement..."
@@ -239,3 +230,4 @@ const res = await axios.post(
 };
 
 export default Friends;
+

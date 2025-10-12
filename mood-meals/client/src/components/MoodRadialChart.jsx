@@ -38,9 +38,8 @@ const MoodRadialChart = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) throw new Error('Failed to fetch mood data');
-        const data = await res.json(); // Expected: [{ mood: 'Happy', note: '...', created_at: '...' }, ...]
+        const data = await res.json(); 
 
-        // Count each mood
         const counts = data.reduce((acc, entry) => {
           acc[entry.mood] = (acc[entry.mood] || 0) + 1;
           return acc;
@@ -89,8 +88,8 @@ const MoodRadialChart = () => {
         align: 'center',
         labels: {
           boxWidth: 18,
-          padding: 16,
-          font: { size: 15, weight: '500' },
+          padding: 24,
+          font: { size: 16, weight: '500' },
           color: '#333',
           usePointStyle: true,
           pointStyle: 'circle',
@@ -122,7 +121,7 @@ const MoodRadialChart = () => {
       {loading && <p>Loading chart...</p>}
       {error && <p className="auth-error">{error}</p>}
       {!loading && !error && chartData.labels.length > 0 && (
-        <div className="mood-chart">
+        <div className="mood-chart-wrapper">
           <Doughnut data={chartData} options={options} />
         </div>
       )}

@@ -1,27 +1,77 @@
+:root {
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --radius-md: 12px;
+  --shadow-sm: 0 6px 18px rgba(0,0,0,0.06);
+  --white: #fff;
+}
+
 .mood-radial-chart-container {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   padding: var(--space-lg);
-  margin-top: var(--space-md);
-  margin-bottom: var(--space-md);
-}
-
-.mood-chart {
-  width: 100%;
-  max-width: 250px;
-  height: 200px;
+  margin: var(--space-md) auto;
+  background: var(--white);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+  max-width: 650px;
 }
 
 .mood-radial-chart-container h2 {
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   font-weight: 700;
   margin-bottom: var(--space-md);
+  text-align: center;
 }
 
 .auth-error {
   color: #ed5565;
   font-weight: 500;
   margin-top: var(--space-sm);
+}
+
+/* Chart wrapper ensures smooth resizing */
+.mood-chart-wrapper {
+  width: 100%;
+  max-width: 400px;
+  height: 320px;
+  transition: all 0.3s ease;
+}
+
+/* Chart itself fills container */
+.mood-chart-wrapper canvas {
+  width: 100% !important;
+  height: 100% !important;
+  transition: all 0.3s ease;
+}
+
+/* Responsive: legend moves below chart on small screens */
+@media (max-width: 768px) {
+  .mood-radial-chart-container {
+    padding: var(--space-md);
+  }
+
+  .mood-chart-wrapper {
+    height: 280px;
+    max-width: 100%;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+  .mood-radial-chart-container {
+    padding: var(--space-sm);
+  }
+
+  .mood-radial-chart-container h2 {
+    font-size: 1.4rem;
+  }
+
+  .mood-chart-wrapper {
+    height: 220px;
+  }
 }
