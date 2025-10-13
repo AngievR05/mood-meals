@@ -11,6 +11,14 @@
   transition: background-color 0.3s ease;
 }
 
+/* --- Logo --- */
+.navbar-logo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
 .navbar-logo a {
   display: flex;
   align-items: center;
@@ -26,7 +34,7 @@
 }
 
 .logo-img {
-  height: 42px;
+  height: 40px;
   width: auto;
   margin-right: var(--space-sm);
   transition: transform 0.3s ease;
@@ -36,16 +44,16 @@
   transform: scale(1.1);
 }
 
-/* Menu Toggle */
+/* --- Menu Toggle --- */
 .menu-toggle {
   display: none;
   background: none;
   border: none;
   cursor: pointer;
   color: var(--neutral-dark);
-  margin-left: 1rem;
 }
 
+/* --- Links --- */
 .navbar-links {
   list-style: none;
   display: flex;
@@ -83,25 +91,11 @@
   width: 100%;
 }
 
+/* --- Actions --- */
 .navbar-actions {
   display: flex;
   align-items: center;
   gap: var(--space-md);
-}
-
-.navbar-actions input {
-  padding: var(--space-sm) var(--space-md);
-  border-radius: var(--border-radius);
-  border: 1.5px solid var(--neutral-light);
-  outline: none;
-  font-size: var(--font-size-body);
-  width: 150px;
-  transition: all 0.3s ease;
-}
-
-.navbar-actions input:focus {
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(93, 156, 236, 0.3);
 }
 
 .logout-button {
@@ -120,57 +114,50 @@
   transform: scale(1.05);
 }
 
-@media (max-width: 768px) {
+/* --- MOBILE --- */
+@media (max-width: 900px) {
   .menu-toggle {
     display: block;
   }
 
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
   .navbar-links {
     position: absolute;
-    top: 100%;
+    top: 70px;
     left: 0;
     width: 100%;
     background: var(--background-color);
     flex-direction: column;
     align-items: center;
-    gap: 1rem;
+    gap: 1.2rem;
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.3s ease;
+    transition: all 0.35s ease;
+    box-shadow: none;
+    opacity: 0;
   }
 
   .navbar-links.open {
-    max-height: 400px;
-    padding: 1rem 0;
+    max-height: 500px;
+    padding: 1.5rem 0;
     box-shadow: var(--box-shadow);
+    opacity: 1;
   }
 
   .navbar-actions {
-    flex-basis: 100%;
-    justify-content: center;
-    gap: var(--space-sm);
-    margin-top: var(--space-sm);
-    flex-wrap: wrap;
+    display: none;
   }
 
-  .navbar-actions input {
-    width: 100%;
-    max-width: 300px;
-  }
-
-  .logout-button {
-    flex-grow: 1;
-    max-width: 120px;
+  .mobile-logout {
+    display: block;
   }
 }
 
-@media (max-width: 480px) {
-  .navbar-actions {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .logout-button {
-    margin-top: var(--space-sm);
-  }
+/* Hide mobile logout on desktop */
+.mobile-logout {
+  display: none;
 }
