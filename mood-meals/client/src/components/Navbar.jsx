@@ -24,40 +24,38 @@ const Navbar = () => {
 
   return (
     <nav className="navbar">
-      <div className="navbar-logo">
-        <Link to="/home" onClick={() => setMenuOpen(false)}>
+      <div className="navbar-left">
+        <Link to="/home" className="navbar-logo" onClick={() => setMenuOpen(false)}>
           <img src={logo} alt="Mood Meals Logo" className="logo-img" />
           <span className="brand-text">Mood Meals</span>
         </Link>
-        <button
-          className="menu-toggle"
-          aria-label="Toggle menu"
-          onClick={() => setMenuOpen(!menuOpen)}
-        >
-          {menuOpen ? <FiX size={26} /> : <FiMenu size={26} />}
-        </button>
       </div>
 
+      {/* Desktop Links */}
       <ul className={`navbar-links ${menuOpen ? 'open' : ''}`}>
         <li><Link to="/home" onClick={() => setMenuOpen(false)}>Home</Link></li>
         <li><Link to="/mood-tracker" onClick={() => setMenuOpen(false)}>Mood Tracker</Link></li>
         <li><Link to="/meals" onClick={() => setMenuOpen(false)}>My Meals</Link></li>
         <li><Link to="/friends" onClick={() => setMenuOpen(false)}>Friends</Link></li>
         <li><Link to="/profile" onClick={() => setMenuOpen(false)}>Profile</Link></li>
-        {role === 'admin' && (
-          <li><Link to="/admin" onClick={() => setMenuOpen(false)}>Admin Panel</Link></li>
-        )}
-        <li className="mobile-logout">
-          <button className="logout-button" onClick={() => logout(navigate)}>Logout</button>
-        </li>
+        {role === 'admin' && <li><Link to="/admin" onClick={() => setMenuOpen(false)}>Admin Panel</Link></li>}
       </ul>
 
+      {/* Desktop logout */}
       <div className="navbar-actions">
         <button className="logout-button" onClick={() => logout(navigate)}>Logout</button>
       </div>
+
+      {/* Mobile Hamburger */}
+      <button
+        className="menu-toggle"
+        aria-label="Toggle menu"
+        onClick={() => setMenuOpen(!menuOpen)}
+      >
+        {menuOpen ? <FiX size={26} /> : <FiMenu size={26} />}
+      </button>
     </nav>
   );
 };
 
 export default Navbar;
-
