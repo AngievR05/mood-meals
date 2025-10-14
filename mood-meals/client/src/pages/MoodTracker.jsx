@@ -130,7 +130,7 @@ const MoodTracker = () => {
 
       setSelectedMood('');
       setNote('');
-      toast.success(`🎉 Mood "${savedMood.mood}" saved successfully!`);
+toast.success(`🎉 Mood "${savedMood?.mood || selectedMood}" saved successfully!`);
     } catch (err) {
       toast.error(`❌ ${err.message}`);
     } finally {

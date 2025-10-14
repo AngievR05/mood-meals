@@ -111,7 +111,7 @@ const Home = () => {
       setSelectedMood("");
       setNote("");
 
-      toast.success(`🎉 Mood "${savedMood.mood}" saved successfully!`, {
+toast.success(`🎉 Mood "${savedMood?.mood || selectedMood}" saved successfully!`);
         position: "bottom-right",
       });
     } catch (err) {
