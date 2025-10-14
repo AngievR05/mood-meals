@@ -13,7 +13,7 @@ if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, uploadsDir),
   filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname).toLowerCase() || ".jpg"; // default to .jpg if missing
+    const ext = path.extname(file.originalname).toLowerCase() || ".jpg";
     cb(null, `${Date.now()}${ext}`);
   },
 });
@@ -30,13 +30,16 @@ const upload = multer({
 
 // -------------------- HELPERS --------------------
 const safeParseJSON = (json, defaultValue = []) => {
-  try { return JSON.parse(json); } catch { return defaultValue; }
+  try {
+    return JSON.parse(json);
+  } catch {
+    return defaultValue;
+  }
 };
+
 const getPrimaryMood = (mood) => (!mood || typeof mood !== "string" || mood.trim() === "" ? "Happy" : mood.trim());
 
 // -------------------- CRUD --------------------
-
-// Create meal
 router.post("/", verifyToken, verifyAdmin, async (req, res) => {
   try {
     const { name, description, ingredients, mood, image_url, steps } = req.body;
@@ -46,7 +49,14 @@ router.post("/", verifyToken, verifyAdmin, async (req, res) => {
 
     await pool.query(
       "INSERT INTO meals (name, description, ingredients, mood, image_url, steps) VALUES (?, ?, ?, ?, ?, ?)",
-      [name.trim(), description || null, JSON.stringify(ingredients || []), primaryMood, image_url || null, JSON.stringify(steps || [])]
+      [
+        name.trim(),
+        description || null,
+        JSON.stringify(ingredients || []),
+        primaryMood,
+        image_url || null,
+        JSON.stringify(steps || []),
+      ]
     );
 
     res.status(201).json({ message: "✅ Meal added successfully" });
@@ -56,7 +66,6 @@ router.post("/", verifyToken, verifyAdmin, async (req, res) => {
   }
 });
 
-// Update meal
 router.put("/:id", verifyToken, verifyAdmin, async (req, res) => {
   try {
     const { id } = req.params;
@@ -67,7 +76,15 @@ router.put("/:id", verifyToken, verifyAdmin, async (req, res) => {
 
     const [result] = await pool.query(
       "UPDATE meals SET name = ?, description = ?, ingredients = ?, mood = ?, image_url = ?, steps = ? WHERE id = ?",
-      [name.trim(), description || null, JSON.stringify(ingredients || []), primaryMood, image_url || null, JSON.stringify(steps || []), id]
+      [
+        name.trim(),
+        description || null,
+        JSON.stringify(ingredients || []),
+        primaryMood,
+        image_url || null,
+        JSON.stringify(steps || []),
+        id,
+      ]
     );
 
     if (result.affectedRows === 0) return res.status(404).json({ message: "Meal not found" });
@@ -78,7 +95,6 @@ router.put("/:id", verifyToken, verifyAdmin, async (req, res) => {
   }
 });
 
-// Delete meal
 router.delete("/:id", verifyToken, verifyAdmin, async (req, res) => {
   try {
     const { id } = req.params;
@@ -91,7 +107,6 @@ router.delete("/:id", verifyToken, verifyAdmin, async (req, res) => {
   }
 });
 
-// Get single meal
 router.get("/:id", verifyToken, async (req, res) => {
   try {
     const [rows] = await pool.query("SELECT * FROM meals WHERE id = ?", [req.params.id]);
@@ -109,11 +124,10 @@ router.get("/:id", verifyToken, async (req, res) => {
   }
 });
 
-// Get all meals
 router.get("/", verifyToken, async (req, res) => {
   try {
     const [rows] = await pool.query("SELECT * FROM meals ORDER BY created_at DESC");
-    const meals = rows.map(r => ({
+    const meals = rows.map((r) => ({
       ...r,
       ingredients: safeParseJSON(r.ingredients),
       steps: safeParseJSON(r.steps),
@@ -126,16 +140,16 @@ router.get("/", verifyToken, async (req, res) => {
   }
 });
 
-// -------------------- UPLOAD MEAL IMAGE --------------------
 router.post("/upload", verifyToken, verifyAdmin, upload.single("image"), (req, res) => {
   if (!req.file) return res.status(400).json({ message: "No file uploaded" });
 
-  const backendUrl = process.env.BACKEND_URL || ""; // prod full URL
-  const fileExt = path.extname(req.file.originalname).toLowerCase() || ".jpg"; // ensure extension
-  const fileName = req.file.filename.endsWith(fileExt) ? req.file.filename : req.file.filename + fileExt;
+  const backendUrl = process.env.BACKEND_URL || "";
+  const fileExt = path.extname(req.file.originalname).toLowerCase() || ".jpg";
+  const fileName = req.file.filename.endsWith(fileExt)
+    ? req.file.filename
+    : req.file.filename + fileExt;
 
   const fileUrl = `${backendUrl}/uploads/meals/${fileName}`;
-
   res.json({ message: "✅ Image uploaded successfully", url: fileUrl });
 });
 

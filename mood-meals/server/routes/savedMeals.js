@@ -32,26 +32,33 @@ router.post("/:mealId/toggle", verifyToken, async (req, res) => {
   const userId = req.user.id;
 
   try {
+    // Check if this user already has the meal saved
     const [existing] = await pool.query(
       "SELECT saved FROM user_meals WHERE user_id = ? AND meal_id = ?",
       [userId, mealId]
     );
 
     if (existing.length > 0) {
-      const newSavedState = existing[0].saved ? 0 : 1;
+      // Toggle the saved value (1 -> 0 or 0 -> 1)
+      const newSaved = existing[0].saved ? 0 : 1;
       await pool.query(
         "UPDATE user_meals SET saved = ? WHERE user_id = ? AND meal_id = ?",
-        [newSavedState, userId, mealId]
+        [newSaved, userId, mealId]
       );
-      return res.json({ mealId, saved: newSavedState });
+      return res.json({
+        mealId,
+        saved: !!newSaved,
+        message: newSaved ? "Meal saved ✅" : "Meal unsaved ❌",
+      });
     }
 
+    // If not existing, insert new record
     await pool.query(
       "INSERT INTO user_meals (user_id, meal_id, saved) VALUES (?, ?, 1)",
       [userId, mealId]
     );
 
-    res.json({ mealId, saved: 1 });
+    res.json({ mealId, saved: true, message: "Meal saved ✅" });
   } catch (err) {
     console.error("❌ Error toggling saved meal:", err);
     res.status(500).json({ message: "Failed to toggle saved meal" });

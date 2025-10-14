@@ -43,21 +43,26 @@ const MealsList = ({
     fetchMeals();
   }, [parentMeals, token, BACKEND_URL]);
 
-  const toggleSave = async (mealId) => {
-    const meal = meals.find((m) => m.id === mealId);
-    if (!meal || !token) return;
+const toggleSave = async (mealId) => {
+  const meal = meals.find((m) => m.id === mealId);
+  if (!meal || !token) return;
 
-    const newSaved = !meal.saved;
-    setMeals((prev) => prev.map((m) => (m.id === mealId ? { ...m, saved: newSaved } : m)));
+  const newSaved = !meal.saved;
+  setMeals((prev) =>
+    prev.map((m) => (m.id === mealId ? { ...m, saved: newSaved } : m))
+  );
 
-    try {
-      const url = `${BACKEND_URL}/saved-meals/${mealId}/${newSaved ? "save" : "unsave"}`;
-      await axios({ method: newSaved ? "POST" : "DELETE", url, headers: { Authorization: `Bearer ${token}` } });
-    } catch (err) {
-      console.error("Error toggling save:", err);
-      setMeals((prev) => prev.map((m) => (m.id === mealId ? { ...m, saved: meal.saved } : m)));
-    }
-  };
+  try {
+    const url = `${BACKEND_URL}/saved-meals/${mealId}/toggle`;
+    await axios.post(url, {}, { headers: { Authorization: `Bearer ${token}` } });
+  } catch (err) {
+    console.error("Error toggling save:", err);
+    // rollback if request fails
+    setMeals((prev) =>
+      prev.map((m) => (m.id === mealId ? { ...m, saved: meal.saved } : m))
+    );
+  }
+};
 
   if (loading) return <p className="loading">Loading meals...</p>;
   if (error) return <p className="no-meals">{error}</p>;
