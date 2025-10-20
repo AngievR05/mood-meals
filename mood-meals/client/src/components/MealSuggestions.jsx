@@ -35,9 +35,13 @@ const MealSuggestions = ({ currentMood, onToggleSave }) => {
   const [chefTip, setChefTip] = useState(chefTips[0]);
   const [loadingMeals, setLoadingMeals] = useState(false);
   const token = localStorage.getItem("token");
-  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "";
   const navigate = useNavigate();
 
+  // ✅ Use clean backend URL without double `/api`
+  const BACKEND_URL =
+    process.env.REACT_APP_BACKEND_URL || "https://moodmeals.site/api";
+
+  // Rotate chef tips every 12 seconds
   useEffect(() => {
     const interval = setInterval(() => {
       setChefTip(chefTips[Math.floor(Math.random() * chefTips.length)]);
@@ -45,12 +49,17 @@ const MealSuggestions = ({ currentMood, onToggleSave }) => {
     return () => clearInterval(interval);
   }, []);
 
+  // ✅ Fetch meals ONCE when component mounts
   useEffect(() => {
     const fetchMeals = async () => {
       setLoadingMeals(true);
       try {
-        const res = await axios.get(`${BACKEND_URL}/api/meals`, { headers: { Authorization: `Bearer ${token}` } });
-        setAllMeals(Array.isArray(res.data) ? res.data : []);
+        // ✅ Fixed URL (no /api/api)
+        const res = await axios.get(`${BACKEND_URL}/meals`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const mealsArray = Array.isArray(res.data) ? res.data : [];
+        setAllMeals(mealsArray);
       } catch (err) {
         console.error("Failed to fetch meals:", err);
         setAllMeals([]);
@@ -58,20 +67,35 @@ const MealSuggestions = ({ currentMood, onToggleSave }) => {
         setLoadingMeals(false);
       }
     };
-    fetchMeals();
-  }, [token, BACKEND_URL]);
 
+    fetchMeals();
+    // ✅ Only run once unless BACKEND_URL or token changes
+  }, [BACKEND_URL, token]);
+
+  // Filter meals based on mood or show all
   useEffect(() => {
     if (!allMeals.length) return setFilteredMeals([]);
-    const moodName = typeof currentMood === "string" ? currentMood : currentMood?.name || "";
-    setFilteredMeals(
+    const moodName =
+      typeof currentMood === "string"
+        ? currentMood
+        : currentMood?.name || "";
+
+    const filtered =
       filterMode === "mood" && moodName
-        ? allMeals.filter((meal) => (meal.mood || "").toLowerCase() === moodName.toLowerCase())
-        : [...allMeals]
-    );
+        ? allMeals.filter(
+            (meal) =>
+              (meal.mood || "").toLowerCase() === moodName.toLowerCase()
+          )
+        : [...allMeals];
+
+    setFilteredMeals(filtered);
   }, [allMeals, filterMode, currentMood]);
 
-  const moodName = currentMood ? (typeof currentMood === "string" ? currentMood : currentMood.name) : "All";
+  const moodName = currentMood
+    ? typeof currentMood === "string"
+      ? currentMood
+      : currentMood.name
+    : "All";
 
   const sliderSettings = {
     dots: true,
@@ -94,33 +118,57 @@ const MealSuggestions = ({ currentMood, onToggleSave }) => {
       {chefTip && <p className="chef-tip">{chefTip}</p>}
 
       <div className="filter-buttons">
-        <button className={filterMode === "mood" ? "active" : ""} onClick={() => setFilterMode("mood")}>
+        <button
+          className={filterMode === "mood" ? "active" : ""}
+          onClick={() => setFilterMode("mood")}
+        >
           Mood Only
         </button>
-        <button className={filterMode === "all" ? "active" : ""} onClick={() => setFilterMode("all")}>
+        <button
+          className={filterMode === "all" ? "active" : ""}
+          onClick={() => setFilterMode("all")}
+        >
           Show All
         </button>
       </div>
 
       {loadingMeals && <p>Loading meals...</p>}
-      {!loadingMeals && !filteredMeals.length && <p className="meal-empty">No meals found for this filter.</p>}
+      {!loadingMeals && !filteredMeals.length && (
+        <p className="meal-empty">No meals found for this filter.</p>
+      )}
 
       {!loadingMeals && filteredMeals.length > 0 && (
         <Slider {...sliderSettings}>
           {filteredMeals.map((meal) => {
-            const imageSrc =
-              meal.image_url?.startsWith("http") ? meal.image_url : `${BACKEND_URL}${meal.image_url || "/default-meal.png"}`;
+            const imageSrc = meal.image_url?.startsWith("http")
+              ? meal.image_url
+              : `${BACKEND_URL}${meal.image_url || "/default-meal.png"}`;
 
             return (
-              <div key={meal.id} className="meal-card" style={{ borderColor: moodColors[moodName] || "#ccc" }}>
-                <img src={imageSrc} alt={meal.name} className="meal-image" loading="lazy" />
+              <div
+                key={meal.id}
+                className="meal-card"
+                style={{ borderColor: moodColors[moodName] || "#ccc" }}
+              >
+                <img
+                  src={imageSrc}
+                  alt={meal.name}
+                  className="meal-image"
+                  loading="lazy"
+                />
                 <p className="meal-name">{meal.name}</p>
                 <div className="meal-card-actions">
-                  <button className="view-recipe-btn" onClick={() => setSelectedMealId(meal.id)}>
+                  <button
+                    className="view-recipe-btn"
+                    onClick={() => setSelectedMealId(meal.id)}
+                  >
                     View Recipe
                   </button>
                   {onToggleSave && (
-                    <button className={`save-btn ${meal.saved ? "saved" : ""}`} onClick={() => onToggleSave(meal.id)}>
+                    <button
+                      className={`save-btn ${meal.saved ? "saved" : ""}`}
+                      onClick={() => onToggleSave(meal.id)}
+                    >
                       {meal.saved ? "★" : "☆"}
                     </button>
                   )}
@@ -140,7 +188,10 @@ const MealSuggestions = ({ currentMood, onToggleSave }) => {
       {selectedMealId && (
         <div className="modal-overlay" onClick={() => setSelectedMealId(null)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <RecipePage mealId={selectedMealId} onClose={() => setSelectedMealId(null)} />
+            <RecipePage
+              mealId={selectedMealId}
+              onClose={() => setSelectedMealId(null)}
+            />
           </div>
         </div>
       )}
@@ -149,4 +200,3 @@ const MealSuggestions = ({ currentMood, onToggleSave }) => {
 };
 
 export default MealSuggestions;
-
