@@ -1,4 +1,3 @@
-// src/pages/AddMealPage.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/AdminPanel.css";
@@ -20,6 +19,7 @@ const AddMealPage = () => {
     image_url: "",
     steps: [""],
   });
+
   const [imageFile, setImageFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -42,20 +42,20 @@ const AddMealPage = () => {
       steps: prev.steps.filter((_, i) => i !== index),
     }));
 
-const handleImageChange = async (e) => {
-  let file = e.target.files[0];
-  if (file) {
-    try {
-      const options = { maxSizeMB: 2, maxWidthOrHeight: 1024 };
-      file = await imageCompression(file, options);
-      setImageFile(file);
-      setPreview(URL.createObjectURL(file));
-    } catch (err) {
-      toast.error("Image compression failed");
-      console.error(err);
+  const handleImageChange = async (e) => {
+    let file = e.target.files[0];
+    if (file) {
+      try {
+        const options = { maxSizeMB: 2, maxWidthOrHeight: 1024 };
+        const compressed = await imageCompression(file, options);
+        setImageFile(compressed);
+        setPreview(URL.createObjectURL(compressed));
+      } catch (err) {
+        toast.error("Image compression failed");
+        console.error(err);
+      }
     }
-  }
-};
+  };
 
   const uploadImage = async () => {
     if (!imageFile) return formData.image_url || "";
@@ -74,10 +74,10 @@ const handleImageChange = async (e) => {
       const result = await res.json();
       if (!res.ok) throw new Error(result.message || "Upload failed");
 
-      // Prepend backend URL to make it fully accessible
-      const FULL_URL = `${result.url.startsWith("http") ? "" : BACKEND_URL}${result.url}`;
-      setPreview(FULL_URL);
-      return FULL_URL;
+      const fileUrl =
+        result.url.startsWith("http") ? result.url : `${BACKEND_URL}${result.url.startsWith("/") ? "" : "/"}${result.url}`;
+      setPreview(fileUrl);
+      return fileUrl;
     } catch (err) {
       toast.error(err.message);
       return "";
@@ -111,9 +111,10 @@ const handleImageChange = async (e) => {
       });
 
       const data = await res.json();
+      if (res.status === 401) return toast.error("Session expired. Please log in again.");
       if (!res.ok) throw new Error(data.message || "Error saving meal");
 
-      toast.success("Meal added successfully!");
+      toast.success("✅ Meal added successfully!");
       navigate("/admin");
     } catch (err) {
       toast.error(err.message);
@@ -153,8 +154,8 @@ const handleImageChange = async (e) => {
           ))}
         </select>
 
-<input type="file" accept="image/*" onChange={handleImageChange} />
-{preview && <img src={preview} alt="Preview" className="image-preview" />}
+        <input type="file" accept="image/*" onChange={handleImageChange} />
+        {preview && <img src={preview} alt="Preview" className="image-preview" />}
 
         <h3>Steps</h3>
         {formData.steps.map((step, idx) => (
@@ -165,11 +166,7 @@ const handleImageChange = async (e) => {
               onChange={(e) => handleStepChange(idx, e.target.value)}
               placeholder={`Step ${idx + 1}`}
             />
-            <button
-              type="button"
-              className="delete-step-btn"
-              onClick={() => removeStep(idx)}
-            >
+            <button type="button" className="delete-step-btn" onClick={() => removeStep(idx)}>
               x
             </button>
           </div>
@@ -182,11 +179,7 @@ const handleImageChange = async (e) => {
           <button type="submit" className="primary-btn" disabled={uploading}>
             {uploading ? "Uploading..." : "Add Meal"}
           </button>
-          <button
-            type="button"
-            className="secondary-btn"
-            onClick={() => navigate("/admin")}
-          >
+          <button type="button" className="secondary-btn" onClick={() => navigate("/admin")}>
             Cancel
           </button>
         </div>
@@ -196,4 +189,3 @@ const handleImageChange = async (e) => {
 };
 
 export default AddMealPage;
-

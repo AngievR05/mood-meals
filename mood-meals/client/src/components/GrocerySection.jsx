@@ -1,9 +1,15 @@
+// src/components/GrocerySection.jsx
 import React, { useState, useEffect } from "react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "../styles/GrocerySection.css";
-import { fetchGroceries, addGrocery, updateGrocery, deleteGrocery } from "../api"; // <-- API
+import {
+  fetchGroceries,
+  addGrocery,
+  updateGrocery,
+  deleteGrocery,
+} from "../api"; // ✅ API functions
 
 const moodHints = {
   Happy: ["🍓 Add something sweet!", "🥗 Keep it colorful!"],
@@ -22,7 +28,7 @@ const GrocerySection = ({ currentMood }) => {
   const [bought, setBought] = useState([]);
   const [hint, setHint] = useState("");
 
-  // Fetch groceries on mount
+  // --- Fetch groceries on mount (runs ONCE) ---
   useEffect(() => {
     const load = async () => {
       try {
@@ -35,9 +41,9 @@ const GrocerySection = ({ currentMood }) => {
       }
     };
     load();
-  }, []);
+  }, []); // ✅ prevents infinite fetch loop
 
-  // Mood hint
+  // --- Set mood-based hint ---
   useEffect(() => {
     if (currentMood && moodHints[currentMood]) {
       const hints = moodHints[currentMood];
@@ -45,11 +51,12 @@ const GrocerySection = ({ currentMood }) => {
     }
   }, [currentMood]);
 
+  // --- Add grocery ---
   const addItem = async () => {
     if (!input.trim()) return toast.warn("📝 Please enter an item name.");
     try {
       const newItem = await addGrocery({ item_name: input, quantity: "1" });
-      setToBuy([...toBuy, newItem]);
+      setToBuy((prev) => [...prev, newItem]);
       setInput("");
       toast.success("✅ Item added to list!");
     } catch (err) {
@@ -58,11 +65,13 @@ const GrocerySection = ({ currentMood }) => {
     }
   };
 
+  // --- Delete grocery ---
   const handleDelete = async (item, isBought) => {
     try {
       await deleteGrocery(item.id);
-      if (isBought) setBought(bought.filter((i) => i.id !== item.id));
-      else setToBuy(toBuy.filter((i) => i.id !== item.id));
+      if (isBought)
+        setBought((prev) => prev.filter((i) => i.id !== item.id));
+      else setToBuy((prev) => prev.filter((i) => i.id !== item.id));
       toast.info(`🗑️ Deleted "${item.item_name}"`);
     } catch (err) {
       console.error(err);
@@ -70,16 +79,21 @@ const GrocerySection = ({ currentMood }) => {
     }
   };
 
+  // --- Toggle bought / unbought ---
   const toggleBought = async (item, isBought) => {
     try {
-      const updatedItem = await updateGrocery(item.id, { ...item, purchased: isBought ? 0 : 1 });
+      const updated = await updateGrocery(item.id, {
+        ...item,
+        purchased: isBought ? 0 : 1,
+      });
+
       if (isBought) {
-        setBought(bought.filter((i) => i.id !== item.id));
-        setToBuy([...toBuy, updatedItem]);
+        setBought((prev) => prev.filter((i) => i.id !== item.id));
+        setToBuy((prev) => [...prev, updated]);
         toast.info(`↩️ Moved "${item.item_name}" back to To Buy.`);
       } else {
-        setToBuy(toBuy.filter((i) => i.id !== item.id));
-        setBought([...bought, updatedItem]);
+        setToBuy((prev) => prev.filter((i) => i.id !== item.id));
+        setBought((prev) => [...prev, updated]);
         toast.success(`✔️ Marked "${item.item_name}" as bought!`);
       }
     } catch (err) {
@@ -88,12 +102,22 @@ const GrocerySection = ({ currentMood }) => {
     }
   };
 
+  // --- Quantity change ---
   const handleQtyChange = async (item, value, isBought) => {
     if (!value) return;
     try {
-      const updated = await updateGrocery(item.id, { ...item, quantity: value });
-      if (isBought) setBought(bought.map((i) => (i.id === item.id ? updated : i)));
-      else setToBuy(toBuy.map((i) => (i.id === item.id ? updated : i)));
+      const updated = await updateGrocery(item.id, {
+        ...item,
+        quantity: value,
+      });
+      if (isBought)
+        setBought((prev) =>
+          prev.map((i) => (i.id === item.id ? updated : i))
+        );
+      else
+        setToBuy((prev) =>
+          prev.map((i) => (i.id === item.id ? updated : i))
+        );
       toast.info(`🔢 Updated "${item.item_name}" quantity to ${value}.`);
     } catch (err) {
       console.error(err);
@@ -101,12 +125,16 @@ const GrocerySection = ({ currentMood }) => {
     }
   };
 
+  // --- Drag & drop reorder ---
   const handleDragEnd = (result) => {
     const { source, destination } = result;
     if (!destination) return;
 
-    const sourceList = source.droppableId === "toBuy" ? Array.from(toBuy) : Array.from(bought);
-    const destList = destination.droppableId === "toBuy" ? Array.from(toBuy) : Array.from(bought);
+    const sourceList =
+      source.droppableId === "toBuy" ? [...toBuy] : [...bought];
+    const destList =
+      destination.droppableId === "toBuy" ? [...toBuy] : [...bought];
+
     const [moved] = sourceList.splice(source.index, 1);
     destList.splice(destination.index, 0, moved);
 
@@ -123,7 +151,12 @@ const GrocerySection = ({ currentMood }) => {
 
   return (
     <div className="grocery-section">
-      <ToastContainer position="bottom-right" autoClose={2000} hideProgressBar theme="colored" />
+      <ToastContainer
+        position="bottom-right"
+        autoClose={2000}
+        hideProgressBar
+        theme="colored"
+      />
 
       <h2>🛒 Grocery List</h2>
       {hint && <p className="mood-hint">{hint}</p>}
@@ -146,38 +179,88 @@ const GrocerySection = ({ currentMood }) => {
               {(provided) => {
                 const list = listName === "toBuy" ? toBuy : bought;
                 return (
-                  <div {...provided.droppableProps} ref={provided.innerRef} className="grocery-column">
+                  <div
+                    {...provided.droppableProps}
+                    ref={provided.innerRef}
+                    className="grocery-column"
+                  >
                     <h3>{listName === "toBuy" ? "To Buy" : "Bought"}</h3>
                     <ul className="grocery-list">
                       {list.map((item, index) => (
-                        <Draggable key={item.id} draggableId={item.id.toString()} index={index}>
+                        <Draggable
+                          key={item.id}
+                          draggableId={item.id.toString()}
+                          index={index}
+                        >
                           {(provided) => (
                             <li
                               ref={provided.innerRef}
                               {...provided.draggableProps}
                               {...provided.dragHandleProps}
-                              className={listName === "bought" ? "checked" : ""}
+                              className={
+                                listName === "bought" ? "checked" : ""
+                              }
                             >
                               <span>{item.item_name}</span>
                               <div className="qty-controls">
-                                <button onClick={() => handleQtyChange(item, (parseInt(item.quantity) || 1) - 1, listName === "bought")}>-</button>
+                                <button
+                                  onClick={() =>
+                                    handleQtyChange(
+                                      item,
+                                      (parseInt(item.quantity) || 1) - 1,
+                                      listName === "bought"
+                                    )
+                                  }
+                                >
+                                  -
+                                </button>
                                 <input
                                   className="qty-input"
                                   value={item.quantity}
-                                  onChange={(e) => handleQtyChange(item, e.target.value, listName === "bought")}
+                                  onChange={(e) =>
+                                    handleQtyChange(
+                                      item,
+                                      e.target.value,
+                                      listName === "bought"
+                                    )
+                                  }
                                 />
-                                <button onClick={() => handleQtyChange(item, (parseInt(item.quantity) || 1) + 1, listName === "bought")}>+</button>
+                                <button
+                                  onClick={() =>
+                                    handleQtyChange(
+                                      item,
+                                      (parseInt(item.quantity) || 1) + 1,
+                                      listName === "bought"
+                                    )
+                                  }
+                                >
+                                  +
+                                </button>
                               </div>
-                              <button className="toggle-btn" onClick={() => toggleBought(item, listName === "bought")}>
+                              <button
+                                className="toggle-btn"
+                                onClick={() =>
+                                  toggleBought(item, listName === "bought")
+                                }
+                              >
                                 {listName === "bought" ? "↩️" : "✔️"}
                               </button>
-                              <span className="delete-icon" onClick={() => handleDelete(item, listName === "bought")}>❌</span>
+                              <span
+                                className="delete-icon"
+                                onClick={() =>
+                                  handleDelete(item, listName === "bought")
+                                }
+                              >
+                                ❌
+                              </span>
                             </li>
                           )}
                         </Draggable>
                       ))}
                       {provided.placeholder}
-                      {list.length === 0 && <li className="empty-msg">No items here!</li>}
+                      {list.length === 0 && (
+                        <li className="empty-msg">No items here!</li>
+                      )}
                     </ul>
                   </div>
                 );
