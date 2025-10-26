@@ -28,10 +28,12 @@ const EditMealPage = () => {
   useEffect(() => {
     const fetchMeal = async () => {
       try {
-        const res = await fetch(`${BACKEND_URL}/api/meals/${id}`, {
+        // ✅ Fixed duplicate /api path
+        const res = await fetch(`${BACKEND_URL}/meals/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        if (res.status === 401) return toast.error("Session expired. Please log in again.");
+        if (res.status === 401)
+          return toast.error("Session expired. Please log in again.");
         if (!res.ok) throw new Error("Failed to fetch meal");
         const meal = await res.json();
 
@@ -54,7 +56,8 @@ const EditMealPage = () => {
     fetchMeal();
   }, [id, token, navigate, BACKEND_URL]);
 
-  const handleChange = (e) => setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  const handleChange = (e) =>
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
   const handleStepChange = (index, value) => {
     const newSteps = [...formData.steps];
@@ -62,10 +65,14 @@ const EditMealPage = () => {
     setFormData((prev) => ({ ...prev, steps: newSteps }));
   };
 
-  const addStep = () => setFormData((prev) => ({ ...prev, steps: [...prev.steps, ""] }));
+  const addStep = () =>
+    setFormData((prev) => ({ ...prev, steps: [...prev.steps, ""] }));
 
   const removeStep = (index) =>
-    setFormData((prev) => ({ ...prev, steps: prev.steps.filter((_, i) => i !== index) }));
+    setFormData((prev) => ({
+      ...prev,
+      steps: prev.steps.filter((_, i) => i !== index),
+    }));
 
   const handleImageChange = async (e) => {
     let file = e.target.files[0];
@@ -90,7 +97,8 @@ const EditMealPage = () => {
     data.append("image", imageFile);
 
     try {
-      const res = await fetch(`${BACKEND_URL}/api/meals/upload`, {
+      // ✅ Fixed /api duplication
+      const res = await fetch(`${BACKEND_URL}/meals/upload`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: data,
@@ -99,7 +107,9 @@ const EditMealPage = () => {
       if (!res.ok) throw new Error(result.message || "Upload failed");
 
       const fileUrl =
-        result.url.startsWith("http") ? result.url : `${BACKEND_URL}${result.url.startsWith("/") ? "" : "/"}${result.url}`;
+        result.url.startsWith("http")
+          ? result.url
+          : `${BACKEND_URL}${result.url.startsWith("/") ? "" : "/"}${result.url}`;
       setPreview(fileUrl);
       return fileUrl;
     } catch (err) {
@@ -125,7 +135,8 @@ const EditMealPage = () => {
     };
 
     try {
-      const res = await fetch(`${BACKEND_URL}/api/meals/${id}`, {
+      // ✅ Correct path (no duplicate /api)
+      const res = await fetch(`${BACKEND_URL}/meals/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -135,7 +146,8 @@ const EditMealPage = () => {
       });
 
       const data = await res.json();
-      if (res.status === 401) return toast.error("Session expired. Please log in again.");
+      if (res.status === 401)
+        return toast.error("Session expired. Please log in again.");
       if (!res.ok) throw new Error(data.message || "Error updating meal");
 
       toast.success("✅ Meal updated successfully!");
@@ -151,8 +163,20 @@ const EditMealPage = () => {
     <div className="admin-panel">
       <h1>Edit Meal</h1>
       <form onSubmit={handleSubmit}>
-        <input type="text" name="name" placeholder="Meal Name" value={formData.name} onChange={handleChange} required />
-        <textarea name="description" placeholder="Description" value={formData.description} onChange={handleChange} />
+        <input
+          type="text"
+          name="name"
+          placeholder="Meal Name"
+          value={formData.name}
+          onChange={handleChange}
+          required
+        />
+        <textarea
+          name="description"
+          placeholder="Description"
+          value={formData.description}
+          onChange={handleChange}
+        />
         <input
           type="text"
           name="ingredients"
@@ -180,7 +204,11 @@ const EditMealPage = () => {
               onChange={(e) => handleStepChange(idx, e.target.value)}
               placeholder={`Step ${idx + 1}`}
             />
-            <button type="button" className="delete-step-btn" onClick={() => removeStep(idx)}>
+            <button
+              type="button"
+              className="delete-step-btn"
+              onClick={() => removeStep(idx)}
+            >
               x
             </button>
           </div>
@@ -193,7 +221,11 @@ const EditMealPage = () => {
           <button type="submit" className="primary-btn" disabled={uploading}>
             {uploading ? "Uploading..." : "Update Meal"}
           </button>
-          <button type="button" className="secondary-btn" onClick={() => navigate("/admin")}>
+          <button
+            type="button"
+            className="secondary-btn"
+            onClick={() => navigate("/admin")}
+          >
             Cancel
           </button>
         </div>

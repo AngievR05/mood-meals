@@ -65,7 +65,8 @@ const AddMealPage = () => {
     data.append("image", imageFile);
 
     try {
-      const res = await fetch(`${BACKEND_URL}/api/meals/upload`, {
+      // ✅ Removed duplicate /api
+      const res = await fetch(`${BACKEND_URL}/meals/upload`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: data,
@@ -75,7 +76,9 @@ const AddMealPage = () => {
       if (!res.ok) throw new Error(result.message || "Upload failed");
 
       const fileUrl =
-        result.url.startsWith("http") ? result.url : `${BACKEND_URL}${result.url.startsWith("/") ? "" : "/"}${result.url}`;
+        result.url.startsWith("http")
+          ? result.url
+          : `${BACKEND_URL}${result.url.startsWith("/") ? "" : "/"}${result.url}`;
       setPreview(fileUrl);
       return fileUrl;
     } catch (err) {
@@ -101,7 +104,8 @@ const AddMealPage = () => {
     };
 
     try {
-      const res = await fetch(`${BACKEND_URL}/api/meals`, {
+      // ✅ Fixed duplicate API path
+      const res = await fetch(`${BACKEND_URL}/meals`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -111,7 +115,8 @@ const AddMealPage = () => {
       });
 
       const data = await res.json();
-      if (res.status === 401) return toast.error("Session expired. Please log in again.");
+      if (res.status === 401)
+        return toast.error("Session expired. Please log in again.");
       if (!res.ok) throw new Error(data.message || "Error saving meal");
 
       toast.success("✅ Meal added successfully!");
@@ -166,7 +171,11 @@ const AddMealPage = () => {
               onChange={(e) => handleStepChange(idx, e.target.value)}
               placeholder={`Step ${idx + 1}`}
             />
-            <button type="button" className="delete-step-btn" onClick={() => removeStep(idx)}>
+            <button
+              type="button"
+              className="delete-step-btn"
+              onClick={() => removeStep(idx)}
+            >
               x
             </button>
           </div>
@@ -179,7 +188,11 @@ const AddMealPage = () => {
           <button type="submit" className="primary-btn" disabled={uploading}>
             {uploading ? "Uploading..." : "Add Meal"}
           </button>
-          <button type="button" className="secondary-btn" onClick={() => navigate("/admin")}>
+          <button
+            type="button"
+            className="secondary-btn"
+            onClick={() => navigate("/admin")}
+          >
             Cancel
           </button>
         </div>
