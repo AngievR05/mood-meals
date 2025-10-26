@@ -4,12 +4,22 @@ import "../styles/AdminPanel.css";
 import { toast } from "react-toastify";
 import imageCompression from "browser-image-compression";
 
-const moods = ["Happy", "Sad", "Angry", "Stressed", "Bored", "Energised", "Confused", "Grateful"];
+const moods = [
+  "Happy",
+  "Sad",
+  "Angry",
+  "Stressed",
+  "Bored",
+  "Energised",
+  "Confused",
+  "Grateful",
+];
 
 const AddMealPage = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
-  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
+  const BACKEND_URL =
+    process.env.REACT_APP_BACKEND_URL || "http://localhost:5000/api";
 
   const [formData, setFormData] = useState({
     name: "",
@@ -65,7 +75,6 @@ const AddMealPage = () => {
     data.append("image", imageFile);
 
     try {
-      // ✅ Removed duplicate /api
       const res = await fetch(`${BACKEND_URL}/meals/upload`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
@@ -104,7 +113,6 @@ const AddMealPage = () => {
     };
 
     try {
-      // ✅ Fixed duplicate API path
       const res = await fetch(`${BACKEND_URL}/meals`, {
         method: "POST",
         headers: {
