@@ -5,6 +5,7 @@ const cors = require('cors');
 const path = require('path');
 const { pool } = require('./config/db');
 
+// ------------------ ROUTES ------------------
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 const moodsRoutes = require('./routes/moods');
