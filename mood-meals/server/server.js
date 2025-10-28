@@ -1,22 +1,9 @@
-require('dotenv').config();
-const express = require('express');
-const helmet = require('helmet');
-const cors = require('cors');
-const path = require('path');
-const { pool } = require('./config/db');
-
-// ------------------ ROUTES ------------------
-const authRoutes = require('./routes/auth');
-const userRoutes = require('./routes/user');
-const moodsRoutes = require('./routes/moods');
-const mealsRoutes = require('./routes/meals');
-const groceriesRouter = require('./routes/groceries');
-const recommendationsRoutes = require('./routes/recommendations');
-const savedMealsRoutes = require("./routes/savedMeals");
-const userMealsRoutes = require("./routes/userMeals");
-const feedbackRouter = require("./routes/feedback");
-const profileRoutes = require("./routes/profile");
-const friendsRoutes = require("./routes/friends");
+require("dotenv").config();
+const express = require("express");
+const helmet = require("helmet");
+const cors = require("cors");
+const path = require("path");
+const { pool } = require("./config/db");
 
 const app = express();
 
@@ -34,30 +21,55 @@ app.use(
 app.use(express.json());
 
 // ------------------ STATIC UPLOADS ------------------
-const uploadsPath = path.join(__dirname, 'uploads');
+// Serve both /uploads and /uploads/meals (for legacy + new uploads)
+const uploadsPath = path.join(__dirname, "uploads");
 app.use(
-  '/uploads',
+  "/uploads",
   cors({ origin: process.env.FRONTEND_URL || "http://localhost:3000" }),
   express.static(uploadsPath, {
-    maxAge: '7d',
+    maxAge: "7d",
     setHeaders: (res) => {
-      res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+      res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+    },
+  })
+);
+
+const mealsUploadsPath = path.join(__dirname, "uploads/meals");
+app.use(
+  "/uploads/meals",
+  cors({ origin: process.env.FRONTEND_URL || "http://localhost:3000" }),
+  express.static(mealsUploadsPath, {
+    maxAge: "7d",
+    setHeaders: (res) => {
+      res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
     },
   })
 );
 
 // ------------------ HEALTH CHECK ------------------
-app.get('/', (req, res) =>
-  res.json({ ok: true, msg: 'Mood Meals backend alive 🚀' })
+app.get("/", (req, res) =>
+  res.json({ ok: true, msg: "Mood Meals backend alive 🚀" })
 );
 
 // ------------------ ROUTES ------------------
-app.use('/api/auth', authRoutes);
-app.use('/api/user', userRoutes);
-app.use('/api/moods', moodsRoutes);
-app.use('/api/meals', mealsRoutes);
-app.use('/api/groceries', groceriesRouter);
-app.use('/api/recommendations', recommendationsRoutes);
+const authRoutes = require("./routes/auth");
+const userRoutes = require("./routes/user");
+const moodsRoutes = require("./routes/moods");
+const mealsRoutes = require("./routes/meals");
+const groceriesRouter = require("./routes/groceries");
+const recommendationsRoutes = require("./routes/recommendations");
+const savedMealsRoutes = require("./routes/savedMeals");
+const userMealsRoutes = require("./routes/userMeals");
+const feedbackRouter = require("./routes/feedback");
+const profileRoutes = require("./routes/profile");
+const friendsRoutes = require("./routes/friends");
+
+app.use("/api/auth", authRoutes);
+app.use("/api/user", userRoutes);
+app.use("/api/moods", moodsRoutes);
+app.use("/api/meals", mealsRoutes);
+app.use("/api/groceries", groceriesRouter);
+app.use("/api/recommendations", recommendationsRoutes);
 app.use("/api/saved-meals", savedMealsRoutes);
 app.use("/api/user-meals", userMealsRoutes);
 app.use("/api/feedback", feedbackRouter);
@@ -74,11 +86,11 @@ if (process.env.NODE_ENV === "production") {
 }
 
 // ------------------ 404 & ERROR HANDLING ------------------
-app.use((req, res) => res.status(404).json({ error: 'Route not found' }));
+app.use((req, res) => res.status(404).json({ error: "Route not found" }));
 
 app.use((err, req, res, next) => {
   console.error(err);
-  res.status(err.status || 500).json({ error: err.message || 'Internal Server Error' });
+  res.status(err.status || 500).json({ error: err.message || "Internal Server Error" });
 });
 
 // ------------------ SERVER START ------------------
@@ -86,14 +98,14 @@ const PORT = parseInt(process.env.PORT, 10) || 5000;
 
 async function start() {
   try {
-    await pool.query('SELECT 1'); // test DB connection
-    console.log('✅ MySQL pool connected');
+    await pool.query("SELECT 1");
+    console.log("✅ MySQL pool connected");
 
-    app.listen(PORT, '0.0.0.0', () =>
+    app.listen(PORT, "0.0.0.0", () =>
       console.log(`🚀 Server running on http://0.0.0.0:${PORT}`)
     );
   } catch (err) {
-    console.error('❌ DB connection failed:', err.message);
+    console.error("❌ DB connection failed:", err.message);
     process.exit(1);
   }
 }

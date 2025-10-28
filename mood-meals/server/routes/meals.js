@@ -23,7 +23,8 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     const allowed = ["image/jpeg", "image/png", "image/webp"];
-    if (!allowed.includes(file.mimetype)) return cb(new Error("Only JPEG, PNG, or WEBP allowed"));
+    if (!allowed.includes(file.mimetype))
+      return cb(new Error("Only JPEG, PNG, or WEBP allowed"));
     cb(null, true);
   },
 });
@@ -37,13 +38,15 @@ const safeParseJSON = (json, defaultValue = []) => {
   }
 };
 
-const getPrimaryMood = (mood) => (!mood || typeof mood !== "string" || mood.trim() === "" ? "Happy" : mood.trim());
+const getPrimaryMood = (mood) =>
+  !mood || typeof mood !== "string" || mood.trim() === "" ? "Happy" : mood.trim();
 
 // -------------------- CRUD --------------------
 router.post("/", verifyToken, verifyAdmin, async (req, res) => {
   try {
     const { name, description, ingredients, mood, image_url, steps } = req.body;
-    if (!name || !mood) return res.status(400).json({ message: "Name and mood are required" });
+    if (!name || !mood)
+      return res.status(400).json({ message: "Name and mood are required" });
 
     const primaryMood = getPrimaryMood(mood);
 
@@ -70,7 +73,8 @@ router.put("/:id", verifyToken, verifyAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     const { name, description, ingredients, mood, image_url, steps } = req.body;
-    if (!name || !mood) return res.status(400).json({ message: "Name and mood are required" });
+    if (!name || !mood)
+      return res.status(400).json({ message: "Name and mood are required" });
 
     const primaryMood = getPrimaryMood(mood);
 
@@ -87,7 +91,8 @@ router.put("/:id", verifyToken, verifyAdmin, async (req, res) => {
       ]
     );
 
-    if (result.affectedRows === 0) return res.status(404).json({ message: "Meal not found" });
+    if (result.affectedRows === 0)
+      return res.status(404).json({ message: "Meal not found" });
     res.json({ message: "✅ Meal updated successfully" });
   } catch (err) {
     console.error(err);
@@ -99,7 +104,8 @@ router.delete("/:id", verifyToken, verifyAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     const [result] = await pool.query("DELETE FROM meals WHERE id = ?", [id]);
-    if (result.affectedRows === 0) return res.status(404).json({ message: "Meal not found" });
+    if (result.affectedRows === 0)
+      return res.status(404).json({ message: "Meal not found" });
     res.json({ message: "✅ Meal deleted successfully" });
   } catch (err) {
     console.error(err);
@@ -109,8 +115,11 @@ router.delete("/:id", verifyToken, verifyAdmin, async (req, res) => {
 
 router.get("/:id", verifyToken, async (req, res) => {
   try {
-    const [rows] = await pool.query("SELECT * FROM meals WHERE id = ?", [req.params.id]);
-    if (!rows.length) return res.status(404).json({ message: "Meal not found" });
+    const [rows] = await pool.query("SELECT * FROM meals WHERE id = ?", [
+      req.params.id,
+    ]);
+    if (!rows.length)
+      return res.status(404).json({ message: "Meal not found" });
 
     const meal = rows[0];
     meal.ingredients = safeParseJSON(meal.ingredients);
@@ -143,13 +152,9 @@ router.get("/", verifyToken, async (req, res) => {
 router.post("/upload", verifyToken, verifyAdmin, upload.single("image"), (req, res) => {
   if (!req.file) return res.status(400).json({ message: "No file uploaded" });
 
-  const backendUrl = process.env.BACKEND_URL || "";
-  const fileExt = path.extname(req.file.originalname).toLowerCase() || ".jpg";
-  const fileName = req.file.filename.endsWith(fileExt)
-    ? req.file.filename
-    : req.file.filename + fileExt;
+  const backendUrl = process.env.BACKEND_URL?.replace(/\/$/, "") || "";
+  const fileUrl = `${backendUrl}/uploads/meals/${req.file.filename}`;
 
-  const fileUrl = `${backendUrl}/uploads/meals/${fileName}`;
   res.json({ message: "✅ Image uploaded successfully", url: fileUrl });
 });
 
