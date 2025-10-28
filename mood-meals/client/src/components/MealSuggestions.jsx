@@ -37,9 +37,7 @@ const MealSuggestions = ({ currentMood, onToggleSave }) => {
   const token = localStorage.getItem("token");
   const navigate = useNavigate();
 
-  // ✅ Use clean backend URL without double `/api`
-  const BACKEND_URL =
-    process.env.REACT_APP_BACKEND_URL || "https://moodmeals.site/api";
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "https://moodmeals.site/api";
 
   // Rotate chef tips every 12 seconds
   useEffect(() => {
@@ -49,12 +47,11 @@ const MealSuggestions = ({ currentMood, onToggleSave }) => {
     return () => clearInterval(interval);
   }, []);
 
-  // ✅ Fetch meals ONCE when component mounts
+  // Fetch meals from backend
   useEffect(() => {
     const fetchMeals = async () => {
       setLoadingMeals(true);
       try {
-        // ✅ Fixed URL (no /api/api)
         const res = await axios.get(`${BACKEND_URL}/meals`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -69,22 +66,17 @@ const MealSuggestions = ({ currentMood, onToggleSave }) => {
     };
 
     fetchMeals();
-    // ✅ Only run once unless BACKEND_URL or token changes
   }, [BACKEND_URL, token]);
 
   // Filter meals based on mood or show all
   useEffect(() => {
     if (!allMeals.length) return setFilteredMeals([]);
-    const moodName =
-      typeof currentMood === "string"
-        ? currentMood
-        : currentMood?.name || "";
+    const moodName = typeof currentMood === "string" ? currentMood : currentMood?.name || "";
 
     const filtered =
       filterMode === "mood" && moodName
         ? allMeals.filter(
-            (meal) =>
-              (meal.mood || "").toLowerCase() === moodName.toLowerCase()
+            (meal) => (meal.mood || "").toLowerCase() === moodName.toLowerCase()
           )
         : [...allMeals];
 
@@ -110,6 +102,14 @@ const MealSuggestions = ({ currentMood, onToggleSave }) => {
       { breakpoint: 1024, settings: { slidesToShow: Math.min(filteredMeals.length, 2) } },
       { breakpoint: 640, settings: { slidesToShow: 1 } },
     ],
+  };
+
+  // ✅ Helper to handle meal image URLs
+  const getMealImage = (image_url) => {
+    if (!image_url) return `${BACKEND_URL}/uploads/default-meal.png`;
+    return image_url.startsWith("http")
+      ? image_url
+      : `${BACKEND_URL}/uploads/${image_url}`;
   };
 
   return (
@@ -139,43 +139,37 @@ const MealSuggestions = ({ currentMood, onToggleSave }) => {
 
       {!loadingMeals && filteredMeals.length > 0 && (
         <Slider {...sliderSettings}>
-          {filteredMeals.map((meal) => {
-            const imageSrc = meal.image_url?.startsWith("http")
-              ? meal.image_url
-              : `${BACKEND_URL}${meal.image_url || "/default-meal.png"}`;
-
-            return (
-              <div
-                key={meal.id}
-                className="meal-card"
-                style={{ borderColor: moodColors[moodName] || "#ccc" }}
-              >
-                <img
-                  src={imageSrc}
-                  alt={meal.name}
-                  className="meal-image"
-                  loading="lazy"
-                />
-                <p className="meal-name">{meal.name}</p>
-                <div className="meal-card-actions">
+          {filteredMeals.map((meal) => (
+            <div
+              key={meal.id}
+              className="meal-card"
+              style={{ borderColor: moodColors[meal.mood] || "#ccc" }}
+            >
+              <img
+                src={getMealImage(meal.image_url)}
+                alt={meal.name}
+                className="meal-image"
+                loading="lazy"
+              />
+              <p className="meal-name">{meal.name}</p>
+              <div className="meal-card-actions">
+                <button
+                  className="view-recipe-btn"
+                  onClick={() => setSelectedMealId(meal.id)}
+                >
+                  View Recipe
+                </button>
+                {onToggleSave && (
                   <button
-                    className="view-recipe-btn"
-                    onClick={() => setSelectedMealId(meal.id)}
+                    className={`save-btn ${meal.saved ? "saved" : ""}`}
+                    onClick={() => onToggleSave(meal.id)}
                   >
-                    View Recipe
+                    {meal.saved ? "★" : "☆"}
                   </button>
-                  {onToggleSave && (
-                    <button
-                      className={`save-btn ${meal.saved ? "saved" : ""}`}
-                      onClick={() => onToggleSave(meal.id)}
-                    >
-                      {meal.saved ? "★" : "☆"}
-                    </button>
-                  )}
-                </div>
+                )}
               </div>
-            );
-          })}
+            </div>
+          ))}
         </Slider>
       )}
 

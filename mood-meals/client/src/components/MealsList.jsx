@@ -22,6 +22,14 @@ const MealsList = ({
 
   const normalizeMood = (mood) => (typeof mood === "string" ? mood.trim().toLowerCase() : "uncategorized");
 
+  // ✅ Fix image URL helper
+  const getMealImage = (image_url) => {
+    if (!image_url) return "https://moodmeals.site/uploads/default-meal.png";
+    return image_url.startsWith("http")
+      ? image_url
+      : `https://moodmeals.site/uploads/${image_url}`;
+  };
+
   useEffect(() => {
     if (parentMeals.length) return;
     if (!token) return setError("You must be logged in to fetch meals.");
@@ -43,26 +51,26 @@ const MealsList = ({
     fetchMeals();
   }, [parentMeals, token, BACKEND_URL]);
 
-const toggleSave = async (mealId) => {
-  const meal = meals.find((m) => m.id === mealId);
-  if (!meal || !token) return;
+  const toggleSave = async (mealId) => {
+    const meal = meals.find((m) => m.id === mealId);
+    if (!meal || !token) return;
 
-  const newSaved = !meal.saved;
-  setMeals((prev) =>
-    prev.map((m) => (m.id === mealId ? { ...m, saved: newSaved } : m))
-  );
-
-  try {
-    const url = `${BACKEND_URL}/saved-meals/${mealId}/toggle`;
-    await axios.post(url, {}, { headers: { Authorization: `Bearer ${token}` } });
-  } catch (err) {
-    console.error("Error toggling save:", err);
-    // rollback if request fails
+    const newSaved = !meal.saved;
     setMeals((prev) =>
-      prev.map((m) => (m.id === mealId ? { ...m, saved: meal.saved } : m))
+      prev.map((m) => (m.id === mealId ? { ...m, saved: newSaved } : m))
     );
-  }
-};
+
+    try {
+      const url = `${BACKEND_URL}/saved-meals/${mealId}/toggle`;
+      await axios.post(url, {}, { headers: { Authorization: `Bearer ${token}` } });
+    } catch (err) {
+      console.error("Error toggling save:", err);
+      // rollback if request fails
+      setMeals((prev) =>
+        prev.map((m) => (m.id === mealId ? { ...m, saved: meal.saved } : m))
+      );
+    }
+  };
 
   if (loading) return <p className="loading">Loading meals...</p>;
   if (error) return <p className="no-meals">{error}</p>;
@@ -88,7 +96,7 @@ const toggleSave = async (mealId) => {
         {filteredMeals.map((meal) => (
           <div className="meal-card" key={meal.id}>
             <div className="meal-image-wrapper">
-              <img src={meal.image_url || "/uploads/meals/default-meal.png"} alt={meal.name} />
+              <img src={getMealImage(meal.image_url)} alt={meal.name} />
             </div>
             <div className="meal-header">
               <h3>{meal.name}</h3>
