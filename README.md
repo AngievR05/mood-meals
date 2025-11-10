@@ -1,9 +1,14 @@
 # 🌿 Mood Meals
 
+
 **Mood Meals** is a full-stack web application that connects emotions with nutrition — helping users log moods, visualize emotional patterns, and discover personalized meals to enhance mental well-being.  
 It’s more than a CRUD project — it’s an emotionally intelligent, data-driven wellness experience built with empathy and modern web standards.
 
-Live Demo → [https://moodmeals.site](https://moodmeals.site)
+<p align="center">
+  <img src="./assets/moodmeals_cover.png" width="950" alt="Mood Meals Cover Image"/>
+</p>
+
+🌐 **Live Demo:** [https://moodmeals.site](https://moodmeals.site)
 
 ---
 
@@ -52,14 +57,15 @@ The project integrates **secure authentication, advanced SQL relationships**, an
 
 ## 🖼️ Screenshots
 
-_Add screenshots or GIFs here for visual documentation._
+> Add screenshots or GIFs here for visual documentation. Place your images inside `/assets/`.
 
 | Section | Example Screenshot |
 |----------|--------------------|
-| Home Page | ![Home](docs/screenshots/home.png) |
-| Mood Tracker | ![Tracker](docs/screenshots/tracker.png) |
-| Recipe Page | ![Recipe](docs/screenshots/recipe.png) |
-| Grocery List | ![Grocery](docs/screenshots/grocery.png) |
+| Home Page | <img src="./assets/moodmeals_cover.png" width="950" alt="Mood Meals Cover Image"/>|
+| Mood Tracker | <img src="./assets/moodmeals_cover.png" width="950" alt="Mood Meals Cover Image"/> |
+| Recipe Page | <img src="./assets/moodmeals_cover.png" width="950" alt="Mood Meals Cover Image"/>|
+| Grocery List | <img src="./assets/moodmeals_cover.png" width="950" alt="Mood Meals Cover Image"/> |
+| Friends | <img src="./assets/moodmeals_cover.png" width="950" alt="Mood Meals Cover Image"/> |
 
 ---
 
@@ -106,7 +112,6 @@ cd mood-meals
 cd client
 npm install
 ```
-
 #### Backend
 ```bash
 cd ../server
@@ -125,7 +130,6 @@ DB_NAME=moodmeals
 JWT_SECRET=supersecret
 PORT=5000
 ```
-
 #### Example (`client/.env`)
 ```
 REACT_APP_BACKEND_URL=http://localhost:5000
@@ -137,13 +141,11 @@ Start backend:
 cd server
 npm run dev
 ```
-
 Start frontend:
 ```bash
 cd ../client
 npm start
 ```
-
 Access app at → `http://localhost:3000`
 
 ---
@@ -157,18 +159,15 @@ Access app at → `http://localhost:3000`
 - Ports open: 22 (SSH), 80 (HTTP), 443 (HTTPS)
 
 ### Deployment Steps
-
 #### 1. SSH into VM
 ```bash
 ssh yourusername@VM_PUBLIC_IP
 ```
-
 #### 2. Pull Latest Code
 ```bash
 cd ~/mood-meals/mood-meals/mood-meals
 git pull origin main
 ```
-
 #### 3. Backend Setup
 ```bash
 cd server
@@ -176,7 +175,6 @@ npm install
 pm2 start server.js --name moodmeals-backend
 pm2 save && pm2 startup
 ```
-
 #### 4. Frontend Setup
 ```bash
 cd ../client
@@ -184,13 +182,11 @@ npm install
 npm run build
 sudo systemctl restart nginx
 ```
-
 #### 5. Enable HTTPS (Certbot)
 ```bash
 sudo apt install certbot python3-certbot-nginx
 sudo certbot --nginx -d moodmeals.site
 ```
-
 #### 6. Verify Deployment
 - Backend Health: `curl http://localhost:5000/api/health`
 - Frontend: [https://moodmeals.site](https://moodmeals.site)
@@ -202,11 +198,11 @@ sudo certbot --nginx -d moodmeals.site
 **Tables:**  
 `users`, `moods`, `recipes`, `mood_logs`, `groceries`, `saved_meals`
 
-**Relationships:**
-- Each mood log references a user (`user_id` FK)
-- Recipes tagged by mood category
-- Groceries linked to meals via FK
-- Saved meals linked to user preferences
+**Relationships:**  
+- Each mood log references a user (`user_id` FK)  
+- Recipes tagged by mood category  
+- Groceries linked to meals via FK  
+- Saved meals linked to user preferences  
 
 All tables normalized to **3rd Normal Form (3NF)** for data integrity.
 
@@ -224,24 +220,26 @@ All tables normalized to **3rd Normal Form (3NF)** for data integrity.
 
 ---
 
-## 🪞 Reflection
+## 🪞 Reflection – *Angie van Rooyen*
 
 Mood Meals demonstrates a deep integration of **human-centered UX** and **data-driven backend logic**.  
 It bridges emotional wellness with nutrition tracking, offering a soft, personal, and intuitive user experience.
 
 Extra achievements:
-- Deployed live with HTTPS, SEO, and analytics.
-- Fully modular React architecture.
+- Deployed live with HTTPS, SEO, and analytics.  
+- Fully modular React architecture.  
 - Real-world production standards (auth, normalization, deployment pipeline).
+
+This project taught me to merge **creative UX empathy** with **full-stack scalability**, proving that emotional intelligence and technology can work hand in hand.
 
 ---
 
 ## 🔮 Future Improvements
 
-- Role-based access (admin, nutritionist, user)
-- Multi-language support
-- AI-based meal recommendations
-- Social mood sharing
+- Role-based access (admin, nutritionist, user)  
+- Multi-language support  
+- AI-based meal recommendations  
+- Social mood sharing  
 - Native mobile integration (React Native)
 
 ---
@@ -263,7 +261,7 @@ This project is licensed under the [MIT License](LICENSE).
 
 ## 🎥 Walkthrough Video
 
-A 5–10 minute video demonstration is included in the repository under:  
+🎬 A 5–10 minute video demonstration is included in the repository under:  
 `/docs/moodmeals_demo.mp4`
 
 ---
