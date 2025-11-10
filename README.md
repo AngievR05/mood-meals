@@ -224,7 +224,7 @@ All tables normalized to **3rd Normal Form (3NF)** for data integrity.
 
 ---
 
-## 🪞 Reflection – *Angie van Rooyen*
+## 🪞 Reflection 
 
 Mood Meals demonstrates a deep integration of **human-centered UX** and **data-driven backend logic**.  
 It bridges emotional wellness with nutrition tracking, offering a soft, personal, and intuitive user experience.
@@ -257,7 +257,7 @@ This project is licensed under the [MIT License](LICENSE).
 ## 👩‍💻 Author
 
 **Angie van Rooyen**  
-📧 support@moodmeals.co.za  
+📧 241077@virtualwindow.co.za  
 🌐 [moodmeals.site](https://moodmeals.site)  
 📂 [GitHub Repo](https://github.com/AngievR05/mood-meals)
 
