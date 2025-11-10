@@ -5,7 +5,7 @@
 It’s more than a CRUD project — it’s an emotionally intelligent, data-driven wellness experience built with empathy and modern web standards.
 
 <p align="center">
-  <img src="./assets/moodmeals_cover.png" width="950" alt="Mood Meals Cover Image"/>
+  <img src="https://github.com/AngievR05/mood-meals/blob/main/mood-meals/documentation/MacBook%20Air%20-%205.png" width="950" alt="Mood Meals Cover Image"/>
 </p>
 
 🌐 **Live Demo:** [https://moodmeals.site](https://moodmeals.site)
@@ -57,15 +57,19 @@ The project integrates **secure authentication, advanced SQL relationships**, an
 
 ## 🖼️ Screenshots
 
-> Add screenshots or GIFs here for visual documentation. Place your images inside `/assets/`.
-
 | Section | Example Screenshot |
 |----------|--------------------|
-| Home Page | <img src="./assets/moodmeals_cover.png" width="950" alt="Mood Meals Cover Image"/>|
-| Mood Tracker | <img src="./assets/moodmeals_cover.png" width="950" alt="Mood Meals Cover Image"/> |
-| Recipe Page | <img src="./assets/moodmeals_cover.png" width="950" alt="Mood Meals Cover Image"/>|
-| Grocery List | <img src="./assets/moodmeals_cover.png" width="950" alt="Mood Meals Cover Image"/> |
-| Friends | <img src="./assets/moodmeals_cover.png" width="950" alt="Mood Meals Cover Image"/> |
+| Login | <img src="https://github.com/AngievR05/mood-meals/blob/main/mood-meals/documentation/Screenshot%202025-11-10%20223910.png" width="950" alt="Mood Meals Cover Image"/>|
+| Register | <img src="https://github.com/AngievR05/mood-meals/blob/main/mood-meals/documentation/Screenshot%202025-11-10%20224102.png" width="950" alt="Mood Meals Cover Image"/>|
+| Home Page | <img src="https://github.com/AngievR05/mood-meals/blob/main/mood-meals/documentation/Screenshot%202025-11-10%20223932.png" width="950" alt="Mood Meals Cover Image"/>|
+| Mood Tracker | <img src="https://github.com/AngievR05/mood-meals/blob/main/mood-meals/documentation/Screenshot%202025-11-10%20223946.png" width="950" alt="Mood Meals Cover Image"/> |
+| Recipe Page | <img src="https://github.com/AngievR05/mood-meals/blob/main/mood-meals/documentation/Screenshot%202025-11-10%20224033.png" width="950" alt="Mood Meals Cover Image"/>|
+| Grocery List | <img src="https://github.com/AngievR05/mood-meals/blob/main/mood-meals/documentation/Screenshot%202025-11-10%20224002.png" width="950" alt="Mood Meals Cover Image"/> |
+| Friends | <img src="https://github.com/AngievR05/mood-meals/blob/main/mood-meals/documentation/Screenshot%202025-11-10%20224012.png" width="950" alt="Mood Meals Cover Image"/> |
+| Profile | <img src="https://github.com/AngievR05/mood-meals/blob/main/mood-meals/documentation/Screenshot%202025-11-10%20224020.png" width="950" alt="Mood Meals Cover Image"/> |
+| Admin Panel (Meals) | <img src="https://github.com/AngievR05/mood-meals/blob/main/mood-meals/documentation/Screenshot%202025-11-10%20224044.png" width="950" alt="Mood Meals Cover Image"/> |
+| Admin Panel (Feedback) | <img src="https://github.com/AngievR05/mood-meals/blob/main/mood-meals/documentation/Screenshot%202025-11-10%20224053.png" width="950" alt="Mood Meals Cover Image"/> |
+| Mood Board | <img src="https://github.com/AngievR05/mood-meals/blob/main/mood-meals/documentation/UI/Mood%20Board.png" width="950" alt="Mood Meals Cover Image"/> |
 
 ---
 
@@ -205,7 +209,7 @@ sudo certbot --nginx -d moodmeals.site
 - Saved meals linked to user preferences  
 
 All tables normalized to **3rd Normal Form (3NF)** for data integrity.
-
+<img src="https://github.com/AngievR05/mood-meals/blob/main/mood-meals/documentation/Entity-Relationship%20Diagram/mood_meals_ERD.png" width="950" alt="Mood Meals Cover Image"/>
 ---
 
 ## 🧱 Challenges & Solutions
