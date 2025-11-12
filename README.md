@@ -1,8 +1,8 @@
 # 🌿 Mood Meals
 
 
-**Mood Meals** is a full-stack web application that connects emotions with nutrition — helping users log moods, visualize emotional patterns, and discover personalized meals to enhance mental well-being.  
-It’s more than a CRUD project — it’s an emotionally intelligent, data-driven wellness experience built with empathy and modern web standards.
+**Mood Meals** is a full-stack web application that connects emotions with nutrition, helping users log moods, visualise emotional patterns, and discover personalised meals to enhance mental well-being.  
+It’s more than a CRUD project; it’s an emotionally intelligent, data-driven wellness experience built with empathy and modern web standards.
 
 <p align="center">
   <img src="https://github.com/AngievR05/mood-meals/blob/main/mood-meals/documentation/MacBook%20Air%20-%205.png" width="950" alt="Mood Meals Cover Image"/>
@@ -14,7 +14,7 @@ It’s more than a CRUD project — it’s an emotionally intelligent, data-driv
 
 ## 🧠 Project Overview
 
-Mood Meals merges emotional awareness and mindful eating into one soft, user-centered experience.  
+Mood Meals merges emotional awareness and mindful eating into one soft, user-centred experience.  
 Users can log how they feel, and the app suggests recipes designed to balance or support that emotional state.
 
 | Mood | Meal Type Example |
@@ -49,7 +49,7 @@ The project integrates **secure authentication, advanced SQL relationships**, an
 - 📊 **Mood Tracker & Calendar:** Visualize weekly or monthly trends.
 - 🛒 **Grocery List:** Add, edit, reorder, and mark items as purchased.
 - 💾 **Save & Favorite Recipes:** Personalized dashboard for user meals.
-- 💡 **Glassy Mood Jar:** Animated, data-driven visualization of mood history.
+- 💡 **Glassy Mood Jar:** Animated, data-driven visualisation of mood history.
 - 🌐 **SEO & Analytics:** Indexed pages, GA4 tracking, meta optimization.
 - 📱 **Responsive UI:** Mobile-first layout, tested on multiple breakpoints.
 
@@ -208,7 +208,7 @@ sudo certbot --nginx -d moodmeals.site
 - Groceries linked to meals via FK  
 - Saved meals linked to user preferences  
 
-All tables normalized to **3rd Normal Form (3NF)** for data integrity.
+All tables normalised to **3rd Normal Form (3NF)** for data integrity.
 <img src="https://github.com/AngievR05/mood-meals/blob/main/mood-meals/documentation/Entity-Relationship%20Diagram/mood_meals_ERD.png" width="950" alt="Mood Meals Cover Image"/>
 ---
 
@@ -226,13 +226,13 @@ All tables normalized to **3rd Normal Form (3NF)** for data integrity.
 
 ## 🪞 Reflection 
 
-Mood Meals demonstrates a deep integration of **human-centered UX** and **data-driven backend logic**.  
+Mood Meals demonstrates a deep integration of **human-centred UX** and **data-driven backend logic**.  
 It bridges emotional wellness with nutrition tracking, offering a soft, personal, and intuitive user experience.
 
 Extra achievements:
 - Deployed live with HTTPS, SEO, and analytics.  
 - Fully modular React architecture.  
-- Real-world production standards (auth, normalization, deployment pipeline).
+- Real-world production standards (auth, normalisation, deployment pipeline).
 
 This project taught me to merge **creative UX empathy** with **full-stack scalability**, proving that emotional intelligence and technology can work hand in hand.
 
